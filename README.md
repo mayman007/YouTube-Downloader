@@ -24,7 +24,6 @@
 </dd>
 </dl>
 
-<hr>
 
 <dl>
 <dt><h2>Screenshots</h2></dt>
