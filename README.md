@@ -1,11 +1,9 @@
 <div align="center">
 <h1><b>YouTube Downloader</b></h1>
 <img src = "YDICO.ico" width = 200></img>
-</div>
 <!-- for github badges (buttons) https://shields.io/ -->
-
 <p><b>Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.</p></b>
-
+</div>
 
 <dl>
 <dt><h2>Features</h2></dt>
