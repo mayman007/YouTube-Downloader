@@ -1,4 +1,4 @@
-<div style = "display: block; margin-left: auto; margin-right: auto;">
+<div align="center">
 <h1><b>YouTube Downloader</b></h1>
 <img src = "YDICO.ico" width = 200></img>
 </div>
