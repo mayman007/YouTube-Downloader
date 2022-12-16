@@ -4,7 +4,7 @@
 </div>
 <!-- for github badges (buttons) https://shields.io/ -->
 
-> Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.
+<p><b>Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.</p></b>
 
 
 <dl>
