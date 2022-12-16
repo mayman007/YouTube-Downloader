@@ -1,5 +1,5 @@
-<center><h1><b>YouTube Downloader</b></h1>
-<img src = "YDICO.ico" width = 200></img></center>
+<h1><b>YouTube Downloader</b></h1>
+<img src = "YDICO.ico" width = 200 style = "display: block; margin-left: auto; margin-right: auto;"></img>
 <!-- for github badges (buttons) https://shields.io/ -->
 
 > Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.
