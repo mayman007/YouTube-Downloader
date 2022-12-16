@@ -1,0 +1,5 @@
+pytube
+customtkinter
+youtube_transcript_api
+moviepy
+prolog
