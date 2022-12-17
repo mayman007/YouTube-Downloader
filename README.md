@@ -57,19 +57,19 @@
 
 <li>Git-clone this repo & change directory</li>
 
-`git clone https://github.com/Shinobi7k/YouTube-Downloader.git`
+```git clone https://github.com/Shinobi7k/YouTube-Downloader.git```
 <br>
-`cd YouTube-Downloader`
+```cd YouTube-Downloader```
 
 <li>Install modules using pip</li>
 
-`pip install -r requirements.txt`
+```pip install -r requirements.txt```
 
 <li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a></li>
 
 <li>Run the .py file!</li>
 
-`py main.py`
+```py main.py```
 <ol>
 </dd>
 </dl>
