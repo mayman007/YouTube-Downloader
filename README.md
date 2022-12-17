@@ -1,12 +1,10 @@
 <div align="center">
-
 <img src = "YDICO.ico" width = 200></img>
-<!-- for github badges (buttons) https://shields.io/ -->
 </div>
 <h1><b>YouTube Downloader</b></h1>
+<!-- for github badges (buttons) https://shields.io/ -->
 
 > <p><b>Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.</p></b>
-
 
 <dl>
 <dt><h2>Features</h2></dt>
@@ -24,17 +22,54 @@
 </dd>
 </dl>
 
-
 <dl>
 <dt><h2>Screenshots</h2></dt>
 <dd>
-#pic1
-#pic2
-#pic3
-#pic4
-#pic5
-#pic6
-#pic7
-#pic8
+<img src = "imgs/home_dark.jpg"></img>
+<p>| Home Page</p>
+</dd>
+<dd>
+<img src = "imgs/home_light.jpg"></img>
+<p>| Home Page (Light)</p>
+</dd>
+<dd>
+<img src = "imgs/video_downloader.jpg"></img>
+<p>| Video Downloader Page</p>
+</dd>
+<dd>
+<img src = "imgs/playlist_downloader.jpg"></img>
+<p>| Playlist Downloader Page</p>
+</dd>
+<dd>
+<img src = "imgs/search_results.jpg"></img>
+<p>| Search Results Page</p>
+</dd>
+<dd>
+<img src = "imgs/results_downloader.jpg"></img>
+<p>| Results Downloader Page</p>
+</dd>
+</dl>
+
+<dl>
+<dt><h2>Installation Guide</h2></dt>
+<dd>
+<ol>
+
+<li>Git-clone this repo & change directory</li>
+
+`git clone https://github.com/Shinobi7k/YouTube-Downloader.git`
+<br>
+`cd YouTube-Downloader`
+
+<li>Install modules using pip</li>
+
+`pip install -r requirements.txt`
+
+<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a></li>
+
+<li>Run the .py file!</li>
+
+`py main.py`
+<ol>
 </dd>
 </dl>
