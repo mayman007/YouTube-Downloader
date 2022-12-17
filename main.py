@@ -57,9 +57,6 @@ link_entry = customtkinter.CTkEntry(root, width = 345, textvariable = link_var)
 link_entry.place(x = 265 , y = 140)
 root.after(200, lambda: link_entry.focus())
 
-# https://www.youtube.com/watch?v=BaW_jenozKc [video test]
-# https://www.youtube.com/playlist?list=PLTCuyMPdTPwFYQYpb8uwGp0Mw3hCNItN0 [playlist test]
-
 # Format and quality selections
 quality_var = IntVar()
 customtkinter.CTkLabel(root, text = "Video Download", font = ("arial bold", 20)).place(x = 35 , y = 75)
@@ -552,6 +549,7 @@ def DownlaodWindow():
     newWindow.maxsize(700, 460)
     newWindow.minsize(700, 460)
     newWindow.iconbitmap("YDICO.ico")
+    newWindow.protocol("WM_DELETE_WINDOW", onClosing)
     root.withdraw()
 
     # Downloading label
@@ -1045,6 +1043,7 @@ def PlaylistWindow():
     pWindow.maxsize(700, 460)
     pWindow.minsize(700, 460)
     pWindow.iconbitmap("YDICO.ico")
+    pWindow.protocol("WM_DELETE_WINDOW", onClosing)
     root.withdraw()
 
     # Downloading label
@@ -1943,6 +1942,7 @@ def SearchWindow():
         sDWindow.geometry(f"{width}x{height}+{x}+{y}")
         sDWindow.maxsize(700, 460)
         sDWindow.minsize(700, 460)
+        sDWindow.protocol("WM_DELETE_WINDOW", onClosing)
         sDWindow.iconbitmap("YDICO.ico")
 
         # Downloading label
