@@ -16,6 +16,7 @@ import getpass
 import time
 import subprocess
 import webbrowser
+import ffmpeg
 
 
 # Get config prefences from JSON
@@ -271,32 +272,67 @@ def DownlaodWindow():
 
     # Downloading label function
     def Downloading():
-        downloading_var.set("Downloading")
-        time.sleep(0.5)
-        while True:
-            if downloading_var.get() == "Downloading":
-                downloading_var.set("Downloading.")
-                time.sleep(0.5)
-            else: break
-            if downloading_var.get() == "Downloading.":
-                downloading_var.set("Downloading..")
-                time.sleep(0.5)
-            else: break
-            if downloading_var.get() == "Downloading..":
-                downloading_var.set("Downloading...")
-                time.sleep(0.5)
-            else: break
-            if downloading_var.get() == "Downloading...":
-                downloading_var.set("Downloading")
-                time.sleep(0.5)
-            else: break
+        if downloading_var.get() == "Merging":
+            while True:
+                if downloading_var.get() == "Merging":
+                    downloading_var.set("Merging.")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Merging.":
+                    downloading_var.set("Merging..")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Merging..":
+                    downloading_var.set("Merging...")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Merging...":
+                    downloading_var.set("Merging")
+                    time.sleep(0.5)
+                else: break
+        elif downloading_var.get() == "Downloading audio":
+            while True:
+                if downloading_var.get() == "Downloading audio":
+                    downloading_var.set("Downloading audio.")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Downloading audio.":
+                    downloading_var.set("Downloading audio..")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Downloading audio..":
+                    downloading_var.set("Downloading audio...")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Downloading audio...":
+                    downloading_var.set("Downloading audio")
+                    time.sleep(0.5)
+                else: break
+        else:
+            downloading_var.set("Downloading")
+            time.sleep(0.5)
+            while True:
+                if downloading_var.get() == "Downloading":
+                    downloading_var.set("Downloading.")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Downloading.":
+                    downloading_var.set("Downloading..")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Downloading..":
+                    downloading_var.set("Downloading...")
+                    time.sleep(0.5)
+                else: break
+                if downloading_var.get() == "Downloading...":
+                    downloading_var.set("Downloading")
+                    time.sleep(0.5)
+                else: break
         dont_change = ["Canceled", "Paused", "Finished"]
         while True:
             time.sleep(1)
-            if downloading_var.get() in dont_change:
-                continue
-            else:
-                Downloading()
+            if downloading_var.get() in dont_change: continue
+            else: Downloading()
 
     # One Video Downloader
     def VideoDownloader():
@@ -391,9 +427,15 @@ def DownlaodWindow():
                             # When finished
                             break
                 # Merge video and audio
+                downloading_var.set("Merging")
                 final_name = vname.replace("_video", f"_({quality_string})")
-                cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
-                subprocess.call(cmd, shell=True)
+                try:
+                    cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
+                    subprocess.call(cmd, shell=True)
+                except:
+                    input_video = ffmpeg.input(vname)
+                    input_audio = ffmpeg.input(aname)
+                    ffmpeg.concat(input_video, input_audio, v=1, a=1).output(final_name).run()
                 os.remove(aname)
                 os.remove(vname)
                 # Finished
