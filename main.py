@@ -448,9 +448,9 @@ def DownlaodWindow():
                         downloading_var.set("Finished")
                         customtkinter.CTkButton(newWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile).place(x = 470 , y = 420)
                         break
-            if is_cancelled:
-                msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
-                if msg_box == "yes": os.remove(vname)
+        if is_cancelled:
+            msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+            if msg_box == "yes": os.remove(vname)
 
 
     # Get video info, get link and check errors
@@ -1934,7 +1934,7 @@ def SearchWindow():
         # Form creating
         sWindow.destroy()
         sDWindow = customtkinter.CTkToplevel()
-        sDWindow.title("Playlist Downloader")
+        sDWindow.title("Results Downloader")
         width = 700
         height = 460
         x = (sDWindow.winfo_screenwidth() // 2) - (width // 2)
