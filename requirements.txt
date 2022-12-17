@@ -2,3 +2,4 @@ pytube
 customtkinter
 youtube_transcript_api
 pillow
+ffmpeg-python
