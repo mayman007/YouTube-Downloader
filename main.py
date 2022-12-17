@@ -3,11 +3,9 @@ from tkinter import filedialog, messagebox
 import customtkinter
 from pytube import YouTube, Playlist, Search, extract, request
 import pytube.request
-import moviepy.editor as mpe
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import SRTFormatter
 import threading
-from proglog import ProgressBarLogger
 import json
 from PIL import Image
 import urllib.request
@@ -132,24 +130,6 @@ def OnDownloadButton(event = None):
     threading.Thread(target = Loading, args = (loading_text,)).start()
 link_entry.bind("<Return>", OnDownloadButton)
 
-# Custom Progress for moviepy
-convert_count = 0
-class MyBarLogger(ProgressBarLogger):
-    def callback(self, **changes):
-        # Every time the logger message is updated, this function is called with
-        # the `changes` dictionary of the form `parameter: new value`.
-        for (parameter, value) in changes.items():
-            print ('Parameter %s is now %s' % (parameter, value))
-            global convert_count
-            convert_count = convert_count + 0.5
-    def bars_callback(self, bar, attr, value, old_value=None):
-        # Every time the logger progress is updated, this function is called
-        percentage = (value / self.bars[bar]['total']) * 100
-        # print(bar,attr,percentage)
-        converting_var.set(f"{round(percentage, 2)}%   {int(convert_count)}/2")
-logger = MyBarLogger()
-
-
 # Integer -> time format
 def to_hms(s):
     m, s = divmod(s, 60)
@@ -191,8 +171,8 @@ def DownlaodWindow():
             icon = "warning")
             if msg_box == "yes": pass
             else: return
-        root.deiconify()
         newWindow.destroy()
+        root.deiconify()
 
     # Set path
     user = getpass.getuser()
@@ -313,23 +293,6 @@ def DownlaodWindow():
                 downloading_var.set("Downloading")
                 time.sleep(0.5)
             else: break
-        while True:
-            if downloading_var.get() == "Converting":
-                downloading_var.set("Converting.")
-                time.sleep(0.5)
-            else: break
-            if downloading_var.get() == "Converting.":
-                downloading_var.set("Converting..")
-                time.sleep(0.5)
-            else: break
-            if downloading_var.get() == "Converting..":
-                downloading_var.set("Converting...")
-                time.sleep(0.5)
-            else: break
-            if downloading_var.get() == "Converting...":
-                downloading_var.set("Converting")
-                time.sleep(0.5)
-            else: break
         dont_change = ["Canceled", "Paused", "Finished"]
         while True:
             time.sleep(1)
@@ -411,6 +374,7 @@ def DownlaodWindow():
             if is_cancelled:
                 pass
             else: # Download audio
+                downloading_var.set("Downloading audio")
                 with open(aname, "wb") as f:
                     is_paused = is_cancelled = False
                     audio = url.streams.get_by_itag(251)
@@ -429,17 +393,10 @@ def DownlaodWindow():
                         else:
                             # When finished
                             break
-                # Setting the audio to the video
-                downloading_var.set("Converting")
-                video2 = mpe.VideoFileClip(vname)
-                audio = mpe.AudioFileClip(aname)
-                final = video2.set_audio(audio)
-                # Output result
+                # Merge video and audio
                 final_name = vname.replace("_video", f"_({quality_string})")
-                final.write_videofile(final_name, logger = logger)
-                # Delete audio and video to keep only the result
-                video2.close()
-                audio.close()
+                cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
+                subprocess.call(cmd, shell=True)
                 os.remove(aname)
                 os.remove(vname)
                 # Finished
@@ -494,6 +451,9 @@ def DownlaodWindow():
                         downloading_var.set("Finished")
                         customtkinter.CTkButton(newWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile).place(x = 470 , y = 420)
                         break
+            if is_cancelled:
+                msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+                if msg_box == "yes": os.remove(vname)
 
 
     # Get video info, get link and check errors
@@ -582,7 +542,7 @@ def DownlaodWindow():
     whenError()
 
     # Video form creating
-    newWindow = customtkinter.CTkToplevel(root) # Toplevel object which will be treated as a new window
+    newWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
     newWindow.title("Video Downloader")
     width = 700
     height = 460
@@ -679,8 +639,8 @@ def PlaylistWindow():
             icon = "warning")
             if msg_box == "yes": pass
             else: return
-        root.deiconify()
         pWindow.destroy()
+        root.deiconify()
 
     # Set path
     user = getpass.getuser()
@@ -697,7 +657,7 @@ def PlaylistWindow():
         for vid_link in vids_subs:
             url = YouTube(vid_link)
             video = url.streams.get_by_itag(quality)
-            if f"✔️ {p.repr(url.title)} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB" in vids_list:
+            if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB" in vids_list:
                 lang = lang_choose.get()
                 video_id = extract.video_id(vid_link)
                 transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
@@ -765,22 +725,51 @@ def PlaylistWindow():
 
     # Add/Remove videos from download list
     def videoSelector(choice):
-        global vids_counter
-        if choice.startswith("✔️ "):
+        global vids_counter, psize, plength
+        if choice.startswith("✔️ "): # Remove from list
             vids_list.remove(choice)
             choice = choice.replace("✔️ ","")
             vids_list.append(choice)
             vids_counter = vids_counter - 1
-        else:
+
+            choice_list = choice.split(" | ")
+            time = choice_list[1].split(":")
+            h = int(time[0]) * 60 * 60
+            m = int(time[1]) * 60
+            s = int(time[2])
+            seconds = h + m + s
+            plength = plength - seconds
+            size_float = choice_list[2]
+            size_float = size_float.replace(" MB", "")
+            size_float = round(float(size_float)*1024*1024, 2)
+            psize = psize - size_float
+
+        else: # Add to list
             vids_list.remove(choice)
             choice = "✔️ " + choice
             vids_list.append(choice)
             vids_counter = vids_counter + 1
+
+            choice_list = choice.split(" | ")
+            time = choice_list[1].split(":")
+            h = int(time[0]) * 60 * 60
+            m = int(time[1]) * 60
+            s = int(time[2])
+            seconds = h + m + s
+            plength = plength + seconds
+            size_float = choice_list[2]
+            size_float = size_float.replace(" MB", "")
+            size_float = round(float(size_float)*1024*1024, 2)
+            psize = psize + size_float
+
         print("==================")
         print(vids_list)
         print(vids_counter)
         menubutton.configure(values = vids_list)
         menubutton.set("Open Videos Menu")
+        length_var.set(to_hms(plength))
+        size_var.set(f"{round(psize/1024/1024, 2)} MB")
+        videos_var.set(vids_counter)
 
     # Pause/Resume function
     def toggle_download():
@@ -885,7 +874,7 @@ def PlaylistWindow():
         for url in urls.videos:
             if is_cancelled: break
             video = url.streams.get_by_itag(quality)
-            if f"✔️ {p.repr(url.title)} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB" in vids_list: pass
+            if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB" in vids_list: pass
             else: continue
             if quality in audio_tags_list: ext = "mp3"
             else: ext = "mp4"
@@ -934,7 +923,8 @@ def PlaylistWindow():
         cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled")
         cancel_button.place(x = 595 , y = 347)
         if is_cancelled:
-            pass
+            msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+            if msg_box == "yes": os.remove(vname)
         else:
             downloadcounter_var.set("")
             pWindow.bell()
@@ -949,7 +939,6 @@ def PlaylistWindow():
     try:
         urls = Playlist(link)
         quality = str(quality_var.get())
-        psize = 0
         if not "youtu" in link or not "playlist" in link: raise KeyError()
     except KeyError:
         whenError()
@@ -960,15 +949,16 @@ def PlaylistWindow():
             whenError()
             return messagebox.showerror(title = "Not Supported", message = "Currently, we support downloading playlists in 720p, 360p, 160kbps and 128kbps only.")
         else:
-            global vids_counter
+            global vids_counter, psize, plength
             vids_list = []
             plength = 0
+            psize = 0
             vids_counter = 0
             vids_subs = []
             pl_tst_counter = 0
             for url in urls.videos:
                 pl_tst_counter = pl_tst_counter + 1
-                print(f"({pl_tst_counter}) ==============")
+                print(f"================================")
                 print(f"({pl_tst_counter}) loop started")
                 try:
                     video = url.streams.get_by_itag(quality)
@@ -1002,7 +992,7 @@ def PlaylistWindow():
                 print(f"({pl_tst_counter}) got size string")
                 plength = plength + url.length
                 print(f"({pl_tst_counter}) got length")
-                vid_option = f"✔️ {p.repr(url.title)} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB"
+                vid_option = f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB"
                 print(f"({pl_tst_counter}) got vid_option")
                 vids_list.append(vid_option)
                 print(f"({pl_tst_counter}) added vid_option to list")
@@ -1045,7 +1035,7 @@ def PlaylistWindow():
     whenError()
 
     # Playlist form creating
-    pWindow = customtkinter.CTkToplevel(root) # Toplevel object which will be treated as a new window
+    pWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
     pWindow.title("Playlist Downloader")
     width = 700
     height = 460
@@ -1064,6 +1054,12 @@ def PlaylistWindow():
     customtkinter.CTkLabel(pWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(x = 460 , y = 418)
 
     # Playlist labels
+    length_var = StringVar()
+    length_var.set(to_hms(plength))
+    size_var = StringVar()
+    size_var.set(f"{size_string} MB")
+    videos_var = IntVar()
+    videos_var.set(vids_counter)
     customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
     customtkinter.CTkLabel(pWindow, text = "Playlist Title:", font = ("arial bold", 20)).place(x = 20 , y = 165)
     customtkinter.CTkLabel(pWindow, text = r.repr(urls.title), font = ("arial", 20)).place(x = 148 , y = 165)
@@ -1072,11 +1068,13 @@ def PlaylistWindow():
     customtkinter.CTkLabel(pWindow, text = "Publish Date:", font = ("arial bold", 20)).place(x = 20 , y = 225)
     customtkinter.CTkLabel(pWindow, text = url.publish_date.strftime(date_format), font = ("arial", 20)).place(x = 152 , y = 225)
     customtkinter.CTkLabel(pWindow, text = "Total Length:", font = ("arial bold", 20)).place(x = 20 , y = 255)
-    customtkinter.CTkLabel(pWindow, text = to_hms(plength), font = ("arial", 20)).place(x = 149 , y = 255)
+    customtkinter.CTkLabel(pWindow, textvariable = length_var, font = ("arial", 20)).place(x = 149 , y = 255)
     customtkinter.CTkLabel(pWindow, text = "Quality:", font = ("arial bold", 20)).place(x = 20 , y = 285)
     customtkinter.CTkLabel(pWindow, text = quality_string, font = ("arial", 20)).place(x = 97 , y = 285)
     customtkinter.CTkLabel(pWindow, text = "Total Size:", font = ("arial bold", 20)).place(x = 20 , y = 315)
-    customtkinter.CTkLabel(pWindow, text = f"{size_string} MB", font = ("arial", 20)).place(x = 126 , y = 315)
+    customtkinter.CTkLabel(pWindow, textvariable = size_var, font = ("arial", 20)).place(x = 126 , y = 315)
+    customtkinter.CTkLabel(pWindow, text = "Total Videos:", font = ("arial bold", 20)).place(x = 340 , y = 285)
+    customtkinter.CTkLabel(pWindow, textvariable = videos_var, font = ("arial", 20)).place(x = 470 , y = 285)
 
     # Path change
     customtkinter.CTkLabel(pWindow, text = "Download Path:", font = ("arial bold", 20)).place(x = 20 , y = 345)
@@ -1160,7 +1158,7 @@ def SearchWindow():
     if quality in not_supported_list:
         whenError()
         return messagebox.showerror(title = "Not Supported", message = "Currently, we support searching youtube in 720p, 360p, 160kbps and 128kbps only.")
-    sWindow = customtkinter.CTkToplevel(root)
+    sWindow = customtkinter.CTkToplevel()
     sWindow.title(f'Search Results For "{search_text}"')
     sWindow.withdraw()
     # On closing
@@ -1169,8 +1167,8 @@ def SearchWindow():
         message = "You will return back to home. This will delete all your selections.\n\n Do you wish to continue?",
         icon = "warning")
         if msg_box == "yes":
-            root.deiconify()
             sWindow.destroy()
+            root.deiconify()
     width = 700
     height = 460
     x = (sWindow.winfo_screenwidth() // 2) - (width // 2)
@@ -1393,10 +1391,14 @@ def SearchWindow():
         cb2.configure(state = "disabled")
         cb3.configure(state = "disabled")
         cb4.configure(state = "disabled")
-        b1.configure(state = "disabled")
-        b2.configure(state = "disabled")
-        b3.configure(state = "disabled")
-        b4.configure(state = "disabled")
+        b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled")
+        b1.place(x = 375, y = 63)
+        b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled")
+        b2.place(x = 375, y = 163)
+        b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled")
+        b3.place(x = 375, y = 263)
+        b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled")
+        b4.place(x = 375, y = 363)
         pr_button.configure(state = "disabled")
         dn_button.configure(state = "disabled")
         nr_button.configure(state = "disabled")
@@ -1427,10 +1429,14 @@ def SearchWindow():
         cb2.configure(state = "normal")
         cb3.configure(state = "normal")
         cb4.configure(state = "normal")
-        b1.configure(state = "normal")
-        b2.configure(state = "normal")
-        b3.configure(state = "normal")
-        b4.configure(state = "normal")
+        b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube1)
+        b1.place(x = 375, y = 63)
+        b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube2)
+        b2.place(x = 375, y = 163)
+        b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube3)
+        b3.place(x = 375, y = 263)
+        b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube4)
+        b4.place(x = 375, y = 363)
         dn_button.configure(state = "normal")
         pr_button_var.set("Previous Results")
         nr_button_var.set("Next Results")
@@ -1652,8 +1658,8 @@ def SearchWindow():
                 icon = "warning")
                 if msg_box == "yes": pass
                 else: return
-            root.deiconify()
             sDWindow.destroy()
+            root.deiconify()
 
         # Set path
         user = getpass.getuser()
@@ -1875,7 +1881,8 @@ def SearchWindow():
             cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled")
             cancel_button.place(x = 595 , y = 347)
             if is_cancelled:
-                pass
+                msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+                if msg_box == "yes": os.remove(vname)
             else:
                 downloadcounter_var.set("")
                 sDWindow.bell()
@@ -1926,7 +1933,8 @@ def SearchWindow():
             quality_string = "160kbps"
 
         # Form creating
-        sDWindow = customtkinter.CTkToplevel(root)
+        sWindow.destroy()
+        sDWindow = customtkinter.CTkToplevel()
         sDWindow.title("Playlist Downloader")
         width = 700
         height = 460
@@ -1936,7 +1944,6 @@ def SearchWindow():
         sDWindow.maxsize(700, 460)
         sDWindow.minsize(700, 460)
         sDWindow.iconbitmap("YDICO.ico")
-        sWindow.destroy()
 
         # Downloading label
         downloading_var = StringVar()
@@ -1957,17 +1964,17 @@ def SearchWindow():
         customtkinter.CTkLabel(sDWindow, text = "Length:", font = ("arial bold", 20)).place(x = 20 , y = 90)
         customtkinter.CTkLabel(sDWindow, textvariable = length_var, font = ("arial", 20)).place(x = 97 , y = 90)
         customtkinter.CTkLabel(sDWindow, text = "File size:", font = ("arial bold", 20)).place(x = 20 , y = 125)
-        customtkinter.CTkLabel(sDWindow, textvariable = size_var, font = ("arial", 20)).place(x = 112 , y = 125)
+        customtkinter.CTkLabel(sDWindow, textvariable = size_var, font = ("arial", 20)).place(x = 111 , y = 125)
 
         customtkinter.CTkLabel(sDWindow, text = "Total Videos Info", font = ("arial bold italic", 30)).place(x = 10 , y = 165)
         customtkinter.CTkLabel(sDWindow, text = "Total Videos:", font = ("arial bold", 20)).place(x = 20 , y = 205)
-        customtkinter.CTkLabel(sDWindow, text = len(to_download), font = ("arial", 20)).place(x = 150 , y = 205)
+        customtkinter.CTkLabel(sDWindow, text = len(to_download), font = ("arial", 20)).place(x = 151 , y = 205)
         customtkinter.CTkLabel(sDWindow, text = "Total Length:", font = ("arial bold", 20)).place(x = 20 , y = 240)
-        customtkinter.CTkLabel(sDWindow, text = f"{to_hms(total_length)}", font = ("arial", 20)).place(x = 149 , y = 240)
+        customtkinter.CTkLabel(sDWindow, text = f"{to_hms(total_length)}", font = ("arial", 20)).place(x = 150 , y = 240)
         customtkinter.CTkLabel(sDWindow, text = "Quality:", font = ("arial bold", 20)).place(x = 20 , y = 275)
-        customtkinter.CTkLabel(sDWindow, text = quality_string, font = ("arial", 20)).place(x = 95 , y = 275)
+        customtkinter.CTkLabel(sDWindow, text = quality_string, font = ("arial", 20)).place(x = 96 , y = 275)
         customtkinter.CTkLabel(sDWindow, text = "Total Size:", font = ("arial bold", 20)).place(x = 20 , y = 310)
-        customtkinter.CTkLabel(sDWindow, text = f"{round(total_size/1024/1024, 2)} MB", font = ("arial", 20)).place(x = 122 , y = 310)
+        customtkinter.CTkLabel(sDWindow, text = f"{round(total_size/1024/1024, 2)} MB", font = ("arial", 20)).place(x = 123 , y = 310)
 
         # Path change
         customtkinter.CTkLabel(sDWindow, text = "Download Path:", font = ("arial bold", 20)).place(x = 20 , y = 345)
