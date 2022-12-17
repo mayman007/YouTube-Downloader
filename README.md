@@ -53,8 +53,8 @@
 <dl>
 <dt><h2>Installation Guide</h2></dt>
 <dd>
+<p>0. First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a></p>
 <ol>
-
 <li>Git-clone this repo & change directory</li>
 
 ```git clone https://github.com/Shinobi7k/YouTube-Downloader.git```
