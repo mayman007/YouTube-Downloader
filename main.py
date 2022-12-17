@@ -429,10 +429,12 @@ def DownlaodWindow():
                 # Merge video and audio
                 downloading_var.set("Merging")
                 final_name = vname.replace("_video", f"_({quality_string})")
-                try:
-                    cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
-                    subprocess.call(cmd, shell=True)
-                except:
+                cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
+                subprocess.call(cmd, shell=True)
+                isFile = os.path.isfile(final_name)
+                if isFile == True:
+                    pass
+                else:
                     input_video = ffmpeg.input(vname)
                     input_audio = ffmpeg.input(aname)
                     ffmpeg.concat(input_video, input_audio, v=1, a=1).output(final_name).run()
