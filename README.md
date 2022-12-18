@@ -41,7 +41,7 @@
 <p>| Playlist Downloader Page</p>
 </dd>
 <dd>
-<img src = "imgs/search_results.jpg"></img>
+<img src = "imgs/search_results_views.jpg"></img>
 <p>| Search Results Page</p>
 </dd>
 <dd>
