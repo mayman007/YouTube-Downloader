@@ -16,8 +16,6 @@ import getpass
 import time
 import subprocess
 import webbrowser
-import ffmpeg
-import pathlib
 
 
 # Get config prefences from JSON
