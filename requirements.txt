@@ -1,5 +1,4 @@
-pytube
-customtkinter
-youtube_transcript_api
-pillow
-ffmpeg-python
+pytube==12.1.0
+customtkinter==5.0.3
+youtube_transcript_api==0.5.0
+pillow==9.3.0
