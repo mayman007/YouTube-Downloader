@@ -534,13 +534,14 @@ def DownlaodWindow():
         whenError()
         return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
     except KeyError as e:
-        print(e)
+        print(f"KeyError: {e}")
         whenError()
-        return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+        return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Try again later.")
     except AttributeError as e:
-        print(e)
+        print(f"AttributeError: {e}")
         whenError()
-        return messagebox.showerror(title = "Format Not Available", message = "This video is not available in the format that you chose.")
+        return messagebox.showerror(title = "Format Not Available",
+        message = f"I can't retrieve '{url.title}' in the format that you chose. change the quality to a proggressive format (720p, 360p, 160kbps and 128kbps). Or try again later.")
     except pytube.exceptions.LiveStreamError as e:
         print(e)
         whenError()
@@ -1084,7 +1085,25 @@ def PlaylistWindow():
         if not "youtu" in link or not "playlist" in link: raise KeyError()
     except KeyError:
         whenError()
-        return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid playlist link.")
+        return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid link.")
+    except pytube.exceptions.AgeRestrictedError:
+        whenError()
+        return messagebox.showerror(title = "Age Restricted", message = "This playlist has age restricted video(s).")
+    except pytube.exceptions.MembersOnly:
+        whenError()
+        return messagebox.showerror(title = "Members Only", message = "This playlist has members only video(s).")
+    except pytube.exceptions.VideoPrivate:
+        whenError()
+        return messagebox.showerror(title = "Private Video", message = "This playlist has private video(s).")
+    except pytube.exceptions.VideoRegionBlocked:
+        whenError()
+        return messagebox.showerror(title = "Region Blocked", message = "This playlist has region blocked video(s).")
+    except pytube.exceptions.VideoUnavailable:
+        whenError()
+        return messagebox.showerror(title = "Video Unavailable", message = "This playlist has unavailable video(s).")
+    except pytube.exceptions.RegexMatchError:
+        whenError()
+        return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid link.")
     if quality == "0":
         whenError()
         return messagebox.showerror(title = "Link Not Valid", message = "Please select a format to download.")
@@ -1123,12 +1142,12 @@ def PlaylistWindow():
                 except KeyError as e:
                     print(f"KeyError: {e}")
                     whenError()
-                    return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment.")
+                    return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Try again later.")
                 except AttributeError as e:
                     print(f"AttributeError: {e}")
                     whenError()
                     return messagebox.showerror(title = "Format Not Available",
-                                                message = f"I can't retrieve '{url.title}' in the format that you chose. change the quality to a proggressive format (720p, 360, 160kbps, 128kbps), or try again later.")
+                                                message = f"I can't retrieve '{url.title}' in the format that you chose. change the quality to a proggressive format (720p, 360p, 160kbps and 128kbps). Or try again later.")
                 try:
                     video_id = extract.video_id(url.watch_url)
                     YouTubeTranscriptApi.list_transcripts(video_id)
