@@ -53,7 +53,7 @@
 <dl>
 <dt><h2>Installation Guide</h2></dt>
 <dd>
-<p>0. First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a></p>
+<p>0. First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</p>
 <ol>
 <li>Git-clone this repo & change directory</li>
 
@@ -65,7 +65,7 @@
 
 ```pip install -r requirements.txt```
 
-<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a></li>
+<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and in tha path. or just put the exe file in the same folder as the script</li>
 
 <li>Run the .py file!</li>
 
