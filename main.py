@@ -925,6 +925,10 @@ def PlaylistWindow():
         if quality in non_progressive_list:
             for url in urls.videos:
                 if is_cancelled: break
+                toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
+                toggle_button.place(x = 550 , y = 347)
+                cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download)
+                cancel_button.place(x = 595 , y = 347)
                 downloading_var.set("Downloading")
                 if quality == "135": video = url.streams.filter(res = "480p").first()
                 elif quality == "133": video = url.streams.filter(res = "240p").first()
@@ -1116,9 +1120,15 @@ def PlaylistWindow():
                     print(e)
                     whenError()
                     return messagebox.showerror(title = "Video is Live", message = "Can't download a live video.")
-                except KeyError:
+                except KeyError as e:
+                    print(f"KeyError: {e}")
                     whenError()
-                    return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                    return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment.")
+                except AttributeError as e:
+                    print(f"AttributeError: {e}")
+                    whenError()
+                    return messagebox.showerror(title = "Format Not Available",
+                                                message = f"I can't retrieve '{url.title}' in the format that you chose. change the quality to a proggressive format (720p, 360, 160kbps, 128kbps), or try again later.")
                 try:
                     video_id = extract.video_id(url.watch_url)
                     YouTubeTranscriptApi.list_transcripts(video_id)
