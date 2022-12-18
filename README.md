@@ -65,7 +65,7 @@
 
 ```pip install -r requirements.txt```
 
-<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and in tha path. or just put the exe file in the same folder as the script</li>
+<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and in the path. or just put the exe file in the same folder as the script</li>
 
 <li>Run the .py file!</li>
 
