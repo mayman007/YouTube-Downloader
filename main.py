@@ -17,6 +17,7 @@ import time
 import subprocess
 import webbrowser
 import ffmpeg
+import pathlib
 
 
 # Get config prefences from JSON
@@ -431,15 +432,6 @@ def DownlaodWindow():
                 final_name = vname.replace("_video", f"_({quality_string})")
                 cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
                 subprocess.call(cmd, shell=True)
-                isFile = os.path.isfile(final_name)
-                if isFile == True:
-                    pass
-                else:
-                    input_video = ffmpeg.input(vname)
-                    input_audio = ffmpeg.input(aname)
-                    ffmpeg.concat(input_video, input_audio, v=1, a=1).output(final_name).run()
-                os.remove(aname)
-                os.remove(vname)
                 # Finished
                 newWindow.bell()
                 downloading_var.set("Finished")
