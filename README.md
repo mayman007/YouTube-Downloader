@@ -70,6 +70,17 @@
 <li>Run the .py file!</li>
 
 ```py main.py```
-<ol>
+</ol>
+</dd>
+</dl>
+
+<dl>
+<dt><h2>Known Problems</h2></dt>
+<dd>
+<p>Due to pytube's limitations, you may face the following problems:</p>
+<ul>
+<li>Can't download videos that have more than 30 fps</li>
+<li>It will throw an error when loading some random videos</li>
+</ul>
 </dd>
 </dl>
