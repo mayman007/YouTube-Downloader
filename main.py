@@ -40,22 +40,16 @@ def onClosing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         root.destroy()
 
-if platform == "linux" or platform == "linux2":
-    window_width = 700
-    window_height = 460
-else:
-    window_width = 700
-    window_height = 460
-
 # Create form
 root = customtkinter.CTk()
-width = window_width
-height = window_height
+width = 700
+height = 460
 x = (root.winfo_screenwidth() // 2) - (width // 2)
 y = (root.winfo_screenheight() // 2) - (height // 2)
 root.geometry(f"{width}x{height}+{x}+{y}")
 root.resizable(False, False)
-root.iconbitmap("YDICO.ico")
+if platform == "linux" or platform == "linux2": pass
+else: root.iconbitmap("YDICO.ico") #Windows & MacOS
 root.title("YouTube Downloader")
 root.protocol("WM_DELETE_WINDOW", onClosing)
 customtkinter.CTkLabel(root, text = "YouTube Downloader", font = ("arial bold", 45)).place(x = 140 , y = 20)
@@ -216,14 +210,15 @@ def AdvancedWindow():
         root.deiconify()
     advWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
     advWindow.title("Advanced Quality Settings")
-    width = window_width
-    height = window_height
+    width = 700
+    height = 460
     x = (advWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (advWindow.winfo_screenheight() // 2) - (height // 2)
     advWindow.geometry(f"{width}x{height}+{x}+{y}")
     advWindow.maxsize(700, 460)
     advWindow.minsize(700, 460)
-    advWindow.iconbitmap("YDICO.ico")
+    if platform == "linux" or platform == "linux2": pass
+    else: advWindow.iconbitmap("YDICO.ico") #Windows & MacOS
     advWindow.protocol("WM_DELETE_WINDOW", onClosing)
     root.withdraw()
 
@@ -982,14 +977,15 @@ def DownlaodWindow():
     # Video form creating
     newWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
     newWindow.title("Video Downloader")
-    width = window_width
-    height = window_height
+    width = 700
+    height = 460
     x = (newWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (newWindow.winfo_screenheight() // 2) - (height // 2)
     newWindow.geometry(f"{width}x{height}+{x}+{y}")
     newWindow.maxsize(700, 460)
     newWindow.minsize(700, 460)
-    newWindow.iconbitmap("YDICO.ico")
+    if platform == "linux" or platform == "linux2": pass
+    else: newWindow.iconbitmap("YDICO.ico") #Windows & MacOS
     newWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # newWindow.bind("<Return>", VideoDownloader)
     root.withdraw()
@@ -1709,14 +1705,15 @@ def PlaylistWindow():
     # Playlist form creating
     pWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
     pWindow.title("Playlist Downloader")
-    width = window_width
-    height = window_height
+    width = 700
+    height = 460
     x = (pWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (pWindow.winfo_screenheight() // 2) - (height // 2)
     pWindow.geometry(f"{width}x{height}+{x}+{y}")
     pWindow.maxsize(700, 460)
     pWindow.minsize(700, 460)
-    pWindow.iconbitmap("YDICO.ico")
+    if platform == "linux" or platform == "linux2": pass
+    else: pWindow.iconbitmap("YDICO.ico") #Windows & MacOS
     pWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # pWindow.bind("<Return>", PlaylistDownloader)
     root.withdraw()
@@ -1859,14 +1856,15 @@ def SearchWindow():
     def onClosing():
         sWindow.destroy()
         root.deiconify()
-    width = window_width
-    height = window_height
+    width = 700
+    height = 460
     x = (sWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (sWindow.winfo_screenheight() // 2) - (height // 2)
     sWindow.geometry(f"{width}x{height}+{x}+{y}")
     sWindow.maxsize(700, 460)
     sWindow.minsize(700, 460)
-    sWindow.iconbitmap("YDICO.ico")
+    if platform == "linux" or platform == "linux2": pass
+    else: sWindow.iconbitmap("YDICO.ico") #Windows & MacOS
     sWindow.withdraw()
     sWindow.protocol("WM_DELETE_WINDOW", onClosing)
     global to_download
@@ -2700,15 +2698,16 @@ def SearchWindow():
         sWindow.destroy()
         sDWindow = customtkinter.CTkToplevel()
         sDWindow.title("Results Downloader")
-        width = window_width
-        height = window_height
+        width = 700
+        height = 460
         x = (sDWindow.winfo_screenwidth() // 2) - (width // 2)
         y = (sDWindow.winfo_screenheight() // 2) - (height // 2)
         sDWindow.geometry(f"{width}x{height}+{x}+{y}")
         sDWindow.maxsize(700, 460)
         sDWindow.minsize(700, 460)
         sDWindow.protocol("WM_DELETE_WINDOW", onClosing)
-        sDWindow.iconbitmap("YDICO.ico")
+        if platform == "linux" or platform == "linux2": pass
+        else: sDWindow.iconbitmap("YDICO.ico") #Windows & MacOS
         # sDWindow.bind("<Return>", SearchDownloader)
 
         # Downloading label
