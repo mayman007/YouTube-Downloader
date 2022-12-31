@@ -15,6 +15,7 @@
 <li>🗒️ Download playlists. With an option to select which videos to download.</li>
 <li>💬 Download the attached subtitles. Or translate it to your prefered language.</li>
 <li>🔖 Selectable qualities and formats.</li>
+<li>⚙️ Advanced quality settings.</li>
 <li>▶️ Supports resumabilty.</li>
 <li>🖼️ Simple & modern GUI.</li>
 <li>🌃 Customize your theme and default color.</li>
