@@ -54,17 +54,95 @@ root.title("YouTube Downloader")
 root.protocol("WM_DELETE_WINDOW", onClosing)
 customtkinter.CTkLabel(root, text = "YouTube Downloader", font = ("arial bold", 45)).place(x = 140 , y = 20)
 
+# Link Entry Copy
+def linkCopy():
+    start = link_entry.index("sel.first")
+    end = link_entry.index("sel.last")
+    to_copy = link_entry.get()[start:end]
+    root.clipboard_append(to_copy)
+# Link Entry Cut
+def linkCut():
+    start = link_entry.index("sel.first")
+    end = link_entry.index("sel.last")
+    to_copy = link_entry.get()[start:end]
+    root.clipboard_append(to_copy) # Get text from clipboard
+    try: # delete the selected text
+        start = link_entry.index("sel.first")
+        end = link_entry.index("sel.last")
+        link_entry.delete(start, end)
+    except TclError:
+        pass # nothing was selected, so paste doesn't need to delete anything
+# Link Entry Paste
+def linkPaste():
+    clipboard = root.clipboard_get() # Get text from clipboard
+    clipboard = clipboard.replace("\n", "\\n")
+    try: # delete the selected text, if any
+        start = link_entry.index("sel.first")
+        end = link_entry.index("sel.last")
+        link_entry.delete(start, end)
+    except TclError:
+        pass # nothing was selected, so paste doesn't need to delete anything
+    link_entry.insert("insert", clipboard) # insert the modified clipboard contents
+# Right-Click menu
+m = Menu(root, tearoff = 0)
+m.add_command(label ="Cut", font = ("arial", 11), command = linkCut)
+m.add_command(label ="Copy", font = ("arial", 11), command = linkCopy)
+m.add_command(label ="Paste", font = ("arial", 11), command = linkPaste)
+def linkRightClickMenu(event):
+    try: m.tk_popup(event.x_root, event.y_root)
+    finally: m.grab_release()
+
+# Search Entry Copy
+def searchCopy():
+    start = link_entry.index("sel.first")
+    end = link_entry.index("sel.last")
+    to_copy = link_entry.get()[start:end]
+    root.clipboard_append(to_copy)
+# Search Entry Cut
+def searchCut():
+    start = search_entry.index("sel.first")
+    end = search_entry.index("sel.last")
+    to_copy = search_entry.get()[start:end]
+    root.clipboard_append(to_copy) # Get text from clipboard
+    try: # delete the selected text
+        start = search_entry.index("sel.first")
+        end = search_entry.index("sel.last")
+        search_entry.delete(start, end)
+    except TclError:
+        pass # nothing was selected, so paste doesn't need to delete anything
+# Search Entry Paste
+def searchPaste():
+    clipboard = root.clipboard_get() # Get text from clipboard
+    clipboard = clipboard.replace("\n", "\\n")
+    try: # delete the selected text, if any
+        start = search_entry.index("sel.first")
+        end = search_entry.index("sel.last")
+        search_entry.delete(start, end)
+    except TclError:
+        pass # nothing was selected, so paste doesn't need to delete anything
+    search_entry.insert("insert", clipboard) # insert the modified clipboard contents
+# Right-Click menu
+m2 = Menu(root, tearoff = 0)
+m2.add_command(label ="Cut", font = ("arial", 11), command = searchCut)
+m2.add_command(label ="Copy", font = ("arial", 11), command = searchCopy)
+m2.add_command(label ="Paste", font = ("arial", 11), command = searchPaste)
+def searchRightClickMenu(event):
+    try: m2.tk_popup(event.x_root, event.y_root)
+    finally: m2.grab_release()
+
 # Paste link here
 link_var = StringVar()
 customtkinter.CTkLabel(root, text = "Paste Your URL Here", font = ("arial bold", 25)).place(x = 105 , y = 120)
 link_entry = customtkinter.CTkEntry(root, width = 345, textvariable = link_var, corner_radius = 20)
 link_entry.place(x = 100 , y = 160)
+link_entry.bind("<Button-3>", linkRightClickMenu)
 
 # Type keywords here
 search_var = StringVar()
 customtkinter.CTkLabel(root, text = "Type Your Keywords Here", font = ("arial bold", 25)).place(x = 105 , y = 220)
 search_entry = customtkinter.CTkEntry(root, width = 345, textvariable = search_var, corner_radius = 20)
 search_entry.place(x = 100 , y = 260)
+search_entry.bind("<Button-3>", searchRightClickMenu)
 
 # Format and quality selections for downloads
 quality_var = IntVar()
@@ -273,7 +351,7 @@ def AdvancedWindow():
     fps_combobox.set("30 (Default)")
     crf_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Constant Quality:", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "crf", command = radioDisableNormal)
     crf_radiobutton.place(x = 20 , y = 163)
-    customtkinter.CTkLabel(advWindow, textvariable = crf_var, font = ("arial", 17)).place(x = 520 , y = 195)
+    customtkinter.CTkLabel(advWindow, textvariable = crf_var, font = ("arial", 17)).place(x = 520 , y = 161)
     crf_slider = customtkinter.CTkSlider(advWindow, corner_radius = 15, width = 300, from_ = 0, to = 51, number_of_steps = 51, command = crfSlider)
     crf_slider.place(x = 212 , y = 167)
     crf_slider.set(23)
@@ -343,7 +421,7 @@ def AdvancedWindow():
         bitrate_entry_var.set("")
         aformat_combobox.set("MP3 (Default)")
         audio_quality_or_bitrate.set("bitrate")
-        abitrate_combobox.set("160kbps")
+        abitrate_combobox.set("320")
         aquality_combobox.set("")
     def okButton(): # For ok button
         global ffmpeg_command, advanced_quality_settings, advanced_extention, fps
