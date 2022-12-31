@@ -17,7 +17,7 @@
 <li>🔖 Selectable qualities and formats.</li>
 <li>▶️ Supports resumabilty.</li>
 <li>🖼️ Simple & modern GUI.</li>
-<li>🌃 Change your theme dynamically.</li>
+<li>🌃 Customize your theme and default color.</li>
 </ul>
 </dd>
 </dl>
@@ -25,27 +25,31 @@
 <dl>
 <dt><h2>Screenshots</h2></dt>
 <dd>
-<img src = "imgs/home_dark.jpg"></img>
+<img src = "images/home_dark.png"></img>
 <p>| Home Page</p>
 </dd>
 <dd>
-<img src = "imgs/home_light.jpg"></img>
+<img src = "images/home_light.png"></img>
 <p>| Home Page (Light)</p>
 </dd>
 <dd>
-<img src = "imgs/video_downloader.jpg"></img>
+<img src = "images/advanced_settings.png"></img>
+<p>| Advanced Quality Settings Page</p>
+</dd>
+<dd>
+<img src = "images/video_downloader.png"></img>
 <p>| Video Downloader Page</p>
 </dd>
 <dd>
-<img src = "imgs/playlist_downloader.jpg"></img>
+<img src = "images/playlist_downloader.png"></img>
 <p>| Playlist Downloader Page</p>
 </dd>
 <dd>
-<img src = "imgs/search_results_views.jpg"></img>
+<img src = "images/search_results.png"></img>
 <p>| Search Results Page</p>
 </dd>
 <dd>
-<img src = "imgs/results_downloader.jpg"></img>
+<img src = "images/results_downloader.png"></img>
 <p>| Results Downloader Page</p>
 </dd>
 </dl>
