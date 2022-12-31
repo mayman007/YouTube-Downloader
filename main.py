@@ -891,7 +891,7 @@ def DownlaodWindow():
                 # Convert if there is a conversion
                 if advanced_checker == "yes":
                     downloading_var.set("Converting")
-                    Conversion(vname, ext, url.length)
+                    Conversion(final_name, ext, url.length)
                 # Finished
                 newWindow.bell()
                 downloading_var.set("Finished")
@@ -1576,7 +1576,7 @@ def PlaylistWindow():
                     # Convert if there is a conversion
                     if advanced_checker == "yes":
                         downloading_var.set("Converting")
-                        Conversion(vname, ext, url.length)
+                        Conversion(final_name, ext, url.length)
 
         # If playlist is 720p, 360p, *audio
         else:
