@@ -51,7 +51,6 @@ root.resizable(False, False)
 if platform == "linux" or platform == "linux2": pass
 else: root.iconbitmap("YDICO.ico") #Windows & MacOS
 root.title("YouTube Downloader")
-root.protocol("WM_DELETE_WINDOW", onClosing)
 customtkinter.CTkLabel(root, text = "YouTube Downloader", font = ("arial bold", 45)).place(x = 140 , y = 20)
 
 # Link Entry Copy
@@ -282,245 +281,275 @@ def whenOpening():
 
 # Advanced Settings Window
 def AdvancedWindow():
-    # Form creating
-    def onClosing():
-        advWindow.destroy()
-        root.deiconify()
-    advWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
-    advWindow.title("Advanced Quality Settings")
-    width = 700
-    height = 460
-    x = (advWindow.winfo_screenwidth() // 2) - (width // 2)
-    y = (advWindow.winfo_screenheight() // 2) - (height // 2)
-    advWindow.geometry(f"{width}x{height}+{x}+{y}")
-    advWindow.maxsize(700, 460)
-    advWindow.minsize(700, 460)
-    if platform == "linux" or platform == "linux2": pass
-    else: advWindow.iconbitmap("YDICO.ico") #Windows & MacOS
-    advWindow.protocol("WM_DELETE_WINDOW", onClosing)
-    root.withdraw()
+    global advWindow
+    try:
+        advWindow.deiconify()
+    except:
+        # Form creating
+        def onClosing():
+            advWindow.destroy()
+            root.deiconify()
+        advWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
+        advWindow.title("Advanced Quality Settings")
+        width = 700
+        height = 460
+        x = (advWindow.winfo_screenwidth() // 2) - (width // 2)
+        y = (advWindow.winfo_screenheight() // 2) - (height // 2)
+        advWindow.geometry(f"{width}x{height}+{x}+{y}")
+        advWindow.maxsize(700, 460)
+        advWindow.minsize(700, 460)
+        if platform == "linux" or platform == "linux2": pass
+        else: advWindow.iconbitmap("YDICO.ico") #Windows & MacOS
+        advWindow.protocol("WM_DELETE_WINDOW", onClosing)
+        root.withdraw()
 
-    # CRF slider function
-    def crfSlider(num):
-        if num == 23: crf_var.set(f"{int(num)} (Default)")
-        elif num == 0: crf_var.set(f"{int(num)} (Loseless Quality)")
-        elif num == 51: crf_var.set(f"{int(num)} (Lowest Quality)")
-        else: crf_var.set(int(num))
+        # CRF slider function
+        def crfSlider(num):
+            if num == 23: crf_var.set(f"{int(num)} (Default)")
+            elif num == 0: crf_var.set(f"{int(num)} (Loseless Quality)")
+            elif num == 51: crf_var.set(f"{int(num)} (Lowest Quality)")
+            else: crf_var.set(int(num))
 
-    # Radiobuttons function
-    def radioDisableNormal():
-        if video_crf_or_bitrate.get() == "crf":
+        # Radiobuttons function
+        def radioDisableNormal():
+            if video_crf_or_bitrate.get() == "crf":
+                crf_slider.configure(state = "normal")
+                bitrate_entry.configure(state = "disabled")
+            else:
+                bitrate_entry.configure(state = "normal")
+                crf_slider.configure(state = "disabled")
+            if audio_quality_or_bitrate.get() == "bitrate":
+                abitrate_combobox.configure(state = "readonly")
+                aquality_combobox.configure(state = "disabled")
+            else:
+                aquality_combobox.configure(state = "readonly")
+                abitrate_combobox.configure(state = "disabled")
+
+        # Widgets vars
+        video_crf_or_bitrate = StringVar()
+        video_crf_or_bitrate.set("crf")
+        crf_var = StringVar()
+        crf_var.set("23 (Default)")
+        audio_quality_or_bitrate = StringVar()
+        audio_quality_or_bitrate.set("bitrate")
+        bitrate_entry_var = StringVar()
+        # Widgets lists
+        profile_combobox_list = ["High", "Main (Default)", "Baseline"] # -profile [selected option]
+        tune_combobox_list = ["None (Default)", "Film", "Animation", "Grain", "Still Image", "Fast Decode", "Zero Latency"] # -tune [selected option]
+        preset_combobox_list = ["Ultrafast", "Superfast", "Veryfast", "Faster", "Fast", "Medium (Default)", "Slow"] # -preset [prselected optioneset]
+        format_combobox_list = ["MP4 (Default)", "M4A", "MKV"]
+        codec_combobox_list = ["H.264 (Default)", "H.265", "AV1", "MPEG-4"]
+        fps_combobox_list = ["5", "10", "15", "20", "23.976", "24", "30 (Default)", "40", "45", "50", "60"]
+        aformat_combobox_list = ["MP3 (Default)", "AAC", "OPUS", "FLAC"]
+        abitrate_combobox_list = ["320", "192", "160", "128", "96", "70", "50"]
+        aquality_combobox_list = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        # Widgets placing
+        customtkinter.CTkLabel(advWindow, text = "Video Settings", font = ("arial bold italic", 30)).place(x = 8 , y = 13)
+        customtkinter.CTkLabel(advWindow, text = "Format:", font = ("arial bold", 20)).place(x = 20 , y = 55)
+        format_combobox = customtkinter.CTkComboBox(advWindow, width = 133, height = 26, values = format_combobox_list, corner_radius = 15, state = "readonly")
+        format_combobox._entry.configure(readonlybackground = format_combobox._apply_appearance_mode(format_combobox._fg_color))
+        format_combobox.set("MP4 (Default)")
+        format_combobox.place(x = 97 , y = 55)
+        customtkinter.CTkLabel(advWindow, text = "Encoder Preset:", font = ("arial bold", 20)).place(x = 360 , y = 55)
+        preset_combobox = customtkinter.CTkComboBox(advWindow, width = 150, height = 26, values = preset_combobox_list, corner_radius = 15, state = "readonly")
+        preset_combobox._entry.configure(readonlybackground = preset_combobox._apply_appearance_mode(preset_combobox._fg_color))
+        preset_combobox.set("Medium (Default)")
+        preset_combobox.place(x = 519 , y = 55)
+        customtkinter.CTkLabel(advWindow, text = "Encoder Tune:", font = ("arial bold", 20)).place(x = 360 , y = 90)
+        tune_combobox = customtkinter.CTkComboBox(advWindow, width = 137, height = 26, values = tune_combobox_list, corner_radius = 15, state = "readonly")
+        tune_combobox._entry.configure(readonlybackground = tune_combobox._apply_appearance_mode(tune_combobox._fg_color))
+        tune_combobox.set("None (Default)")
+        tune_combobox.place(x = 505 , y = 90)
+        customtkinter.CTkLabel(advWindow, text = "Encoder Profile:", font = ("arial bold", 20)).place(x = 360 , y = 125)
+        profile_combobox = customtkinter.CTkComboBox(advWindow, width = 137, height = 26, values = profile_combobox_list, corner_radius = 15, state = "readonly")
+        profile_combobox._entry.configure(readonlybackground = profile_combobox._apply_appearance_mode(profile_combobox._fg_color))
+        profile_combobox.set("Main (Default)")
+        profile_combobox.place(x = 518 , y = 125)
+        customtkinter.CTkLabel(advWindow, text = "Codec:", font = ("arial bold", 20)).place(x = 20 , y = 90)
+        codec_combobox = customtkinter.CTkComboBox(advWindow, width = 138, height = 26, values = codec_combobox_list, corner_radius = 15, state = "readonly")
+        codec_combobox.place(x = 93 , y = 90)
+        codec_combobox._entry.configure(readonlybackground = codec_combobox._apply_appearance_mode(codec_combobox._fg_color))
+        codec_combobox.set("H.264 (Default)")
+        customtkinter.CTkLabel(advWindow, text = "Framerate (FPS):", font = ("arial bold", 20)).place(x = 20 , y = 125)
+        fps_combobox = customtkinter.CTkComboBox(advWindow, width = 120, height = 26, values = fps_combobox_list, corner_radius = 15, state = "readonly")
+        fps_combobox.place(x = 185 , y = 125)
+        fps_combobox._entry.configure(readonlybackground = fps_combobox._apply_appearance_mode(fps_combobox._fg_color))
+        fps_combobox.set("30 (Default)")
+        crf_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Constant Quality:", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "crf", command = radioDisableNormal)
+        crf_radiobutton.place(x = 20 , y = 163)
+        customtkinter.CTkLabel(advWindow, textvariable = crf_var, font = ("arial", 17)).place(x = 520 , y = 161)
+        crf_slider = customtkinter.CTkSlider(advWindow, corner_radius = 15, width = 300, from_ = 0, to = 51, number_of_steps = 51, command = crfSlider)
+        crf_slider.place(x = 212 , y = 167)
+        crf_slider.set(23)
+        bitrate_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Total Bitrate (kbps):", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "bitrate", command = radioDisableNormal)
+        bitrate_radiobutton.place(x = 20 , y = 198)
+        bitrate_entry = customtkinter.CTkEntry(advWindow, textvariable = bitrate_entry_var, width = 100, height = 26, corner_radius = 15, state = "disabled")
+        bitrate_entry.place(x = 238 , y = 198)
+        customtkinter.CTkLabel(advWindow, text = "Audio Settings", font = ("arial bold italic", 30)).place(x = 8 , y = 238)
+        customtkinter.CTkLabel(advWindow, text = "Format:", font = ("arial bold", 20)).place(x = 20 , y = 280)
+        aformat_combobox = customtkinter.CTkComboBox(advWindow, width = 133, height = 26, values = aformat_combobox_list, corner_radius = 15, state = "readonly")
+        aformat_combobox._entry.configure(readonlybackground = aformat_combobox._apply_appearance_mode(aformat_combobox._fg_color))
+        aformat_combobox.set("MP3 (Default)")
+        aformat_combobox.place(x = 96 , y = 280)
+        abitrate_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Bitrate:", font = ("arial bold", 20), variable = audio_quality_or_bitrate, value = "bitrate", command = radioDisableNormal)
+        abitrate_radiobutton.place(x = 20 , y = 318)
+        abitrate_combobox = customtkinter.CTkComboBox(advWindow, width = 80, height = 26, values = abitrate_combobox_list, corner_radius = 15, state = "readonly")
+        abitrate_combobox._entry.configure(readonlybackground = abitrate_combobox._apply_appearance_mode(abitrate_combobox._fg_color))
+        abitrate_combobox.set("320")
+        abitrate_combobox.place(x = 121 , y = 316)
+        aquality_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Quality:", font = ("arial bold", 20), variable = audio_quality_or_bitrate, value = "quality", command = radioDisableNormal)
+        aquality_radiobutton.place(x = 20 , y = 353)
+        aquality_combobox = customtkinter.CTkComboBox(advWindow, width = 90, height = 26, values = aquality_combobox_list, corner_radius = 15, state = "disabled")
+        aquality_combobox._entry.configure(readonlybackground = aquality_combobox._apply_appearance_mode(aquality_combobox._fg_color))
+        aquality_combobox.place(x = 125 , y = 351)
+
+        # Switch stuff
+        global switch_value
+        switch_value = "video and audio"
+        def switchFunction():
+            global switch_value
+            if switch_value == "video and audio":
+                switch_value = "audio only"
+                format_combobox.configure(state = "disabled")
+                codec_combobox.configure(state = "disabled")
+                fps_combobox.configure(state = "disabled")
+                crf_slider.configure(state = "disabled")
+                bitrate_entry.configure(state = "disabled")
+                crf_radiobutton.configure(state = "disabled")
+                bitrate_radiobutton.configure(state = "disabled")
+                preset_combobox.configure(state = "disabled")
+                tune_combobox.configure(state = "disabled")
+                profile_combobox.configure(state = "disabled")
+            elif switch_value == "audio only":
+                switch_value = "video and audio"
+                format_combobox.configure(state = "readonly")
+                codec_combobox.configure(state = "readonly")
+                fps_combobox.configure(state = "readonly")
+                if video_crf_or_bitrate.get() == "crf": crf_slider.configure(state = "normal")
+                else: bitrate_entry.configure(state = "normal")
+                crf_radiobutton.configure(state = "normal")
+                bitrate_radiobutton.configure(state = "normal")
+                preset_combobox.configure(state = "normal")
+                tune_combobox.configure(state = "normal")
+                profile_combobox.configure(state = "normal")
+        # Placing the switch and labels
+        customtkinter.CTkLabel(advWindow, text = "Audio Only", font = ("arial", 15)).place(x = 27 , y = 417)
+        switch = customtkinter.CTkSwitch(advWindow, text = "", command = switchFunction)
+        switch.place(x = 110 , y = 420)
+        switch.select()
+        customtkinter.CTkLabel(advWindow, text = "Video & Audio", font = ("arial", 15)).place(x = 154 , y = 417)
+
+        # Buttons stuff
+        def cancelButton(): # For cancel button
+            advWindow.destroy()
+            root.deiconify()
+        def resetButton(): # For reset button
+            switch.select()
+            if switch_value == "audio only": switchFunction()
             crf_slider.configure(state = "normal")
             bitrate_entry.configure(state = "disabled")
-        else:
-            bitrate_entry.configure(state = "normal")
-            crf_slider.configure(state = "disabled")
-        if audio_quality_or_bitrate.get() == "bitrate":
             abitrate_combobox.configure(state = "normal")
             aquality_combobox.configure(state = "disabled")
-        else:
-            aquality_combobox.configure(state = "normal")
-            abitrate_combobox.configure(state = "disabled")
-
-    # Widgets vars
-    video_crf_or_bitrate = StringVar()
-    video_crf_or_bitrate.set("crf")
-    crf_var = StringVar()
-    crf_var.set("23 (Default)")
-    audio_quality_or_bitrate = StringVar()
-    audio_quality_or_bitrate.set("bitrate")
-    bitrate_entry_var = StringVar()
-    # Widgets lists
-    format_combobox_list = ["MP4 (Default)", "M4A", "MKV"]
-    codec_combobox_list = ["H.264 (Default)", "H.265", "AV1", "MPEG-4"]
-    fps_combobox_list = ["5", "10", "15", "20", "23.976", "24", "30 (Default)", "40", "45", "50", "60"]
-    aformat_combobox_list = ["MP3 (Default)", "AAC", "OPUS", "FLAC"]
-    abitrate_combobox_list = ["320", "192", "160", "128", "96", "70", "50"]
-    aquality_combobox_list = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    # Widgets placing
-    customtkinter.CTkLabel(advWindow, text = "Video Settings", font = ("arial bold italic", 30)).place(x = 8 , y = 13)
-    customtkinter.CTkLabel(advWindow, text = "Format:", font = ("arial bold", 20)).place(x = 20 , y = 55)
-    format_combobox = customtkinter.CTkComboBox(advWindow, width = 133, height = 26, values = format_combobox_list, corner_radius = 15)
-    format_combobox.place(x = 97 , y = 55)
-    customtkinter.CTkLabel(advWindow, text = "Codec:", font = ("arial bold", 20)).place(x = 20 , y = 90)
-    codec_combobox = customtkinter.CTkComboBox(advWindow, width = 138, height = 26, values = codec_combobox_list, corner_radius = 15)
-    codec_combobox.place(x = 93 , y = 90)
-    customtkinter.CTkLabel(advWindow, text = "Framerate (FPS):", font = ("arial bold", 20)).place(x = 20 , y = 125)
-    fps_combobox = customtkinter.CTkComboBox(advWindow, width = 120, height = 26, values = fps_combobox_list, corner_radius = 15)
-    fps_combobox.place(x = 185 , y = 125)
-    fps_combobox.set("30 (Default)")
-    crf_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Constant Quality:", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "crf", command = radioDisableNormal)
-    crf_radiobutton.place(x = 20 , y = 163)
-    customtkinter.CTkLabel(advWindow, textvariable = crf_var, font = ("arial", 17)).place(x = 520 , y = 161)
-    crf_slider = customtkinter.CTkSlider(advWindow, corner_radius = 15, width = 300, from_ = 0, to = 51, number_of_steps = 51, command = crfSlider)
-    crf_slider.place(x = 212 , y = 167)
-    crf_slider.set(23)
-    bitrate_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Total Bitrate (kbps):", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "bitrate", command = radioDisableNormal)
-    bitrate_radiobutton.place(x = 20 , y = 198)
-    bitrate_entry = customtkinter.CTkEntry(advWindow, textvariable = bitrate_entry_var, width = 100, height = 26, corner_radius = 15, state = "disabled")
-    bitrate_entry.place(x = 238 , y = 198)
-    customtkinter.CTkLabel(advWindow, text = "Audio Settings", font = ("arial bold italic", 30)).place(x = 8 , y = 238)
-    customtkinter.CTkLabel(advWindow, text = "Format:", font = ("arial bold", 20)).place(x = 20 , y = 280)
-    aformat_combobox = customtkinter.CTkComboBox(advWindow, width = 133, height = 26, values = aformat_combobox_list, corner_radius = 15)
-    aformat_combobox.place(x = 96 , y = 280)
-    abitrate_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Bitrate:", font = ("arial bold", 20), variable = audio_quality_or_bitrate, value = "bitrate", command = radioDisableNormal)
-    abitrate_radiobutton.place(x = 20 , y = 318)
-    abitrate_combobox = customtkinter.CTkComboBox(advWindow, width = 80, height = 26, values = abitrate_combobox_list, corner_radius = 15)
-    abitrate_combobox.place(x = 121 , y = 316)
-    aquality_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Quality:", font = ("arial bold", 20), variable = audio_quality_or_bitrate, value = "quality", command = radioDisableNormal)
-    aquality_radiobutton.place(x = 20 , y = 353)
-    aquality_combobox = customtkinter.CTkComboBox(advWindow, width = 90, height = 26, values = aquality_combobox_list, corner_radius = 15, state = "disabled")
-    aquality_combobox.place(x = 125 , y = 351)
-
-    # Switch stuff
-    global switch_value
-    switch_value = "video and audio"
-    def switchFunction():
-        global switch_value
-        if switch_value == "video and audio":
-            switch_value = "audio only"
-            format_combobox.configure(state = "disabled")
-            codec_combobox.configure(state = "disabled")
-            fps_combobox.configure(state = "disabled")
-            crf_slider.configure(state = "disabled")
-            bitrate_entry.configure(state = "disabled")
-            crf_radiobutton.configure(state = "disabled")
-            bitrate_radiobutton.configure(state = "disabled")
-        elif switch_value == "audio only":
-            switch_value = "video and audio"
-            format_combobox.configure(state = "normal")
-            codec_combobox.configure(state = "normal")
-            fps_combobox.configure(state = "normal")
-            if video_crf_or_bitrate.get() == "crf": crf_slider.configure(state = "normal")
-            else: bitrate_entry.configure(state = "normal")
-            crf_radiobutton.configure(state = "normal")
-            bitrate_radiobutton.configure(state = "normal")
-    # Placing the switch and labels
-    customtkinter.CTkLabel(advWindow, text = "Audio Only", font = ("arial", 15)).place(x = 27 , y = 417)
-    switch = customtkinter.CTkSwitch(advWindow, text = "", command = switchFunction)
-    switch.place(x = 110 , y = 420)
-    switch.select()
-    customtkinter.CTkLabel(advWindow, text = "Video & Audio", font = ("arial", 15)).place(x = 154 , y = 417)
-
-    # Buttons stuff
-    def cancelButton(): # For cancel button
-        advWindow.destroy()
-        root.deiconify()
-    def resetButton(): # For reset button
-        switch.select()
-        if switch_value == "audio only": switchFunction()
-        crf_slider.configure(state = "normal")
-        bitrate_entry.configure(state = "disabled")
-        abitrate_combobox.configure(state = "normal")
-        aquality_combobox.configure(state = "disabled")
-        format_combobox.set("MP4 (Default)")
-        codec_combobox.set("H.264 (Default)")
-        fps_combobox.set("30 (Default)")
-        video_crf_or_bitrate.set("crf")
-        crfSlider(23)
-        bitrate_entry_var.set("")
-        aformat_combobox.set("MP3 (Default)")
-        audio_quality_or_bitrate.set("bitrate")
-        abitrate_combobox.set("320")
-        aquality_combobox.set("")
-    def okButton(): # For ok button
-        global ffmpeg_command, advanced_quality_settings, advanced_extention, fps
-        fps = "30"
-        ffmpeg_command = 'ffmpeg -i "input"'
-        format_combobox.configure(border_color = "#565B5E")
-        codec_combobox.configure(border_color = "#565B5E")
-        fps_combobox.configure(border_color = "#565B5E")
-        bitrate_entry.configure(border_color = "#565B5E")
-        aformat_combobox.configure(border_color = "#565B5E")
-        abitrate_combobox.configure(border_color = "#565B5E")
-        aquality_combobox.configure(border_color = "#565B5E")
-        if switch_value == "video and audio":
-            if format_combobox.get() == "M4A" and aformat_combobox.get() == "FLAC":
-                format_combobox.configure(border_color = "red")
-                aformat_combobox.configure(border_color = "red")
-                return messagebox.showerror(title = "Formats Not Compatible", message = "M4A Container doesn't support FLAC format.")
-            if format_combobox.get() not in format_combobox_list:
-                format_combobox.configure(border_color = "red")
-                return messagebox.showerror(title = "Wrong Video Format", message = "Please select a valid video format.")
-            elif codec_combobox.get() not in codec_combobox_list:
-                codec_combobox.configure(border_color = "red")
-                return messagebox.showerror(title = "Wrong Video Codec", message = "Please select a valid video codec.")
-            elif fps_combobox.get() not in fps_combobox_list:
-                fps_combobox.configure(border_color = "red")
-                return messagebox.showerror(title = "Wrong Video Framrate", message = "Please select a valid video framerate.")
-            elif video_crf_or_bitrate.get() == "crf":
-                if crf_slider.get() not in range(0, 52):
-                    return messagebox.showerror(title = "Wrong Video Constant Quality", message = "Please select a valid video constant quality.")
+            format_combobox.set("MP4 (Default)")
+            codec_combobox.set("H.264 (Default)")
+            fps_combobox.set("30 (Default)")
+            preset_combobox.set("Medium (Default)")
+            tune_combobox.set("None (Default)")
+            profile_combobox.set("Main (Default)")
+            video_crf_or_bitrate.set("crf")
+            crfSlider(23)
+            bitrate_entry_var.set("")
+            aformat_combobox.set("MP3 (Default)")
+            audio_quality_or_bitrate.set("bitrate")
+            abitrate_combobox.set("320")
+            aquality_combobox.set("")
+        def okButton(): # For ok button
+            global ffmpeg_command, advanced_quality_settings, advanced_extention, fps
+            fps = "30"
+            ffmpeg_command = 'ffmpeg -i "input"'
+            format_combobox.configure(border_color = "#565B5E")
+            bitrate_entry.configure(border_color = "#565B5E")
+            aformat_combobox.configure(border_color = "#565B5E")
+            if switch_value == "video and audio":
                 if format_combobox.get() == "MP4 (Default)": advanced_extention = "mp4"
                 else: advanced_extention = format_combobox.get().lower()
                 if codec_combobox.get() == "H.264 (Default)": codec = "libx264"
                 elif codec_combobox.get() == "H.265": codec = "libx265"
                 elif codec_combobox.get() == "AV1": codec = "libaom-av1"
                 elif codec_combobox.get() == "MPEG-4": codec = "mpeg4"
+                ffmpeg_command = ffmpeg_command + f' -c:v {codec}'
                 if fps_combobox.get() == "30 (Default)": fps = "30"
                 else: fps = fps_combobox.get()
-                if crf_slider.get() == "23 (Default)": crf = "23"
-                elif crf_slider.get() == "0 (Loseless Quality)": crf = "0"
-                elif crf_slider.get() == "51 (Highest Quality)": crf = "51"
-                else: crf = crf_slider.get()
-                ffmpeg_command = ffmpeg_command + f' -filter:v fps=fps={fps} -c:v {codec} -crf {crf}'
-            else:
-                try:
-                    if int(bitrate_entry.get()) not in range(100, 50001):
+                ffmpeg_command = ffmpeg_command + f' -filter:v fps=fps={fps}'
+                if aformat_combobox.get() == "MP3 (Default)": format_codec = "libmp3lame"
+                elif aformat_combobox.get() == "AAC": format_codec = "aac"
+                elif aformat_combobox.get() == "OPUS": format_codec = "libopus"
+                elif aformat_combobox.get() == "FLAC": format_codec = "flac"
+                if format_combobox.get() == "M4A" and aformat_combobox.get() == "FLAC":
+                    format_combobox.configure(border_color = "red")
+                    aformat_combobox.configure(border_color = "red")
+                    return messagebox.showerror(title = "Formats Not Compatible", message = "M4A Container doesn't support FLAC format.")
+                if profile_combobox.get() == "Main (Default)": profile = "main"
+                else: profile = profile_combobox.get().lower()
+                ffmpeg_command = ffmpeg_command + f' -profile {profile}'
+                if preset_combobox.get() == "Medium (Default)": preset = "Medium"
+                else: preset = preset_combobox.get().lower()
+                ffmpeg_command = ffmpeg_command + f' -preset {preset}'
+                if tune_combobox.get() == "None (Default)":
+                    pass
+                else:
+                    tune = tune_combobox.get().lower().replace(" ", "")
+                    ffmpeg_command = ffmpeg_command + f' -tune {tune}'
+                if video_crf_or_bitrate.get() == "crf":
+                    if crf_slider.get() == "23 (Default)": crf = "23"
+                    elif crf_slider.get() == "0 (Loseless Quality)": crf = "0"
+                    elif crf_slider.get() == "51 (Highest Quality)": crf = "51"
+                    else: crf = crf_slider.get()
+                    ffmpeg_command = ffmpeg_command + f' -crf {crf}'
+                else:
+                    try:
+                        if int(bitrate_entry.get()) not in range(100, 50001):
+                            bitrate_entry.configure(border_color = "red")
+                            return messagebox.showerror(title = "Wrong Video Bitrate", message = "Please select a valid video bitrate (from 100 to 50000).")
+                    except ValueError:
                         bitrate_entry.configure(border_color = "red")
                         return messagebox.showerror(title = "Wrong Video Bitrate", message = "Please select a valid video bitrate (from 100 to 50000).")
-                except ValueError:
-                    return messagebox.showerror(title = "Wrong Video Bitrate", message = "Please select a valid video bitrate (from 100 to 50000).")
-                if format_combobox.get() == "MP4 (Default)": advanced_extention = "mp4"
-                else: advanced_extention = format_combobox.get().lower()
-                if codec_combobox.get() == "H.264 (Default)": codec = "libx264"
-                elif codec_combobox.get() == "H.265": codec = "libx265"
-                elif codec_combobox.get() == "AV1": codec = "libaom-av1"
-                elif codec_combobox.get() == "MPEG-4": codec = "mpeg4"
-                if fps_combobox.get() == "30 (Default)": fps = "30"
-                else: fps = fps_combobox.get()
-                bitrate = bitrate_entry.get() + "K"
-                ffmpeg_command = ffmpeg_command + f' -filter:v fps=fps={fps} -c:v {codec} -b:v {bitrate}'
-            advanced_quality_settings = "video"
-        else:
-            advanced_quality_settings = "audio"
-            if aformat_combobox.get() == "MP3 (Default)": advanced_extention = "mp3"
-            elif aformat_combobox.get() == "AAC": advanced_extention = "aac"
-            elif aformat_combobox.get() == "OPUS": advanced_extention = "opus"
-            elif aformat_combobox.get() == "FLAC": advanced_extention = "flac"
-        if aformat_combobox.get() not in aformat_combobox_list:
-            aformat_combobox.configure(border_color = "red")
-            return messagebox.showerror(title = "Wrong Audio Format", message = "Please select a valid audio format.")
-        elif audio_quality_or_bitrate.get() == "bitrate":
-            if abitrate_combobox.get() not in abitrate_combobox_list:
-                abitrate_combobox.configure(border_color = "red")
-                return messagebox.showerror(title = "Wrong Audio Bitrate", message = "Please select a valid audio bitrate.")
-            if aformat_combobox.get() == "MP3 (Default)": format_codec = "libmp3lame"
-            elif aformat_combobox.get() == "AAC": format_codec = "aac"
-            elif aformat_combobox.get() == "OPUS": format_codec = "libopus"
-            elif aformat_combobox.get() == "FLAC": format_codec = "flac"
-            abitrate = abitrate_combobox.get() + "K"
-            ffmpeg_command = ffmpeg_command + f' -c:a {format_codec} -b:a {abitrate}'
-        else:
-            if aquality_combobox.get() not in aquality_combobox_list:
-                aquality_combobox.configure(border_color = "red")
-                return messagebox.showerror(title = "Wrong Audio Format", message = "Please select a valid audio quality.")
-            if aformat_combobox.get() == "MP3 (Default)": format_codec = "libmp3lame"
-            elif aformat_combobox.get() == "AAC": format_codec = "aac"
-            elif aformat_combobox.get() == "OPUS": format_codec = "libopus"
-            elif aformat_combobox.get() == "FLAC": format_codec = "flac"
-            ffmpeg_command = ffmpeg_command + f' -c:a {format_codec} -q:a {aquality_combobox.get()}'
-        ffmpeg_command = ffmpeg_command + ' -progress pipe:1 "output"'
-        print(ffmpeg_command)
-        print(advanced_quality_settings)
-        print(advanced_extention)
-        advWindow.destroy()
-        root.deiconify()
+                    else: fps = fps_combobox.get()
+                    bitrate = bitrate_entry.get() + "K"
+                    ffmpeg_command = ffmpeg_command + f' -b:v {bitrate}'
+                advanced_quality_settings = "video"
+            else:
+                advanced_quality_settings = "audio"
+                if aformat_combobox.get() == "MP3 (Default)":
+                    format_codec = "libmp3lame"
+                    advanced_extention = "mp3"
+                elif aformat_combobox.get() == "AAC":
+                    format_codec = "aac"
+                    advanced_extention = "aac"
+                elif aformat_combobox.get() == "OPUS":
+                    format_codec = "libopus"
+                    advanced_extention = "opus"
+                elif aformat_combobox.get() == "FLAC":
+                    format_codec = "flac"
+                    advanced_extention = "flac"
+                ffmpeg_command = ffmpeg_command + f' -c:a {format_codec}'
+            if audio_quality_or_bitrate.get() == "bitrate":
+                abitrate = abitrate_combobox.get() + "K"
+                ffmpeg_command = ffmpeg_command + f' -b:a {abitrate}'
+            else:
+                ffmpeg_command = ffmpeg_command + f' -q:a {aquality_combobox.get()}'
+            ffmpeg_command = ffmpeg_command + ' -progress pipe:1 "output"'
+            print(ffmpeg_command)
+            print(advanced_quality_settings)
+            print(advanced_extention)
+            advWindow.withdraw()
+            root.deiconify()
 
-    # Placing the buttons
-    customtkinter.CTkButton(advWindow, text = "OK", font = ("arial bold", 20), width = 120, corner_radius = 20, command = okButton).place(x = 565 , y = 415)
-    customtkinter.CTkButton(advWindow, text = "Reset", font = ("arial bold", 20), width = 120, corner_radius = 20, command = resetButton).place(x = 435 , y = 415)
-    customtkinter.CTkButton(advWindow, text = "Cancel", font = ("arial bold", 20), width = 120, corner_radius = 20, command = cancelButton).place(x = 305 , y = 415)
+        # Placing the buttons
+        customtkinter.CTkButton(advWindow, text = "OK", font = ("arial bold", 20), width = 120, corner_radius = 20, command = okButton).place(x = 565 , y = 415)
+        customtkinter.CTkButton(advWindow, text = "Reset", font = ("arial bold", 20), width = 120, corner_radius = 20, command = resetButton).place(x = 435 , y = 415)
+        customtkinter.CTkButton(advWindow, text = "Cancel", font = ("arial bold", 20), width = 120, corner_radius = 20, command = cancelButton).place(x = 305 , y = 415)
+
 
 # Advanced settings button
 advanced_quality_settings = "no"
@@ -559,7 +588,8 @@ def Conversion(input, ext, seconds):
         n_frame = q[0]  # Read last element from progress_reader - current encoded frame
         progress_percent = (n_frame/tot_n_frames)*100   # Convert to percentage.
         print(f'Progress [%]: {progress_percent:.2f} ')  # Print the progress
-        converting_percentage_var.set(f'{progress_percent:.2f}%')  # Show the progress
+        if ext == "mp4": converting_percentage_var.set(f'{progress_percent:.2f}%')  # Show the progress
+        else: pass # For some reson, progress doesn't get printed when it's an audio
     process.stdout.close()          # Close stdin pipe.
     progress_reader_thread.join()   # Join thread
     process.wait()                  # Wait for FFmpeg sub-process to finish
@@ -631,10 +661,6 @@ def DownlaodWindow():
                     break
                 else:
                     lang = "en"
-        else:
-            whenVideoError()
-            messagebox.showerror(title = "Subtitle Not Supported", message = "Please choose a supported language.")
-            return False
         try: # Get the subtitle directly if it's there
             final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
             print("got one already there")
@@ -801,8 +827,7 @@ def DownlaodWindow():
         elif quality == "160": video = url.streams.filter(res = "144p").first()
         else: video = url.streams.get_by_itag(quality)
         # Download subtitles if selected
-        if caps == "yes":
-            if CaptionsDownload() == False: return
+        if caps == "yes": CaptionsDownload()
         else: pass
         # Progress stuff
         pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
@@ -907,48 +932,7 @@ def DownlaodWindow():
             try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
             except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
             try:
-                with open(vname, "wb") as f:
-                    is_paused = is_cancelled = False
-                    video = request.stream(video.url) # get an iterable stream
-                    downloaded = 0
-                    while True:
-                        if is_cancelled:
-                            toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                            toggle_button.place(x = 550 , y = 347)
-                            cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                            cancel_button.place(x = 595 , y = 347)
-                            downloading_var.set("Canceled")
-                            break
-                        if is_paused:
-                            time.sleep(0.5)
-                            continue
-                        try: chunk = next(video, None) # Get next chunk of video
-                        except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
-                        if chunk:
-                            f.write(chunk) # Downlaod the chunk into the file
-                            # Update progress
-                            downloaded += len(chunk)
-                            remaining = size - downloaded
-                            bytes_downloaded = size - remaining
-                            percentage_of_completion = bytes_downloaded / size * 100
-                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
-                            progressbar.set(percentage_of_completion/100)
-                        else:
-                            # When finished
-                            toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                            toggle_button.place(x = 550 , y = 347)
-                            cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                            cancel_button.place(x = 595 , y = 347)
-                            # Convert if there is a conversion
-                            if advanced_checker == "yes":
-                                downloading_var.set("Converting")
-                                Conversion(vname, ext, url.length)
-                            newWindow.bell()
-                            downloading_var.set("Finished")
-                            converting_percentage_var.set("")
-                            customtkinter.CTkButton(newWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
-                            break
+                with open(vname, "wb") as f: pass
             except PermissionError:
                 whenVideoError()
                 path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
@@ -957,6 +941,48 @@ def DownlaodWindow():
                 whenVideoError()
                 path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
                 return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+            with open(vname, "wb") as f:
+                is_paused = is_cancelled = False
+                video = request.stream(video.url) # get an iterable stream
+                downloaded = 0
+                while True:
+                    if is_cancelled:
+                        toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                        toggle_button.place(x = 550 , y = 347)
+                        cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                        cancel_button.place(x = 595 , y = 347)
+                        downloading_var.set("Canceled")
+                        break
+                    if is_paused:
+                        time.sleep(0.5)
+                        continue
+                    try: chunk = next(video, None) # Get next chunk of video
+                    except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                    if chunk:
+                        f.write(chunk) # Downlaod the chunk into the file
+                        # Update progress
+                        downloaded += len(chunk)
+                        remaining = size - downloaded
+                        bytes_downloaded = size - remaining
+                        percentage_of_completion = bytes_downloaded / size * 100
+                        percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                        sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                        progressbar.set(percentage_of_completion/100)
+                    else:
+                        # When finished
+                        toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                        toggle_button.place(x = 550 , y = 347)
+                        cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                        cancel_button.place(x = 595 , y = 347)
+                        # Convert if there is a conversion
+                        if advanced_checker == "yes":
+                            downloading_var.set("Converting")
+                            Conversion(vname, ext, url.length)
+                        newWindow.bell()
+                        downloading_var.set("Finished")
+                        converting_percentage_var.set("")
+                        customtkinter.CTkButton(newWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
+                        break
         if is_cancelled:
             msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
             if msg_box == "yes": os.remove(vname)
@@ -1023,7 +1049,7 @@ def DownlaodWindow():
     try:
         video_id = extract.video_id(link)
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        lang_choose_state = "normal"
+        lang_choose_state = "readonly"
         caps = "yes"
     except:
         lang_choose_state = "disabled"
@@ -1104,6 +1130,7 @@ def DownlaodWindow():
     # Subtitle Combobox
     customtkinter.CTkLabel(newWindow, text = "Subtitle:", font = ("arial bold", 20), corner_radius = 20).place(x = 325 , y = 315)
     lang_choose = customtkinter.CTkComboBox(newWindow, width = 100, height = 26, values = ["None", "Arabic", "English"], state = lang_choose_state, corner_radius = 15)
+    lang_choose._entry.configure(readonlybackground = lang_choose._apply_appearance_mode(lang_choose._fg_color))
     lang_choose.set("None")
     lang_choose.place(x = 430 , y = 315)
 
@@ -1227,10 +1254,6 @@ def PlaylistWindow():
                             break
                         else:
                             lang = "en"
-                else:
-                    whenPlaylistError()
-                    messagebox.showerror(title = "Subtitle Not Supported", message = "Please choose a supported language.")
-                    return False
                 downloadcounter_var.set("Subtitle Download")
                 try: # Get the subtitle directly if it's there
                     final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
@@ -1445,8 +1468,7 @@ def PlaylistWindow():
         audio_tags_list = ["251" , "140" , "250" , "249"]
         non_progressive_list = ["137" , "135" , "133", "160"]
         # Download subtitles if selected
-        if caps == "yes":
-            if pCaptionsDownload() == False: return
+        if caps == "yes": pCaptionsDownload()
         else: pass
         # Progress stuff
         pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
@@ -1479,6 +1501,7 @@ def PlaylistWindow():
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
                 downloading_var.set("Downloading")
+                converting_percentage_var.set("")
                 if quality == "137": video = url.streams.filter(res = "1080p").first()
                 elif quality == "135": video = url.streams.filter(res = "480p").first()
                 elif quality == "133": video = url.streams.filter(res = "240p").first()
@@ -1545,7 +1568,7 @@ def PlaylistWindow():
                 if is_cancelled:
                     pass
                 else: # Download audio
-                    # downloading_var.set("Downloading audio")
+                    downloading_var.set("Downloading audio")
                     with open(aname, "wb") as f:
                         is_paused = is_cancelled = False
                         audio = url.streams.get_by_itag(251)
@@ -1587,6 +1610,7 @@ def PlaylistWindow():
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
                 downloading_var.set("Downloading")
+                converting_percentage_var.set("")
                 video = url.streams.get_by_itag(quality)
                 size = video.filesize
                 if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
@@ -1601,45 +1625,7 @@ def PlaylistWindow():
                 percentage_var.set(f"0.00%  ")
                 sizeprogress_var.set(f"0 MB  ")
                 try:
-                    with open(vname, "wb") as f:
-                        customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
-                        downloaded = 0
-                        video = request.stream(video.url) # Get an iterable stream
-                        while True:
-                            if is_cancelled:
-                                downloading_var.set("Canceled")
-                                toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                                toggle_button.place(x = 550 , y = 347)
-                                cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                                cancel_button.place(x = 595 , y = 347)
-                                break
-                            if is_paused:
-                                time.sleep(0.5)
-                                continue
-                            try: chunk = next(video, None) # Get next chunk of video
-                            except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
-                            if chunk:
-                                f.write(chunk) # Download the chunk into the file
-                                # Update Progress
-                                downloaded += len(chunk)
-                                remaining = size - downloaded
-                                bytes_downloaded = size - remaining
-                                percentage_of_completion = bytes_downloaded / size * 100
-                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
-                                progressbar.set(percentage_of_completion/100)
-                            else:
-                                # Convert if there is a conversion
-                                if advanced_checker == "yes":
-                                    toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                                    toggle_button.place(x = 550 , y = 347)
-                                    cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                                    cancel_button.place(x = 595 , y = 347)
-                                    downloading_var.set("Converting")
-                                    Conversion(vname, ext, url.length)
-                                downloaded_counter = downloaded_counter + 1
-                                downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
-                                break # No more data = Finished
+                    with open(vname, "wb") as f: pass
                 except PermissionError:
                     whenPlaylistError()
                     path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
@@ -1648,6 +1634,45 @@ def PlaylistWindow():
                     whenPlaylistError()
                     path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
                     return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                with open(vname, "wb") as f:
+                    customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
+                    downloaded = 0
+                    video = request.stream(video.url) # Get an iterable stream
+                    while True:
+                        if is_cancelled:
+                            downloading_var.set("Canceled")
+                            toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                            toggle_button.place(x = 550 , y = 347)
+                            cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                            cancel_button.place(x = 595 , y = 347)
+                            break
+                        if is_paused:
+                            time.sleep(0.5)
+                            continue
+                        try: chunk = next(video, None) # Get next chunk of video
+                        except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                        if chunk:
+                            f.write(chunk) # Download the chunk into the file
+                            # Update Progress
+                            downloaded += len(chunk)
+                            remaining = size - downloaded
+                            bytes_downloaded = size - remaining
+                            percentage_of_completion = bytes_downloaded / size * 100
+                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                            progressbar.set(percentage_of_completion/100)
+                        else:
+                            # Convert if there is a conversion
+                            if advanced_checker == "yes":
+                                toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                                toggle_button.place(x = 550 , y = 347)
+                                cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                                cancel_button.place(x = 595 , y = 347)
+                                downloading_var.set("Converting")
+                                Conversion(vname, ext, url.length)
+                            downloaded_counter = downloaded_counter + 1
+                            downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
+                            break # No more data = Finished
 
         # When finished
         toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
@@ -1661,6 +1686,7 @@ def PlaylistWindow():
             downloadcounter_var.set("")
             pWindow.bell()
             downloading_var.set("Finished")
+            converting_percentage_var.set("")
             customtkinter.CTkButton(pWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
 
 
@@ -1800,7 +1826,7 @@ def PlaylistWindow():
     downloading_var = StringVar()
     customtkinter.CTkLabel(pWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 265 , y = 418)
     downloadcounter_var = StringVar()
-    customtkinter.CTkLabel(pWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(x = 460 , y = 418)
+    customtkinter.CTkLabel(pWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(rely = 1.0, relx = 1.0, x = -17, y = -13, anchor = SE)
     global converting_percentage_var
     converting_percentage_var = StringVar()
     customtkinter.CTkLabel(pWindow, textvariable = converting_percentage_var, font = ("arial", 22)).place(x = 410 , y = 418)
@@ -1844,11 +1870,12 @@ def PlaylistWindow():
         lang_choose_state = "disabled"
         caps = "no"
     else:
-        lang_choose_state = "normal"
+        lang_choose_state = "readonly"
         caps = "yes"
     print(vids_subs)
     customtkinter.CTkLabel(pWindow, text = "Subtitle:", font = ("arial bold", 20)).place(x = 340 , y = 315)
     lang_choose = customtkinter.CTkComboBox(pWindow, width = 100, height = 26, values = ["None", "Arabic", "English"], state = lang_choose_state, corner_radius = 15)
+    lang_choose._entry.configure(readonlybackground = lang_choose._apply_appearance_mode(lang_choose._fg_color))
     lang_choose.set("None")
     lang_choose.place(x = 430 , y = 315)
 
@@ -2469,10 +2496,6 @@ def SearchWindow():
                                 break
                             else:
                                 lang = "en"
-                    else:
-                        whenResultsError()
-                        messagebox.showerror(title = "Subtitle Not Supported", message = "Please choose a supported language.")
-                        return False
                     downloadcounter_var.set("Subtitle Download")
                     try: # Get the subtitle directly if it's there
                         final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
@@ -2641,8 +2664,7 @@ def SearchWindow():
             try: adv_checkbox.configure(state = "disabled")
             except: pass
             # Download subtitles if selected
-            if caps == "yes":
-                if sCaptionsDownload() == False: return
+            if caps == "yes": sCaptionsDownload()
             else: pass
 
             # Download to_download
@@ -2657,6 +2679,7 @@ def SearchWindow():
                 cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
                 downloading_var.set("Downloading")
+                converting_percentage_var.set("")
                 video = url.streams.get_by_itag(quality)
                 title_var.set(r.repr(url.title))
                 length_var.set(to_hms(url.length))
@@ -2792,7 +2815,7 @@ def SearchWindow():
         downloading_var = StringVar()
         customtkinter.CTkLabel(sDWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 265 , y = 418)
         downloadcounter_var = StringVar()
-        customtkinter.CTkLabel(sDWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(x = 500 , y = 418)
+        customtkinter.CTkLabel(sDWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(rely = 1.0, relx = 1.0, x = -17, y = -13, anchor = SE)
         global converting_percentage_var
         converting_percentage_var = StringVar()
         customtkinter.CTkLabel(sDWindow, textvariable = converting_percentage_var, font = ("arial", 22)).place(x = 410 , y = 418)
@@ -2838,11 +2861,12 @@ def SearchWindow():
             lang_choose_state = "disabled"
             caps = "no"
         else:
-            lang_choose_state = "normal"
+            lang_choose_state = "readonly"
             caps = "yes"
         print(vids_subs)
         customtkinter.CTkLabel(sDWindow, text = "Subtitle:", font = ("arial bold", 20)).place(x = 340 , y = 315)
         lang_choose = customtkinter.CTkComboBox(sDWindow, width = 100, height = 26, values = ["None", "Arabic", "English"], state = lang_choose_state, corner_radius = 15)
+        lang_choose._entry.configure(readonlybackground = lang_choose._apply_appearance_mode(lang_choose._fg_color))
         lang_choose.set("None")
         lang_choose.place(x = 430 , y = 315)
 
