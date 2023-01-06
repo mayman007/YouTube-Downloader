@@ -24,32 +24,32 @@
 <img src = "images/home_dark.png"></img>
 <figcaption>| Home Page</figcaption>
 </figure>
-
+<br>
 <figure>
 <img src = "images/home_light.png"></img>
 <figcaption>| Home Page (Light)</figcaption>
 </figure>
-
+<br>
 <figure>
 <img src = "images/advanced_settings.png"></img>
 <figcaption>| Advanced Quality Settings Page</figcaption>
 </figure>
-
+<br>
 <figure>
 <img src = "images/video_downloader.png"></img>
 <figcaption>| Video Downloader Page</figcaption>
 </figure>
-
+<br>
 <figure>
 <img src = "images/playlist_downloader.png"></img>
 <figcaption>| Playlist Downloader Page</figcaption>
 </figure>
-
+<br>
 <figure>
 <img src = "images/search_results.png"></img>
 <figcaption>| Search Results Page</figcaption>
 </figure>
-
+<br>
 <figure>
 <img src = "images/results_downloader.png"></img>
 <figcaption>| Results Downloader Page</figcaption>
