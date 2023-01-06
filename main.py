@@ -198,20 +198,22 @@ def changeTheme(color):
         to_change = "bg_theme"
     else:
         customtkinter.set_default_color_theme(color)
-        customtkinter.CTkLabel(root, text = "(Restart to take full effect)", font = ("arial", 12)).place(x = 175 , y = 415)
+        customtkinter.CTkLabel(root, text = "(Restart to take full effect)", font = ("arial", 12)).place(x = 242 , y = 415)
         to_change = "default_color"
     with open("theme_config.json", "r", encoding="utf8") as f:
         theme = json.load(f)
     with open("theme_config.json", "w", encoding="utf8") as f:
         theme[to_change] = color
         json.dump(theme, f, sort_keys = True, indent = 4, ensure_ascii = False)
-customtkinter.CTkLabel(root, text = "Appearance Mode", font = ("arial bold", 19)).place(x = 17 , y = 340)
-themes_menu = customtkinter.CTkOptionMenu(root, values = ["System", "Dark", "Light"], command = changeTheme, corner_radius = 20)
-themes_menu.place(x = 27 , y = 375)
-themes_menu.set("Theme")
-defaultcolor_menu = customtkinter.CTkOptionMenu(root, values = ["Blue", "Dark-blue", "Green"], command = changeTheme, corner_radius = 20)
-defaultcolor_menu.place(x = 27 , y = 415)
-defaultcolor_menu.set("Default Color")
+customtkinter.CTkLabel(root, text = "App Appearance", font = ("arial bold", 19)).place(x = 50 , y = 340)
+customtkinter.CTkLabel(root, text = "Theme Mode: ", font = ("arial", 15)).place(x = 27 , y = 375)
+themes_menu = customtkinter.CTkOptionMenu(root, values = ["System", "Dark", "Light"], width = 110, command = changeTheme, corner_radius = 15)
+themes_menu.place(x = 127 , y = 375)
+themes_menu.set(get_bg_theme().title())
+customtkinter.CTkLabel(root, text = "Default Color: ", font = ("arial", 15)).place(x = 27 , y = 415)
+defaultcolor_menu = customtkinter.CTkOptionMenu(root, values = ["Blue", "Dark-blue", "Green"], width = 110, command = changeTheme, corner_radius = 15)
+defaultcolor_menu.place(x = 127 , y = 415)
+defaultcolor_menu.set(get_default_color().title())
 
 # Loadings
 ploading_counter_var = StringVar()
@@ -278,12 +280,34 @@ def whenOpening():
     link_entry.configure(state = "disabled")
     search_entry.configure(state = "disabled")
 
+# Show tooltip
+def show_tooltip(event, tip_text, tip_window):
+    # Create a new top-level window with the tooltip text
+    global tooltip_window
+    tooltip_window = Toplevel(tip_window)
+    tooltip_label = Label(tooltip_window, text = tip_text)
+    tooltip_label.pack()
+    # Use the overrideredirect method to remove the window's decorations
+    tooltip_window.overrideredirect(True)
+    # Calculate the coordinates for the tooltip window
+    x = root.winfo_pointerx() + 20
+    y = root.winfo_pointery() + 20
+    tooltip_window.geometry("+{}+{}".format(x, y))
+
+# Hide tooltip
+def hide_tooltip(event):
+    # Destroy the tooltip window
+    global tooltip_window
+    tooltip_window.destroy()
+    tooltip_window = None
+
 
 # Advanced Settings Window
 def AdvancedWindow():
     global advWindow
     try:
         advWindow.deiconify()
+        root.withdraw()
     except:
         # Form creating
         def onClosing():
@@ -335,7 +359,7 @@ def AdvancedWindow():
         bitrate_entry_var = StringVar()
         # Widgets lists
         profile_combobox_list = ["High", "Main (Default)", "Baseline"] # -profile [selected option]
-        tune_combobox_list = ["None (Default)", "Film", "Animation", "Grain", "Still Image", "Fast Decode", "Zero Latency"] # -tune [selected option]
+        tune_combobox_list = ["Film", "Animation", "Grain", "Still Image", "Fast Decode", "Zero Latency", "None (Default)"] # -tune [selected option]
         preset_combobox_list = ["Ultrafast", "Superfast", "Veryfast", "Faster", "Fast", "Medium (Default)", "Slow"] # -preset [prselected optioneset]
         format_combobox_list = ["MP4 (Default)", "M4A", "MKV"]
         codec_combobox_list = ["H.264 (Default)", "H.265", "AV1", "MPEG-4"]
@@ -350,21 +374,21 @@ def AdvancedWindow():
         format_combobox._entry.configure(readonlybackground = format_combobox._apply_appearance_mode(format_combobox._fg_color))
         format_combobox.set("MP4 (Default)")
         format_combobox.place(x = 97 , y = 55)
+        customtkinter.CTkLabel(advWindow, text = "Encoder Tune:", font = ("arial bold", 20)).place(x = 360 , y = 125)
+        tune_combobox = customtkinter.CTkComboBox(advWindow, width = 137, height = 26, values = tune_combobox_list, corner_radius = 15, state = "readonly")
+        tune_combobox._entry.configure(readonlybackground = tune_combobox._apply_appearance_mode(tune_combobox._fg_color))
+        tune_combobox.set("None (Default)")
+        tune_combobox.place(x = 505 , y =125)
+        customtkinter.CTkLabel(advWindow, text = "Encoder Profile:", font = ("arial bold", 20)).place(x = 360 , y = 90)
+        profile_combobox = customtkinter.CTkComboBox(advWindow, width = 137, height = 26, values = profile_combobox_list, corner_radius = 15, state = "readonly")
+        profile_combobox._entry.configure(readonlybackground = profile_combobox._apply_appearance_mode(profile_combobox._fg_color))
+        profile_combobox.set("Main (Default)")
+        profile_combobox.place(x = 518 , y = 90)
         customtkinter.CTkLabel(advWindow, text = "Encoder Preset:", font = ("arial bold", 20)).place(x = 360 , y = 55)
         preset_combobox = customtkinter.CTkComboBox(advWindow, width = 150, height = 26, values = preset_combobox_list, corner_radius = 15, state = "readonly")
         preset_combobox._entry.configure(readonlybackground = preset_combobox._apply_appearance_mode(preset_combobox._fg_color))
         preset_combobox.set("Medium (Default)")
         preset_combobox.place(x = 519 , y = 55)
-        customtkinter.CTkLabel(advWindow, text = "Encoder Tune:", font = ("arial bold", 20)).place(x = 360 , y = 90)
-        tune_combobox = customtkinter.CTkComboBox(advWindow, width = 137, height = 26, values = tune_combobox_list, corner_radius = 15, state = "readonly")
-        tune_combobox._entry.configure(readonlybackground = tune_combobox._apply_appearance_mode(tune_combobox._fg_color))
-        tune_combobox.set("None (Default)")
-        tune_combobox.place(x = 505 , y = 90)
-        customtkinter.CTkLabel(advWindow, text = "Encoder Profile:", font = ("arial bold", 20)).place(x = 360 , y = 125)
-        profile_combobox = customtkinter.CTkComboBox(advWindow, width = 137, height = 26, values = profile_combobox_list, corner_radius = 15, state = "readonly")
-        profile_combobox._entry.configure(readonlybackground = profile_combobox._apply_appearance_mode(profile_combobox._fg_color))
-        profile_combobox.set("Main (Default)")
-        profile_combobox.place(x = 518 , y = 125)
         customtkinter.CTkLabel(advWindow, text = "Codec:", font = ("arial bold", 20)).place(x = 20 , y = 90)
         codec_combobox = customtkinter.CTkComboBox(advWindow, width = 138, height = 26, values = codec_combobox_list, corner_radius = 15, state = "readonly")
         codec_combobox.place(x = 93 , y = 90)
@@ -1907,19 +1931,23 @@ def PlaylistWindow():
     global advanced_checker
     advanced_checker = "no"
     if not advanced_quality_settings == "no":
-        audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
-        if advanced_quality_settings == "audio":
-            if quality_string in audio_quality_list:
-                adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                adv_checkbox.place(x = 410 , y = 240)
-                adv_checkbox.select()
-                advanced_checker = "yes"
-        else:
-            if not quality_string in audio_quality_list:
-                adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                adv_checkbox.place(x = 410 , y = 240)
-                adv_checkbox.select()
-                advanced_checker = "yes"
+        # audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
+        # if advanced_quality_settings == "audio":
+        #     if quality_string in audio_quality_list:
+        #         adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+        #         adv_checkbox.place(x = 410 , y = 240)
+        #         adv_checkbox.select()
+        #         advanced_checker = "yes"
+        # else:
+        #     if not quality_string in audio_quality_list:
+        #         adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+        #         adv_checkbox.place(x = 410 , y = 240)
+        #         adv_checkbox.select()
+        #         advanced_checker = "yes"
+        adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), state = "disabled")
+        adv_checkbox.place(x = 410 , y = 240)
+        adv_checkbox.bind("<Enter>", lambda event: show_tooltip(event, "Currently, this is feature is only available at single video download.", pWindow))
+        adv_checkbox.bind("<Leave>", hide_tooltip)
 
     # Download button
     download_button = customtkinter.CTkButton(pWindow, text = "Download", font = ("arial bold", 25), command = pVideoStart, corner_radius = 20)
@@ -2893,19 +2921,23 @@ def SearchWindow():
         global advanced_checker
         advanced_checker = "no"
         if not advanced_quality_settings == "no":
-            audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
-            if advanced_quality_settings == "audio":
-                if quality_string in audio_quality_list:
-                    adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                    adv_checkbox.place(x = 410 , y = 270)
-                    adv_checkbox.select()
-                    advanced_checker = "yes"
-            else:
-                if not quality_string in audio_quality_list:
-                    adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                    adv_checkbox.place(x = 410 , y = 270)
-                    adv_checkbox.select()
-                    advanced_checker = "yes"
+            # audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
+            # if advanced_quality_settings == "audio":
+            #     if quality_string in audio_quality_list:
+            #         adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+            #         adv_checkbox.place(x = 410 , y = 270)
+            #         adv_checkbox.select()
+            #         advanced_checker = "yes"
+            # else:
+            #     if not quality_string in audio_quality_list:
+            #         adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+            #         adv_checkbox.place(x = 410 , y = 270)
+            #         adv_checkbox.select()
+            #         advanced_checker = "yes"
+            adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), state = "disabled")
+            adv_checkbox.place(x = 410 , y = 270)
+            adv_checkbox.bind("<Enter>", lambda event: show_tooltip(event, "Currently, this is feature is only available at single video download.", sDWindow))
+            adv_checkbox.bind("<Leave>", hide_tooltip)
 
         # Download button
         download_button = customtkinter.CTkButton(sDWindow, text = "Download", font = ("arial bold", 25), command = pVideoStart, corner_radius = 20)
