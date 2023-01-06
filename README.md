@@ -6,9 +6,7 @@
 
 > <p><b>Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.</p></b>
 
-<dl>
-<dt><h2>Features</h2></dt>
-<dd>
+<h2>Features</h2>
 <ul>
 <li>🔗 Download videos by URL.</li>
 <li>🔎 Download videos by search query.</li>
@@ -20,46 +18,50 @@
 <li>🖼️ Simple & modern GUI.</li>
 <li>🌃 Customize your theme and default color.</li>
 </ul>
-</dd>
-</dl>
 
-<dl>
-<dt><h2>Screenshots</h2></dt>
-<dd>
+<h2>Screenshots</h2>
+<figure>
 <img src = "images/home_dark.png"></img>
-<p>| Home Page</p>
-</dd>
-<dd>
-<img src = "images/home_light.png"></img>
-<p>| Home Page (Light)</p>
-</dd>
-<dd>
-<img src = "images/advanced_settings.png"></img>
-<p>| Advanced Quality Settings Page</p>
-</dd>
-<dd>
-<img src = "images/video_downloader.png"></img>
-<p>| Video Downloader Page</p>
-</dd>
-<dd>
-<img src = "images/playlist_downloader.png"></img>
-<p>| Playlist Downloader Page</p>
-</dd>
-<dd>
-<img src = "images/search_results.png"></img>
-<p>| Search Results Page</p>
-</dd>
-<dd>
-<img src = "images/results_downloader.png"></img>
-<p>| Results Downloader Page</p>
-</dd>
-</dl>
+<figcaption>| Home Page</figcaption>
+</figure>
 
-<dl>
-<dt><h2>Installation Guide</h2></dt>
-<dd>
-<p>0. First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</p>
+<figure>
+<img src = "images/home_light.png"></img>
+<figcaption>| Home Page (Light)</figcaption>
+</figure>
+
+<figure>
+<img src = "images/advanced_settings.png"></img>
+<figcaption>| Advanced Quality Settings Page</figcaption>
+</figure>
+
+<figure>
+<img src = "images/video_downloader.png"></img>
+<figcaption>| Video Downloader Page</figcaption>
+</figure>
+
+<figure>
+<img src = "images/playlist_downloader.png"></img>
+<figcaption>| Playlist Downloader Page</figcaption>
+</figure>
+
+<figure>
+<img src = "images/search_results.png"></img>
+<figcaption>| Search Results Page</figcaption>
+</figure>
+
+<figure>
+<img src = "images/results_downloader.png"></img>
+<figcaption>| Results Downloader Page</figcaption>
+</figure>
+
+
+<h2>Installation Guide</h2>
+<p>Install the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install from the source code:</p>
+
 <ol>
+<li>First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
+
 <li>Git-clone this repo & change directory</li>
 
 ```git clone https://github.com/Shinobi7k/YouTube-Downloader.git```
@@ -76,5 +78,3 @@
 
 ```py main.py```
 </ol>
-</dd>
-</dl>
