@@ -20,40 +20,54 @@
 </ul>
 
 <h2>Screenshots</h2>
+<dl>
 <figure>
 <img src = "images/home_dark.png"></img>
 <figcaption>| Home Page</figcaption>
 </figure>
-<br>
+</dl>
+
+<dl>
 <figure>
 <img src = "images/home_light.png"></img>
 <figcaption>| Home Page (Light)</figcaption>
 </figure>
-<br>
+</dl>
+
+<dl>
 <figure>
 <img src = "images/advanced_settings.png"></img>
 <figcaption>| Advanced Quality Settings Page</figcaption>
 </figure>
-<br>
+</dl>
+
+<dl>
 <figure>
 <img src = "images/video_downloader.png"></img>
 <figcaption>| Video Downloader Page</figcaption>
 </figure>
-<br>
+</dl>
+
+<dl>
 <figure>
 <img src = "images/playlist_downloader.png"></img>
 <figcaption>| Playlist Downloader Page</figcaption>
 </figure>
-<br>
+</dl>
+
+<dl>
 <figure>
 <img src = "images/search_results.png"></img>
 <figcaption>| Search Results Page</figcaption>
 </figure>
-<br>
+</dl>
+
+<dl>
 <figure>
 <img src = "images/results_downloader.png"></img>
 <figcaption>| Results Downloader Page</figcaption>
 </figure>
+</dl>
 
 
 <h2>Installation Guide</h2>
