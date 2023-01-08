@@ -205,7 +205,7 @@ def changeTheme(color):
     with open("theme_config.json", "w", encoding="utf8") as f:
         theme[to_change] = color
         json.dump(theme, f, sort_keys = True, indent = 4, ensure_ascii = False)
-customtkinter.CTkLabel(root, text = "App Appearance", font = ("arial bold", 19)).place(x = 50 , y = 340)
+customtkinter.CTkLabel(root, text = "Appearance Settings", font = ("arial bold", 19)).place(x = 34 , y = 340)
 customtkinter.CTkLabel(root, text = "Theme Mode: ", font = ("arial", 15)).place(x = 27 , y = 375)
 themes_menu = customtkinter.CTkOptionMenu(root, values = ["System", "Dark", "Light"], width = 110, command = changeTheme, corner_radius = 15)
 themes_menu.place(x = 127 , y = 375)
@@ -617,6 +617,8 @@ def Conversion(input, ext, seconds):
     process.stdout.close()          # Close stdin pipe.
     progress_reader_thread.join()   # Join thread
     process.wait()                  # Wait for FFmpeg sub-process to finish
+    ffmpeg_command = ffmpeg_command.replace(input, "input")
+    ffmpeg_command = ffmpeg_command.replace(output, "output")
 
 
 # Download window
@@ -1524,6 +1526,11 @@ def PlaylistWindow():
                 toggle_button.place(x = 550 , y = 347)
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
+                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+                progressbar.set(0)
+                percentage_var.set(f"0.00%  ")
+                sizeprogress_var.set(f"0 MB  ")
                 downloading_var.set("Downloading")
                 converting_percentage_var.set("")
                 if quality == "137": video = url.streams.filter(res = "1080p").first()
@@ -1535,11 +1542,6 @@ def PlaylistWindow():
                 if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
                 else: continue
                 ext = "mp4"
-                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
-                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                progressbar.set(0)
-                percentage_var.set(f"0.00%  ")
-                sizeprogress_var.set(f"0 MB  ")
                 try:
                     vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
                     aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
@@ -1633,6 +1635,11 @@ def PlaylistWindow():
                 toggle_button.place(x = 550 , y = 347)
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
+                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+                progressbar.set(0)
+                percentage_var.set(f"0.00%  ")
+                sizeprogress_var.set(f"0 MB  ")
                 downloading_var.set("Downloading")
                 converting_percentage_var.set("")
                 video = url.streams.get_by_itag(quality)
@@ -1643,11 +1650,6 @@ def PlaylistWindow():
                 else: ext = "mp4"
                 try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
                 except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
-                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
-                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                progressbar.set(0)
-                percentage_var.set(f"0.00%  ")
-                sizeprogress_var.set(f"0 MB  ")
                 try:
                     with open(vname, "wb") as f: pass
                 except PermissionError:
@@ -1931,23 +1933,23 @@ def PlaylistWindow():
     global advanced_checker
     advanced_checker = "no"
     if not advanced_quality_settings == "no":
-        # audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
-        # if advanced_quality_settings == "audio":
-        #     if quality_string in audio_quality_list:
-        #         adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-        #         adv_checkbox.place(x = 410 , y = 240)
-        #         adv_checkbox.select()
-        #         advanced_checker = "yes"
-        # else:
-        #     if not quality_string in audio_quality_list:
-        #         adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-        #         adv_checkbox.place(x = 410 , y = 240)
-        #         adv_checkbox.select()
-        #         advanced_checker = "yes"
-        adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), state = "disabled")
-        adv_checkbox.place(x = 410 , y = 240)
-        adv_checkbox.bind("<Enter>", lambda event: show_tooltip(event, "Currently, this is feature is only available at single video download.", pWindow))
-        adv_checkbox.bind("<Leave>", hide_tooltip)
+        audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
+        if advanced_quality_settings == "audio":
+            if quality_string in audio_quality_list:
+                adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+                adv_checkbox.place(x = 410 , y = 240)
+                adv_checkbox.select()
+                advanced_checker = "yes"
+        else:
+            if not quality_string in audio_quality_list:
+                adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+                adv_checkbox.place(x = 410 , y = 240)
+                adv_checkbox.select()
+                advanced_checker = "yes"
+        # adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), state = "disabled")
+        # adv_checkbox.place(x = 410 , y = 240)
+        # adv_checkbox.bind("<Enter>", lambda event: show_tooltip(event, "Currently, this is feature is only available at single video download.", pWindow))
+        # adv_checkbox.bind("<Leave>", hide_tooltip)
 
     # Download button
     download_button = customtkinter.CTkButton(pWindow, text = "Download", font = ("arial bold", 25), command = pVideoStart, corner_radius = 20)
@@ -2706,6 +2708,13 @@ def SearchWindow():
                 toggle_button.place(x = 550 , y = 347)
                 cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
+                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+                thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
+                thumb.place(x = 415 , y = 15)
+                percentage_var.set(f"0.00%  ")
+                sizeprogress_var.set(f"0 MB  ")
+                progressbar.set(0)
                 downloading_var.set("Downloading")
                 converting_percentage_var.set("")
                 video = url.streams.get_by_itag(quality)
@@ -2718,13 +2727,6 @@ def SearchWindow():
                 size = video.filesize
                 try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
                 except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
-                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
-                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
-                thumb.place(x = 415 , y = 15)
-                percentage_var.set(f"0.00%  ")
-                sizeprogress_var.set(f"0 MB  ")
-                progressbar.set(0)
                 try:
                     with open(vname, "wb") as f:
                         video = request.stream(video.url) # Get an iterable stream
