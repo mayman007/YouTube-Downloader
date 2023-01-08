@@ -280,27 +280,6 @@ def whenOpening():
     link_entry.configure(state = "disabled")
     search_entry.configure(state = "disabled")
 
-# Show tooltip
-def show_tooltip(event, tip_text, tip_window):
-    # Create a new top-level window with the tooltip text
-    global tooltip_window
-    tooltip_window = Toplevel(tip_window)
-    tooltip_label = Label(tooltip_window, text = tip_text)
-    tooltip_label.pack()
-    # Use the overrideredirect method to remove the window's decorations
-    tooltip_window.overrideredirect(True)
-    # Calculate the coordinates for the tooltip window
-    x = root.winfo_pointerx() + 20
-    y = root.winfo_pointery() + 20
-    tooltip_window.geometry("+{}+{}".format(x, y))
-
-# Hide tooltip
-def hide_tooltip(event):
-    # Destroy the tooltip window
-    global tooltip_window
-    tooltip_window.destroy()
-    tooltip_window = None
-
 
 # Advanced Settings Window
 def AdvancedWindow():
@@ -2923,23 +2902,19 @@ def SearchWindow():
         global advanced_checker
         advanced_checker = "no"
         if not advanced_quality_settings == "no":
-            # audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
-            # if advanced_quality_settings == "audio":
-            #     if quality_string in audio_quality_list:
-            #         adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-            #         adv_checkbox.place(x = 410 , y = 270)
-            #         adv_checkbox.select()
-            #         advanced_checker = "yes"
-            # else:
-            #     if not quality_string in audio_quality_list:
-            #         adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-            #         adv_checkbox.place(x = 410 , y = 270)
-            #         adv_checkbox.select()
-            #         advanced_checker = "yes"
-            adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), state = "disabled")
-            adv_checkbox.place(x = 410 , y = 270)
-            adv_checkbox.bind("<Enter>", lambda event: show_tooltip(event, "Currently, this is feature is only available at single video download.", sDWindow))
-            adv_checkbox.bind("<Leave>", hide_tooltip)
+            audio_quality_list = ["160kbps" , "128kbps" , "70kbps" , "50kbps"]
+            if advanced_quality_settings == "audio":
+                if quality_string in audio_quality_list:
+                    adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+                    adv_checkbox.place(x = 410 , y = 270)
+                    adv_checkbox.select()
+                    advanced_checker = "yes"
+            else:
+                if not quality_string in audio_quality_list:
+                    adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
+                    adv_checkbox.place(x = 410 , y = 270)
+                    adv_checkbox.select()
+                    advanced_checker = "yes"
 
         # Download button
         download_button = customtkinter.CTkButton(sDWindow, text = "Download", font = ("arial bold", 25), command = pVideoStart, corner_radius = 20)
