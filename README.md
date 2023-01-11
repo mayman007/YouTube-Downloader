@@ -9,7 +9,7 @@
 <h2>Features</h2>
 <ul>
 <li>🔗 Download videos by URL.</li>
-<li>🔎 Download videos by search query.</li>
+<li>🔎 Search keywords and download videos from the search results.</li>
 <li>🗒️ Download playlists. With an option to select which videos to download.</li>
 <li>💬 Download the attached subtitles. Or translate it to your prefered language.</li>
 <li>🔉 Download audio only</li>
