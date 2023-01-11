@@ -77,7 +77,7 @@
 <ol>
 <li>First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
 
-<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a> in the path. or just put ffmpeg.exe in the same folder as the script</li>
+<li>Download <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and add it to the path or put ffmpeg.exe in the same folder as the script</li>
 
 <li>Git-clone this repo & change directory</li>
 
