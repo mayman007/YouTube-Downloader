@@ -15,7 +15,7 @@
 <li>🔉 Download audio only</li>
 <li>🔖 Selectable qualities.</li>
 <li>⚙️ Advanced quality settings. (Change format, codec, bitrate, etc...)</li>
-<li>▶️ Supports resumabilty.</li>
+<li>⏯️ Supports resumability.</li>
 <li>📂 Change the download path.</li>
 <li>🖼️ Simple & modern GUI.</li>
 <li>🌃 Customize your theme and default color.</li>
