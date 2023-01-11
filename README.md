@@ -13,8 +13,9 @@
 <li>🗒️ Download playlists. With an option to select which videos to download.</li>
 <li>💬 Download the attached subtitles. Or translate it to your prefered language.</li>
 <li>🔖 Selectable qualities and formats.</li>
-<li>⚙️ Advanced quality settings.</li>
+<li>⚙️ Advanced quality settings. (Change format, codec, bitrate, etc...)</li>
 <li>▶️ Supports resumabilty.</li>
+<li>📂 Change the download path.</li>
 <li>🖼️ Simple & modern GUI.</li>
 <li>🌃 Customize your theme and default color.</li>
 </ul>
@@ -76,6 +77,8 @@
 <ol>
 <li>First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
 
+<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a> in the path. or just put ffmpeg.exe in the same folder as the script</li>
+
 <li>Git-clone this repo & change directory</li>
 
 ```git clone https://github.com/Shinobi7k/YouTube-Downloader.git```
@@ -85,8 +88,6 @@
 <li>Install modules using pip</li>
 
 ```pip install -r requirements.txt```
-
-<li>Make sure that you have <a href = "https://ffmpeg.org/download.html">ffmpeg</a> in the path. or just put ffmpeg.exe in the same folder as the script</li>
 
 <li>Run the .py file!</li>
 
