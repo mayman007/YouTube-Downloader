@@ -12,7 +12,8 @@
 <li>🔎 Download videos by search query.</li>
 <li>🗒️ Download playlists. With an option to select which videos to download.</li>
 <li>💬 Download the attached subtitles. Or translate it to your prefered language.</li>
-<li>🔖 Selectable qualities and formats.</li>
+<li>🔉 Download audio only</li>
+<li>🔖 Selectable qualities.</li>
 <li>⚙️ Advanced quality settings. (Change format, codec, bitrate, etc...)</li>
 <li>▶️ Supports resumabilty.</li>
 <li>📂 Change the download path.</li>
