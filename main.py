@@ -171,8 +171,12 @@ download_optionmenu.set("Download")
 # Format and quality selections for search
 quality_var = IntVar()
 def searchQualitySelect(quality):
-    if quality == "Video: 720p": quality_var.set(22)
+    if quality == "Video: 1080p": quality_var.set(137)
+    elif quality == "Video: 720p": quality_var.set(22)
+    elif quality == "Video: 480p": quality_var.set(135)
     elif quality == "Video: 360p": quality_var.set(18)
+    elif quality == "Video: 240p": quality_var.set(133)
+    elif quality == "Video: 144p": quality_var.set(160)
     elif quality == "Audio: 160kbps": quality_var.set(251)
     elif quality == "Audio: 128kbps": quality_var.set(140)
     elif quality == "Audio: 70kbps": quality_var.set(250)
@@ -184,7 +188,7 @@ def searchQualitySelect(quality):
     search_optionmenu.configure(corner_radius = 15)
     threading.Thread(target = SearchWindow).start()
     threading.Thread(target = Loading, args = (loading_optionmenu,)).start()
-search_quality_list = ["Video: 720p", "Video: 360p", "Audio: 160kbps", "Audio: 128kbps", "Audio: 70kbps", "Audio: 50kbps"]
+search_quality_list = ["Video: 1080p", "Video: 720p", "Video: 480p", "Video: 360p", "Video: 240p", "Video: 144p", "Audio: 160kbps", "Audio: 128kbps", "Audio: 70kbps", "Audio: 50kbps"]
 search_optionmenu = customtkinter.CTkOptionMenu(root, width = 175, height = 35, font = ("arial bold", 25), values = search_quality_list, command = searchQualitySelect, corner_radius = 35)
 search_optionmenu.place(x = 460 , y = 255)
 search_optionmenu.set("Search")
@@ -926,7 +930,7 @@ def DownlaodWindow():
                 newWindow.bell()
                 downloading_var.set("Finished")
                 converting_percentage_var.set("")
-                customtkinter.CTkButton(newWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
+                customtkinter.CTkButton(newWindow, text = "Open in File Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
                 global convert_count
                 convert_count = 0
 
@@ -937,7 +941,48 @@ def DownlaodWindow():
             try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
             except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
             try:
-                with open(vname, "wb") as f: pass
+                with open(vname, "wb") as f:
+                    is_paused = is_cancelled = False
+                    video = request.stream(video.url) # get an iterable stream
+                    downloaded = 0
+                    while True:
+                        if is_cancelled:
+                            toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                            toggle_button.place(x = 550 , y = 347)
+                            cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                            cancel_button.place(x = 595 , y = 347)
+                            downloading_var.set("Canceled")
+                            break
+                        if is_paused:
+                            time.sleep(0.5)
+                            continue
+                        try: chunk = next(video, None) # Get next chunk of video
+                        except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                        if chunk:
+                            f.write(chunk) # Downlaod the chunk into the file
+                            # Update progress
+                            downloaded += len(chunk)
+                            remaining = size - downloaded
+                            bytes_downloaded = size - remaining
+                            percentage_of_completion = bytes_downloaded / size * 100
+                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                            progressbar.set(percentage_of_completion/100)
+                        else:
+                            # When finished
+                            toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                            toggle_button.place(x = 550 , y = 347)
+                            cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                            cancel_button.place(x = 595 , y = 347)
+                            # Convert if there is a conversion
+                            if advanced_checker == "yes":
+                                downloading_var.set("Converting")
+                                Conversion(vname, ext, url.length)
+                            newWindow.bell()
+                            downloading_var.set("Finished")
+                            converting_percentage_var.set("")
+                            customtkinter.CTkButton(newWindow, text = "Open in File Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
+                            break
             except PermissionError:
                 whenVideoError()
                 path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
@@ -946,48 +991,6 @@ def DownlaodWindow():
                 whenVideoError()
                 path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
                 return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
-            with open(vname, "wb") as f:
-                is_paused = is_cancelled = False
-                video = request.stream(video.url) # get an iterable stream
-                downloaded = 0
-                while True:
-                    if is_cancelled:
-                        toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                        toggle_button.place(x = 550 , y = 347)
-                        cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                        cancel_button.place(x = 595 , y = 347)
-                        downloading_var.set("Canceled")
-                        break
-                    if is_paused:
-                        time.sleep(0.5)
-                        continue
-                    try: chunk = next(video, None) # Get next chunk of video
-                    except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
-                    if chunk:
-                        f.write(chunk) # Downlaod the chunk into the file
-                        # Update progress
-                        downloaded += len(chunk)
-                        remaining = size - downloaded
-                        bytes_downloaded = size - remaining
-                        percentage_of_completion = bytes_downloaded / size * 100
-                        percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                        sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
-                        progressbar.set(percentage_of_completion/100)
-                    else:
-                        # When finished
-                        toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                        toggle_button.place(x = 550 , y = 347)
-                        cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                        cancel_button.place(x = 595 , y = 347)
-                        # Convert if there is a conversion
-                        if advanced_checker == "yes":
-                            downloading_var.set("Converting")
-                            Conversion(vname, ext, url.length)
-                        newWindow.bell()
-                        downloading_var.set("Finished")
-                        converting_percentage_var.set("")
-                        customtkinter.CTkButton(newWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
-                        break
         if is_cancelled:
             msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
             if msg_box == "yes": os.remove(vname)
@@ -1630,7 +1633,45 @@ def PlaylistWindow():
                 try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
                 except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
                 try:
-                    with open(vname, "wb") as f: pass
+                    with open(vname, "wb") as f:
+                        customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
+                        downloaded = 0
+                        video = request.stream(video.url) # Get an iterable stream
+                        while True:
+                            if is_cancelled:
+                                downloading_var.set("Canceled")
+                                toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                                toggle_button.place(x = 550 , y = 347)
+                                cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                                cancel_button.place(x = 595 , y = 347)
+                                break
+                            if is_paused:
+                                time.sleep(0.5)
+                                continue
+                            try: chunk = next(video, None) # Get next chunk of video
+                            except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                            if chunk:
+                                f.write(chunk) # Download the chunk into the file
+                                # Update Progress
+                                downloaded += len(chunk)
+                                remaining = size - downloaded
+                                bytes_downloaded = size - remaining
+                                percentage_of_completion = bytes_downloaded / size * 100
+                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                progressbar.set(percentage_of_completion/100)
+                            else:
+                                # Convert if there is a conversion
+                                if advanced_checker == "yes":
+                                    toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                                    toggle_button.place(x = 550 , y = 347)
+                                    cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                                    cancel_button.place(x = 595 , y = 347)
+                                    downloading_var.set("Converting")
+                                    Conversion(vname, ext, url.length)
+                                downloaded_counter = downloaded_counter + 1
+                                downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
+                                break # No more data = Finished
                 except PermissionError:
                     whenPlaylistError()
                     path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
@@ -1639,45 +1680,6 @@ def PlaylistWindow():
                     whenPlaylistError()
                     path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
                     return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
-                with open(vname, "wb") as f:
-                    customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
-                    downloaded = 0
-                    video = request.stream(video.url) # Get an iterable stream
-                    while True:
-                        if is_cancelled:
-                            downloading_var.set("Canceled")
-                            toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                            toggle_button.place(x = 550 , y = 347)
-                            cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                            cancel_button.place(x = 595 , y = 347)
-                            break
-                        if is_paused:
-                            time.sleep(0.5)
-                            continue
-                        try: chunk = next(video, None) # Get next chunk of video
-                        except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
-                        if chunk:
-                            f.write(chunk) # Download the chunk into the file
-                            # Update Progress
-                            downloaded += len(chunk)
-                            remaining = size - downloaded
-                            bytes_downloaded = size - remaining
-                            percentage_of_completion = bytes_downloaded / size * 100
-                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
-                            progressbar.set(percentage_of_completion/100)
-                        else:
-                            # Convert if there is a conversion
-                            if advanced_checker == "yes":
-                                toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                                toggle_button.place(x = 550 , y = 347)
-                                cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                                cancel_button.place(x = 595 , y = 347)
-                                downloading_var.set("Converting")
-                                Conversion(vname, ext, url.length)
-                            downloaded_counter = downloaded_counter + 1
-                            downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
-                            break # No more data = Finished
 
         # When finished
         toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
@@ -1692,7 +1694,7 @@ def PlaylistWindow():
             pWindow.bell()
             downloading_var.set("Finished")
             converting_percentage_var.set("")
-            customtkinter.CTkButton(pWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
+            customtkinter.CTkButton(pWindow, text = "Open in File Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
 
 
     # Get playlist info, get link and check errors
@@ -1959,10 +1961,10 @@ def SearchWindow():
     if quality == "0":
         whenError()
         return messagebox.showerror(title = "Format Not Selected", message = "Please select a format.")
-    not_supported_list = ["137" , "135" , "250" , "249" , "133" , "160"]
-    if quality in not_supported_list:
-        whenError()
-        return messagebox.showerror(title = "Not Supported", message = "Currently, we support searching youtube in 720p, 360p, 160kbps and 128kbps only.")
+    # not_supported_list = ["137" , "135" , "250" , "249" , "133" , "160"]
+    # if quality in not_supported_list:
+    #     whenError()
+    #     return messagebox.showerror(title = "Not Supported", message = "Currently, we support searching youtube in 720p, 360p, 160kbps and 128kbps only.")
     sWindow = customtkinter.CTkToplevel()
     sWindow.title(f'Search Results For "{search_text}"')
     sWindow.withdraw()
@@ -2058,7 +2060,7 @@ def SearchWindow():
         print(to_download)
         print(len(to_download))
 
-    #Checkboxes variables
+    # Checkboxes variables
     cb_var1 = IntVar()
     cb_var2 = IntVar()
     cb_var3 = IntVar()
@@ -2075,6 +2077,12 @@ def SearchWindow():
     cb_var14 = IntVar()
     cb_var15 = IntVar()
     cb_var16 = IntVar()
+
+    # Titles variables
+    t_var1 = StringVar()
+    t_var2 = StringVar()
+    t_var3 = StringVar()
+    t_var4 = StringVar()
 
     # Open in Youtube buttons
     def openYouTube1():
@@ -2101,66 +2109,74 @@ def SearchWindow():
     # First video
     cb1 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var1, command = checkboxes)
     cb1.place(x = 30, y = 40)
-    t1 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial bold", 20))
+    t1 = customtkinter.CTkLabel(sWindow, textvariable = t_var1, font = ("arial bold", 20))
     t1.place(x = 250, y = 15)
-    a1 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial", 15))
+    a1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
     a1.place(x = 255, y = 40)
-    s1 = customtkinter.CTkLabel(sWindow, text = "0.00 MB", font = ("arial", 12))
+    s1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     s1.place(x = 260, y = 65)
-    l1 = customtkinter.CTkLabel(sWindow, text = "0:00:00", font = ("arial", 12))
+    l1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     l1.place(x = 320, y = 65)
     b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube1, corner_radius = 20)
-    b1.place(x = 367, y = 63)
-    v1 = customtkinter.CTkLabel(sWindow, text = "0 Views", font = ("arial", 15))
-    v1.place(x = 505, y = 65)
+    b1.place(x = 372, y = 63)
+    v1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
+    v1.place(x = 515, y = 65)
+    img1 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img1.place(x = 80, y = 10)
 
     # Second video
     cb2 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var2, command = checkboxes)
     cb2.place(x = 30, y = 140)
-    t2 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial bold", 20))
+    t2 = customtkinter.CTkLabel(sWindow, textvariable = t_var2, font = ("arial bold", 20))
     t2.place(x = 250, y = 115)
     a2 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial", 15))
     a2.place(x = 255, y = 140)
-    s2 = customtkinter.CTkLabel(sWindow, text = "0.00 MB", font = ("arial", 12))
+    s2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     s2.place(x = 260, y = 165)
-    l2 = customtkinter.CTkLabel(sWindow, text = "0:00:00", font = ("arial", 12))
+    l2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     l2.place(x = 320, y = 165)
     b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube2, corner_radius = 20)
-    b2.place(x = 367, y = 163)
-    v2 = customtkinter.CTkLabel(sWindow, text = "0 Views", font = ("arial", 15))
-    v2.place(x = 505, y = 165)
+    b2.place(x = 372, y = 163)
+    v2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
+    v2.place(x = 515, y = 165)
+    img2 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img2.place(x = 80, y = 110)
 
     # Third video
     cb3 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var3, command = checkboxes)
     cb3.place(x = 30, y = 240)
-    t3 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial bold", 20))
+    t3 = customtkinter.CTkLabel(sWindow, textvariable = t_var3, font = ("arial bold", 20))
     t3.place(x = 250, y = 215)
     a3 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial", 15))
     a3.place(x = 255, y = 240)
-    s3 = customtkinter.CTkLabel(sWindow, text = "0.00 MB", font = ("arial", 12))
+    s3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     s3.place(x = 260, y = 265)
-    l3 = customtkinter.CTkLabel(sWindow, text = "0:00:00", font = ("arial", 12))
+    l3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     l3.place(x = 320, y = 265)
     b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube3, corner_radius = 20)
-    b3.place(x = 367, y = 263)
-    v3 = customtkinter.CTkLabel(sWindow, text = "0 Views", font = ("arial", 15))
-    v3.place(x = 505, y = 265)
+    b3.place(x = 372, y = 263)
+    v3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
+    v3.place(x = 515, y = 265)
+    img3 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img3.place(x = 80, y = 210)
 
     # Fourth video
     cb4 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var4, command = checkboxes)
     cb4.place(x = 30, y = 340)
-    t4 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial bold", 20))
+    t4 = customtkinter.CTkLabel(sWindow, textvariable = t_var4, font = ("arial bold", 20))
     t4.place(x = 250, y = 315)
-    a4 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial", 15))
+    a4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
     a4.place(x = 255, y = 340)
-    s4 = customtkinter.CTkLabel(sWindow, text = "0.00 MB", font = ("arial", 12))
+    s4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     s4.place(x = 260, y = 365)
-    l4 = customtkinter.CTkLabel(sWindow, text = "0:00:00", font = ("arial", 12))
+    l4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
     l4.place(x = 320, y = 365)
     b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube4, corner_radius = 20)
-    b4.place(x = 367, y = 363)
-    v4 = customtkinter.CTkLabel(sWindow, text = "0 Views", font = ("arial", 15))
-    v4.place(x = 505, y = 365)
+    b4.place(x = 372, y = 363)
+    v4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
+    v4.place(x = 515, y = 365)
+    img4 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img4.place(x = 80, y = 310)
 
     # Loading
     def Loading(button_var):
@@ -2170,13 +2186,13 @@ def SearchWindow():
         cb3.configure(state = "disabled")
         cb4.configure(state = "disabled")
         b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b1.place(x = 367, y = 63)
+        b1.place(x = 372, y = 63)
         b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b2.place(x = 367, y = 163)
+        b2.place(x = 372, y = 163)
         b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b3.place(x = 367, y = 263)
+        b3.place(x = 372, y = 263)
         b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b4.place(x = 367, y = 363)
+        b4.place(x = 372, y = 363)
         pr_button.configure(state = "disabled")
         dn_button.configure(state = "disabled")
         nr_button.configure(state = "disabled")
@@ -2203,18 +2219,18 @@ def SearchWindow():
 
     # Return to normal
     def normalWidgets(results_counter, error):
-        cb1.configure(state = "normal")
-        cb2.configure(state = "normal")
-        cb3.configure(state = "normal")
-        cb4.configure(state = "normal")
+        if t_var1.get() != "Video is Not Available": cb1.configure(state = "normal")
+        if t_var2.get() != "Video is Not Available": cb2.configure(state = "normal")
+        if t_var3.get() != "Video is Not Available": cb3.configure(state = "normal")
+        if t_var4.get() != "Video is Not Available": cb4.configure(state = "normal")
         b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube1, corner_radius = 20)
-        b1.place(x = 367, y = 63)
+        b1.place(x = 372, y = 63)
         b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube2, corner_radius = 20)
-        b2.place(x = 367, y = 163)
+        b2.place(x = 372, y = 163)
         b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube3, corner_radius = 20)
-        b3.place(x = 367, y = 263)
+        b3.place(x = 372, y = 263)
         b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube4, corner_radius = 20)
-        b4.place(x = 367, y = 363)
+        b4.place(x = 372, y = 363)
         dn_button.configure(state = "normal")
         pr_button_var.set("Previous Results")
         nr_button_var.set("Next Results")
@@ -2294,8 +2310,6 @@ def SearchWindow():
         elif results_counter == 12:
             limit = 16
             results_list = search.results[12:16]
-        print("====================================")
-        print("====================================")
         for url in results_list:
             first = [0, 4, 8, 12]
             second = [1, 5, 9, 13]
@@ -2307,41 +2321,50 @@ def SearchWindow():
             elif results_counter in third: url3 = url
             elif results_counter in fourth: url4 = url
             results_counter = results_counter + 1
-            print(f"results_counter {results_counter}")
-
+        print(f"got {results_counter} results")
         print("====================")
-        try:
-            video1 = url1.streams.get_by_itag(quality)
-            size1 = f"{round(video1.filesize/1024/1024, 2)} MB"
-            ploading_counter_var.set("(1)")
-            print("first done")
-            video2 = url2.streams.get_by_itag(quality)
-            size2 = f"{round(video2.filesize/1024/1024, 2)} MB"
-            ploading_counter_var.set("(2)")
-            print("second done")
-            video3 = url3.streams.get_by_itag(quality)
-            size3 = f"{round(video3.filesize/1024/1024, 2)} MB"
-            ploading_counter_var.set("(3)")
-            print("third done")
-            video4 = url4.streams.get_by_itag(quality)
-            size4 = f"{round(video4.filesize/1024/1024, 2)} MB"
-            ploading_counter_var.set("(4)")
-            print("fourth done")
-        except urllib.error.URLError as e:
-            whenSearchError(results_counter)
-            return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
-        except KeyError as e:
-            print(f"KeyError: {e}")
-            whenSearchError(results_counter)
-            return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve results for '{search_text}' at the moment. Change the selected quality or try again later.")
-        except AttributeError as e:
-            print(f"AttributeError: {e}")
-            whenSearchError(results_counter)
-            return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve results for '{search_text}' at the moment. Change the selected quality or try again later.")
-        except pytube.exceptions.LiveStreamError as e:
-            print(f"LiveStreamError: {e}")
-            whenSearchError(results_counter)
-            return messagebox.showerror(title = "Video is Live", message = "Can't retrive a live video.")
+
+        current_video_count = 1
+        failed_list = []
+        while current_video_count != 5:
+            try:
+                if current_video_count == 1:
+                    video = url1.streams.get_by_itag(quality)
+                    size1 = f"{round(video.filesize/1024/1024, 2)} MB"
+                    failed_list.append("no")
+                elif current_video_count == 2:
+                    video = url2.streams.get_by_itag(quality)
+                    size2 = f"{round(video.filesize/1024/1024, 2)} MB"
+                    failed_list.append("no")
+                if current_video_count == 3:
+                    video = url3.streams.get_by_itag(quality)
+                    size3 = f"{round(video.filesize/1024/1024, 2)} MB"
+                    failed_list.append("no")
+                elif current_video_count == 4:
+                    video = url4.streams.get_by_itag(quality)
+                    size4 = f"{round(video.filesize/1024/1024, 2)} MB"
+                    failed_list.append("no")
+                ploading_counter_var.set(f"({current_video_count})")
+                print(f"{current_video_count} done")
+                current_video_count = current_video_count + 1
+            except urllib.error.URLError as e:
+                whenSearchError(results_counter)
+                return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
+            except KeyError as e:
+                print(f"KeyError: {e}")
+                failed_list.append(f"Try changing the quality. Or try again later.")
+                current_video_count = current_video_count + 1
+                continue
+            except AttributeError as e:
+                print(f"AttributeError: {e}")
+                failed_list.append(f"Try changing the quality. Or try again later.")
+                current_video_count = current_video_count + 1
+                continue
+            except pytube.exceptions.LiveStreamError as e:
+                print(f"LiveStreamError: {e}")
+                failed_list.append(f"This video is live. I can't retieve a live video.")
+                current_video_count = current_video_count + 1
+                continue
         print("Done videos and sizes")
 
         # Configure checkboxes
@@ -2366,57 +2389,122 @@ def SearchWindow():
             cb3.configure(variable = cb_var15)
             cb4.configure(variable = cb_var16)
 
-        # Configure first video in page
-        if url1.views > 1000000: views = f"{int(url1.views/1000000)}M"
-        elif url1.views > 1000: views = f"{int(url1.views/1000)}K"
-        else: views = int(url1.views/1000000)
-        t1.configure(text = r.repr(url1.title))
-        a1.configure(text = r.repr(url1.author))
-        l1.configure(text = to_hms(url1.length))
-        s1.configure(text = size1)
-        v1.configure(text = f"{views} Views")
+        # Get thumbnails
         raw_data = urllib.request.urlopen(url1.thumbnail_url).read()
-        photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        customtkinter.CTkLabel(sWindow, text = "", image = photo).place(x = 80, y = 10)
+        thumb1 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
+        thumb2 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
+        thumb3 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
+        thumb4 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+
+        # Configure first video in page
+        failed_list.reverse()
+        try:
+            s1.configure(text = size1)
+        except UnboundLocalError:
+            for error_message in failed_list:
+                if error_message == "no": continue
+                else: this_error_message = error_message
+            failed_list.remove(this_error_message)
+            t_var1.set("Video is Not Available")
+            a1.configure(text = this_error_message)
+            cb1.configure(state = "disabled")
+            l1.configure(text = "")
+            v1.configure(text = "")
+            s1.configure(text = "")
+            img1.configure(image = "")
+        else:
+            if url1.views > 1000000: views = f"{int(url1.views/1000000)}M"
+            elif url1.views > 1000: views = f"{int(url1.views/1000)}K"
+            else: views = int(url1.views/1000000)
+            t_var1.set(r.repr(url1.title))
+            a1.configure(text = r.repr(url1.author))
+            l1.configure(text = to_hms(url1.length))
+            v1.configure(text = f"{views} Views")
+            img1.configure(image = thumb1)
 
         # Configure second video in page
-        if url2.views > 1000000: views = f"{int(url2.views/1000000)}M"
-        elif url2.views > 1000: views = f"{int(url2.views/1000)}K"
-        else: views = int(url2.views/1000000)
-        t2.configure(text = r.repr(url2.title))
-        a2.configure(text = r.repr(url2.author))
-        l2.configure(text = to_hms(url2.length))
-        s2.configure(text = size2)
-        v2.configure(text = f"{views} Views")
-        raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
-        photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        customtkinter.CTkLabel(sWindow, text = "", image = photo).place(x = 80, y = 110)
+        try:
+            s2.configure(text = size2)
+        except UnboundLocalError:
+            for error_message in failed_list:
+                if error_message == "no": continue
+                else: this_error_message = error_message
+            failed_list.remove(this_error_message)
+            t_var2.set("Video is Not Available")
+            a2.configure(text = this_error_message)
+            cb2.configure(state = "disabled")
+            l2.configure(text = "")
+            v2.configure(text = "")
+            s2.configure(text = "")
+            img2.configure(image = "")
+        else:
+            if url2.views > 1000000: views = f"{int(url2.views/1000000)}M"
+            elif url2.views > 1000: views = f"{int(url2.views/1000)}K"
+            else: views = int(url2.views/1000000)
+            t_var2.set(r.repr(url2.title))
+            a2.configure(text = r.repr(url2.author))
+            l2.configure(text = to_hms(url2.length))
+            v2.configure(text = f"{views} Views")
+            raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
+            photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+            img2.configure(image = thumb2)
 
         # Configure third video in page
-        if url3.views > 1000000: views = f"{int(url3.views/1000000)}M"
-        elif url3.views > 1000: views = f"{int(url3.views/1000)}K"
-        else: views = int(url3.views/1000000)
-        t3.configure(text = r.repr(url3.title))
-        a3.configure(text = r.repr(url3.author))
-        l3.configure(text = to_hms(url3.length))
-        s3.configure(text = size3)
-        v3.configure(text = f"{views} Views")
-        raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
-        photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        customtkinter.CTkLabel(sWindow, text = "", image = photo).place(x = 80, y = 210)
+        try:
+            s3.configure(text = size3)
+        except UnboundLocalError:
+            for error_message in failed_list:
+                if error_message == "no": continue
+                else: this_error_message = error_message
+            failed_list.remove(this_error_message)
+            t_var3.set("Video is Not Available")
+            a3.configure(text = this_error_message)
+            cb3.configure(state = "disabled")
+            l3.configure(text = "")
+            v3.configure(text = "")
+            s3.configure(text = "")
+            img3.configure(image = "")
+        else:
+            if url3.views > 1000000: views = f"{int(url3.views/1000000)}M"
+            elif url3.views > 1000: views = f"{int(url3.views/1000)}K"
+            else: views = int(url3.views/1000000)
+            t_var3.set(r.repr(url3.title))
+            a3.configure(text = r.repr(url3.author))
+            l3.configure(text = to_hms(url3.length))
+            v3.configure(text = f"{views} Views")
+            raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
+            photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+            img3.configure(image = thumb3)
 
         # Configure fourth video in page
-        if url4.views > 1000000: views = f"{int(url4.views/1000000)}M"
-        elif url4.views > 1000: views = f"{int(url4.views/1000)}K"
-        else: views = int(url4.views/1000000)
-        t4.configure(text = r.repr(url4.title))
-        a4.configure(text = r.repr(url4.author))
-        l4.configure(text = to_hms(url4.length))
-        s4.configure(text = size4)
-        v4.configure(text = f"{views} Views")
-        raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
-        photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        customtkinter.CTkLabel(sWindow, text = "", image = photo).place(x = 80, y = 310)
+        try:
+            s4.configure(text = size4)
+        except UnboundLocalError:
+            for error_message in failed_list:
+                if error_message == "no": continue
+                else: this_error_message = error_message
+            failed_list.remove(this_error_message)
+            t_var4.set("Video is Not Available")
+            a4.configure(text = this_error_message)
+            cb4.configure(state = "disabled")
+            l4.configure(text = "")
+            v4.configure(text = "")
+            s4.configure(text = "")
+            img4.configure(image = "")
+        else:
+            if url4.views > 1000000: views = f"{int(url4.views/1000000)}M"
+            elif url4.views > 1000: views = f"{int(url4.views/1000)}K"
+            else: views = int(url4.views/1000000)
+            t_var4.set(r.repr(url4.title))
+            a4.configure(text = r.repr(url4.author))
+            l4.configure(text = to_hms(url4.length))
+            v4.configure(text = f"{views} Views")
+            raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
+            photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+            img4.configure(image = thumb4)
 
         # Returns widgets to right state
         error = "no"
@@ -2665,6 +2753,11 @@ def SearchWindow():
             path_button = customtkinter.CTkButton(sDWindow, text = "Change Path", font = ("arial bold", 12), fg_color = "dim grey", width = 5, state = "disabled", corner_radius = 20)
             path_button.place(x = 430 , y = 347)
             audio_tags_list = ["251" , "140" , "250" , "249"]
+            non_progressive_list = ["137" , "135" , "133", "160"]
+            downloaded_counter = 0
+            downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
+            r = reprlib.Repr()
+            r.maxstring = 27
             # Progress stuff
             pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
             progress_label.configure(text_color = "green")
@@ -2676,83 +2769,190 @@ def SearchWindow():
             if caps == "yes": sCaptionsDownload()
             else: pass
 
-            # Download to_download
-            downloaded_counter = 0
-            downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
-            r = reprlib.Repr()
-            r.maxstring = 27
-            for url in to_download:
-                if is_cancelled: break
-                toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
-                toggle_button.place(x = 550 , y = 347)
-                cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
-                cancel_button.place(x = 595 , y = 347)
-                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
-                photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
-                thumb.place(x = 415 , y = 15)
-                percentage_var.set(f"0.00%  ")
-                sizeprogress_var.set(f"0 MB  ")
-                progressbar.set(0)
-                downloading_var.set("Downloading")
-                converting_percentage_var.set("")
-                video = url.streams.get_by_itag(quality)
-                title_var.set(r.repr(url.title))
-                length_var.set(to_hms(url.length))
-                size_var.set(f"{round(video.filesize/1024/1024, 2)} MB")
-                if quality in audio_tags_list: ext = "mp3"
-                else: ext = "mp4"
-                video = url.streams.get_by_itag(quality)
-                size = video.filesize
-                try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
-                except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
-                try:
-                    with open(vname, "wb") as f:
-                        video = request.stream(video.url) # Get an iterable stream
-                        downloaded = 0
-                        while True:
-                            if is_cancelled:
-                                downloading_var.set("Canceled")
-                                toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
-                                toggle_button.place(x = 550 , y = 347)
-                                cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
-                                cancel_button.place(x = 595 , y = 347)
-                                break
-                            if is_paused:
-                                time.sleep(0.5)
-                                continue
-                            try: chunk = next(video, None) # Get next chunk of video
-                            except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
-                            if chunk:
-                                f.write(chunk) # Download the chunk into the file
-                                # Update Progress
-                                downloaded += len(chunk)
-                                remaining = size - downloaded
-                                bytes_downloaded = size - remaining
-                                percentage_of_completion = bytes_downloaded / size * 100
-                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
-                                progressbar.set(percentage_of_completion/100)
-                            else:
-                                # Convert if there is a conversion
-                                if advanced_checker == "yes":
-                                    toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
+            # If the quality is non progressive video (1080p, 480p, 240p and 144p)
+            if quality in non_progressive_list:
+                for url in to_download:
+                    if is_cancelled: break
+                    toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
+                    toggle_button.place(x = 550 , y = 347)
+                    cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
+                    cancel_button.place(x = 595 , y = 347)
+                    raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                    photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+                    thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
+                    thumb.place(x = 415 , y = 15)
+                    percentage_var.set(f"0.00%  ")
+                    sizeprogress_var.set(f"0 MB  ")
+                    progressbar.set(0)
+                    downloading_var.set("Downloading")
+                    converting_percentage_var.set("")
+                    if quality == "137": video = url.streams.filter(res = "1080p").first()
+                    elif quality == "135": video = url.streams.filter(res = "480p").first()
+                    elif quality == "133": video = url.streams.filter(res = "240p").first()
+                    elif quality == "160": video = url.streams.filter(res = "144p").first()
+                    title_var.set(r.repr(url.title))
+                    length_var.set(to_hms(url.length))
+                    size_var.set(f"{round(video.filesize/1024/1024, 2)} MB")
+                    if quality in audio_tags_list: ext = "mp3"
+                    else: ext = "mp4"
+                    size = video.filesize
+                    try:
+                        vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
+                        aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
+                    except NameError:
+                        vname = f"{directory}/{clean_filename(url.title)}_video.mp4"
+                        aname = f"{directory}/{clean_filename(url.title)}_audio.mp3"
+                    # Downlaod video
+                    try:
+                        with open(vname, "wb") as f:
+                            video = request.stream(video.url) # Get an iterable stream
+                            downloaded = 0
+                            while True:
+                                if is_cancelled:
+                                    downloading_var.set("Canceled")
+                                    toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
                                     toggle_button.place(x = 550 , y = 347)
-                                    cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
+                                    cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
                                     cancel_button.place(x = 595 , y = 347)
-                                    downloading_var.set("Converting")
-                                    Conversion(vname, ext, url.length)
-                                downloaded_counter = downloaded_counter + 1
-                                downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
-                                break # No more data = Finished
-                except PermissionError:
-                    whenResultsError()
-                    path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                    return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
-                except FileNotFoundError:
-                    whenResultsError()
-                    path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                    return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                                    break
+                                if is_paused:
+                                    time.sleep(0.5)
+                                    continue
+                                try: chunk = next(video, None) # Get next chunk of video
+                                except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                                if chunk:
+                                    f.write(chunk) # Download the chunk into the file
+                                    # Update Progress
+                                    downloaded += len(chunk)
+                                    remaining = size - downloaded
+                                    bytes_downloaded = size - remaining
+                                    percentage_of_completion = bytes_downloaded / size * 100
+                                    percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                                    sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                    progressbar.set(percentage_of_completion/100)
+                                else:
+                                    break # No more data = Finished
+                    except PermissionError:
+                        whenResultsError()
+                        path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
+                        return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                    except FileNotFoundError:
+                        whenResultsError()
+                        path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
+                        return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                    toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                    toggle_button.place(x = 550 , y = 347)
+                    cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                    cancel_button.place(x = 595 , y = 347)
+                    if is_cancelled:
+                        pass
+                    else: # Download audio
+                        downloading_var.set("Downloading audio")
+                        with open(aname, "wb") as f:
+                            is_paused = is_cancelled = False
+                            audio = url.streams.get_by_itag(251)
+                            video = request.stream(audio.url) # Get an iterable stream
+                            downloaded = 0
+                            while True:
+                                if is_paused:
+                                    time.sleep(0.1)
+                                    continue
+                                try: chunk = next(video, None) # Get next chunk of video
+                                except Exception as e:
+                                    print(e)
+                                    return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                                if chunk:
+                                    f.write(chunk) # Download the chunk into the file
+                                else:
+                                    # When finished
+                                    downloaded_counter = downloaded_counter + 1
+                                    downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
+                                    break
+                        # Merge video and audio
+                        downloading_var.set("Merging")
+                        final_name = vname.replace("_video", f"_({quality_string})")
+                        cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
+                        subprocess.call(cmd, shell=True)
+                        os.remove(vname)
+                        os.remove(aname)
+                        # Convert if there is a conversion
+                        if advanced_checker == "yes":
+                            downloading_var.set("Converting")
+                            Conversion(final_name, "mp4", url.length)
+
+            # Download to_download
+            else:
+                for url in to_download:
+                    if is_cancelled: break
+                    toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
+                    toggle_button.place(x = 550 , y = 347)
+                    cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
+                    cancel_button.place(x = 595 , y = 347)
+                    raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                    photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+                    thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
+                    thumb.place(x = 415 , y = 15)
+                    percentage_var.set(f"0.00%  ")
+                    sizeprogress_var.set(f"0 MB  ")
+                    progressbar.set(0)
+                    downloading_var.set("Downloading")
+                    converting_percentage_var.set("")
+                    video = url.streams.get_by_itag(quality)
+                    title_var.set(r.repr(url.title))
+                    length_var.set(to_hms(url.length))
+                    size_var.set(f"{round(video.filesize/1024/1024, 2)} MB")
+                    if quality in audio_tags_list: ext = "mp3"
+                    else: ext = "mp4"
+                    size = video.filesize
+                    try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
+                    except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
+                    try:
+                        with open(vname, "wb") as f:
+                            video = request.stream(video.url) # Get an iterable stream
+                            downloaded = 0
+                            while True:
+                                if is_cancelled:
+                                    downloading_var.set("Canceled")
+                                    toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
+                                    toggle_button.place(x = 550 , y = 347)
+                                    cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
+                                    cancel_button.place(x = 595 , y = 347)
+                                    break
+                                if is_paused:
+                                    time.sleep(0.5)
+                                    continue
+                                try: chunk = next(video, None) # Get next chunk of video
+                                except: return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
+                                if chunk:
+                                    f.write(chunk) # Download the chunk into the file
+                                    # Update Progress
+                                    downloaded += len(chunk)
+                                    remaining = size - downloaded
+                                    bytes_downloaded = size - remaining
+                                    percentage_of_completion = bytes_downloaded / size * 100
+                                    percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                                    sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                    progressbar.set(percentage_of_completion/100)
+                                else:
+                                    # Convert if there is a conversion
+                                    if advanced_checker == "yes":
+                                        toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
+                                        toggle_button.place(x = 550 , y = 347)
+                                        cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
+                                        cancel_button.place(x = 595 , y = 347)
+                                        downloading_var.set("Converting")
+                                        Conversion(vname, ext, url.length)
+                                    downloaded_counter = downloaded_counter + 1
+                                    downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
+                                    break # No more data = Finished
+                    except PermissionError:
+                        whenResultsError()
+                        path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                        return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                    except FileNotFoundError:
+                        whenResultsError()
+                        path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                        return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
 
             # When finished
             toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
@@ -2770,7 +2970,7 @@ def SearchWindow():
                 length_var.set("Finished")
                 size_var.set("Finished")
                 downloading_var.set("Finished")
-                customtkinter.CTkButton(sDWindow, text = "Open File in Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
+                customtkinter.CTkButton(sDWindow, text = "Open in File Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
 
         # Get to_download list info, get link and check errors
         total_size = 0
@@ -2790,8 +2990,8 @@ def SearchWindow():
                 pass
 
         # Selected labels prepare
-        if quality == "144": quality_string = "144p"
-        elif quality == "240": quality_string = "240p"
+        if quality == "160": quality_string = "144p"
+        elif quality == "133": quality_string = "240p"
         elif quality == "18": quality_string = "360p"
         elif quality == "135": quality_string = "480p"
         elif quality == "22": quality_string = "720p"
