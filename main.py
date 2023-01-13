@@ -347,7 +347,7 @@ def AdvancedWindow():
         format_combobox_list = ["MP4 (Default)", "M4A", "MKV"]
         codec_combobox_list = ["H.264 (Default)", "H.265", "AV1", "MPEG-4"]
         fps_combobox_list = ["5", "10", "15", "20", "23.976", "24", "30 (Default)", "40", "45", "50", "60"]
-        aformat_combobox_list = ["MP3 (Default)", "AAC", "OPUS", "FLAC"]
+        aformat_combobox_list = ["MP3 (Default)", "WAV", "AAC", "OPUS", "FLAC"]
         abitrate_combobox_list = ["320", "192", "160", "128", "96", "70", "50"]
         aquality_combobox_list = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
         # Widgets placing
@@ -530,6 +530,9 @@ def AdvancedWindow():
                 if aformat_combobox.get() == "MP3 (Default)":
                     format_codec = "libmp3lame"
                     advanced_extention = "mp3"
+                elif aformat_combobox.get() == "WAV":
+                    format_codec = "pcm_s32le"
+                    advanced_extention = "wav"
                 elif aformat_combobox.get() == "AAC":
                     format_codec = "aac"
                     advanced_extention = "aac"
