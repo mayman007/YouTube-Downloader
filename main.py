@@ -13,7 +13,6 @@ import urllib.request
 import os
 import io
 import reprlib
-import getpass
 import time
 import subprocess
 import webbrowser
@@ -37,8 +36,8 @@ customtkinter.set_default_color_theme(get_default_color())
 
 # On closing
 def onClosing():
-    if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        root.destroy()
+    # if messagebox.askokcancel("Quit", "Do you want to quit?"):
+    root.destroy()
 
 # Create form
 root = customtkinter.CTk()
@@ -243,6 +242,88 @@ def Loading(loading_optionmenu):
             time.sleep(0.5)
         else: break
 
+# Downloading label function
+def Downloading(downloading_var):
+    if downloading_var.get() == "Converting":
+        while True:
+            if downloading_var.get() == "Converting":
+                downloading_var.set("Converting.")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Converting.":
+                downloading_var.set("Converting..")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Converting..":
+                downloading_var.set("Converting...")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Converting...":
+                downloading_var.set("Converting")
+                time.sleep(0.5)
+            else: break
+    elif downloading_var.get() == "Merging":
+        while True:
+            if downloading_var.get() == "Merging":
+                downloading_var.set("Merging.")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Merging.":
+                downloading_var.set("Merging..")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Merging..":
+                downloading_var.set("Merging...")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Merging...":
+                downloading_var.set("Merging")
+                time.sleep(0.5)
+            else: break
+    elif downloading_var.get() == "Downloading audio":
+        while True:
+            if downloading_var.get() == "Downloading audio":
+                downloading_var.set("Downloading audio.")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Downloading audio.":
+                downloading_var.set("Downloading audio..")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Downloading audio..":
+                downloading_var.set("Downloading audio...")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Downloading audio...":
+                downloading_var.set("Downloading audio")
+                time.sleep(0.5)
+            else: break
+    else:
+        downloading_var.set("Downloading")
+        time.sleep(0.5)
+        while True:
+            if downloading_var.get() == "Downloading":
+                downloading_var.set("Downloading.")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Downloading.":
+                downloading_var.set("Downloading..")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Downloading..":
+                downloading_var.set("Downloading...")
+                time.sleep(0.5)
+            else: break
+            if downloading_var.get() == "Downloading...":
+                downloading_var.set("Downloading")
+                time.sleep(0.5)
+            else: break
+        dont_change = ["Canceled", "Paused", "Finished", " "]
+        while True:
+            time.sleep(1)
+            if downloading_var.get() in dont_change: continue
+            else: Downloading(downloading_var)
+
 # Integer -> time format
 def to_hms(s):
     m, s = divmod(s, 60)
@@ -322,6 +403,7 @@ def AdvancedWindow():
             if video_crf_or_bitrate.get() == "crf":
                 crf_slider.configure(state = "normal")
                 bitrate_entry.configure(state = "disabled")
+                bitrate_entry.configure(border_color = "#565B5E")
             else:
                 bitrate_entry.configure(state = "normal")
                 crf_slider.configure(state = "disabled")
@@ -499,7 +581,7 @@ def AdvancedWindow():
                 if profile_combobox.get() == "Main (Default)": profile = "main"
                 else: profile = profile_combobox.get().lower()
                 ffmpeg_command = ffmpeg_command + f' -profile {profile}'
-                if preset_combobox.get() == "Medium (Default)": preset = "Medium"
+                if preset_combobox.get() == "Medium (Default)": preset = "medium"
                 else: preset = preset_combobox.get().lower()
                 ffmpeg_command = ffmpeg_command + f' -preset {preset}'
                 if tune_combobox.get() == "None (Default)":
@@ -611,7 +693,7 @@ def Conversion(input, ext, seconds):
 def DownlaodWindow():
     # Starting
     def VideoStart():
-        threading.Thread(target = Downloading).start()
+        threading.Thread(target = Downloading, args = (downloading_var,)).start()
         threading.Thread(target = VideoDownloader).start()
 
     # Back home
@@ -630,8 +712,7 @@ def DownlaodWindow():
         root.deiconify()
 
     # Set path
-    user = getpass.getuser()
-    path = f"C:/Users\{user}\Downloads"
+    path = f"C:/Users\{os.getlogin()}\Downloads"
     global directory
     directory = os.path.realpath(path) # Deafult path in case the user didn't choose
     def BrowseDir(): # Path function
@@ -734,88 +815,6 @@ def DownlaodWindow():
         except NameError:
             subprocess.Popen(f'explorer "{directory}"')
 
-    # Downloading label function
-    def Downloading():
-        if downloading_var.get() == "Converting":
-            while True:
-                if downloading_var.get() == "Converting":
-                    downloading_var.set("Converting.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Converting.":
-                    downloading_var.set("Converting..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Converting..":
-                    downloading_var.set("Converting...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Converting...":
-                    downloading_var.set("Converting")
-                    time.sleep(0.5)
-                else: break
-        elif downloading_var.get() == "Merging":
-            while True:
-                if downloading_var.get() == "Merging":
-                    downloading_var.set("Merging.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Merging.":
-                    downloading_var.set("Merging..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Merging..":
-                    downloading_var.set("Merging...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Merging...":
-                    downloading_var.set("Merging")
-                    time.sleep(0.5)
-                else: break
-        elif downloading_var.get() == "Downloading audio":
-            while True:
-                if downloading_var.get() == "Downloading audio":
-                    downloading_var.set("Downloading audio.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading audio.":
-                    downloading_var.set("Downloading audio..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading audio..":
-                    downloading_var.set("Downloading audio...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading audio...":
-                    downloading_var.set("Downloading audio")
-                    time.sleep(0.5)
-                else: break
-        else:
-            downloading_var.set("Downloading")
-            time.sleep(0.5)
-            while True:
-                if downloading_var.get() == "Downloading":
-                    downloading_var.set("Downloading.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading.":
-                    downloading_var.set("Downloading..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading..":
-                    downloading_var.set("Downloading...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading...":
-                    downloading_var.set("Downloading")
-                    time.sleep(0.5)
-                else: break
-        dont_change = ["Canceled", "Paused", "Finished", " "]
-        while True:
-            time.sleep(1)
-            if downloading_var.get() in dont_change: continue
-            else: Downloading()
-
     # One Video Downloader
     def VideoDownloader(event = None):
         # Preperations
@@ -833,11 +832,6 @@ def DownlaodWindow():
         except: pass
         audio_tags_list = ["251" , "140" , "250" , "249"]
         non_progressive_list = ["137" , "135" , "133", "160"]
-        if quality == "137": video = url.streams.filter(res = "1080p").first()
-        elif quality == "135": video = url.streams.filter(res = "480p").first()
-        elif quality == "133": video = url.streams.filter(res = "240p").first()
-        elif quality == "160": video = url.streams.filter(res = "144p").first()
-        else: video = url.streams.get_by_itag(quality)
         # Download subtitles if selected
         if caps == "yes": CaptionsDownload()
         else: pass
@@ -848,6 +842,12 @@ def DownlaodWindow():
 
         # If the quality is non progressive video (1080p, 480p, 240p and 144p)
         if quality in non_progressive_list:
+            if quality == "137": video = url.streams.filter(res = "1080p").first()
+            elif quality == "135": video = url.streams.filter(res = "480p").first()
+            elif quality == "133": video = url.streams.filter(res = "240p").first()
+            elif quality == "160": video = url.streams.filter(res = "144p").first()
+            audio = url.streams.get_by_itag(251)
+            size = video.filesize + audio.filesize
             try:
                 vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
                 aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
@@ -902,9 +902,7 @@ def DownlaodWindow():
                 downloading_var.set("Downloading audio")
                 with open(aname, "wb") as f:
                     is_paused = is_cancelled = False
-                    audio = url.streams.get_by_itag(251)
                     video = request.stream(audio.url) # Get an iterable stream
-                    downloaded = 0
                     while True:
                         if is_paused:
                             time.sleep(0.1)
@@ -915,6 +913,14 @@ def DownlaodWindow():
                             return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
                         if chunk:
                             f.write(chunk) # Download the chunk into the file
+                            # Update progress
+                            downloaded += len(chunk)
+                            remaining = size - downloaded
+                            bytes_downloaded = size - remaining
+                            percentage_of_completion = bytes_downloaded / size * 100
+                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                            progressbar.set(percentage_of_completion/100)
                         else:
                             # When finished
                             break
@@ -939,6 +945,8 @@ def DownlaodWindow():
 
         # If the quality is 720p or 360p or audio
         else:
+            video = url.streams.get_by_itag(quality)
+            size = video.filesize
             if quality in audio_tags_list: ext = "mp3"
             else: ext = "mp4"
             try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
@@ -1007,21 +1015,6 @@ def DownlaodWindow():
         quality = str(quality_var.get())
         if not "youtu" in link or "playlist" in link:
             raise pytube.exceptions.RegexMatchError
-    except pytube.exceptions.AgeRestrictedError:
-        whenError()
-        return messagebox.showerror(title = "Age Restricted", message = "This video is age restricted.")
-    except pytube.exceptions.MembersOnly:
-        whenError()
-        return messagebox.showerror(title = "Members Only", message = "This video is members only.")
-    except pytube.exceptions.VideoPrivate:
-        whenError()
-        return messagebox.showerror(title = "Private Video", message = "This video is private.")
-    except pytube.exceptions.VideoRegionBlocked:
-        whenError()
-        return messagebox.showerror(title = "Region Blocked", message = "This video is region blocked.")
-    except pytube.exceptions.VideoUnavailable:
-        whenError()
-        return messagebox.showerror(title = "Video Unavailable", message = "This video is unavailable.")
     except pytube.exceptions.RegexMatchError:
         whenError()
         return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid video link.")
@@ -1031,12 +1024,25 @@ def DownlaodWindow():
         if quality == "0":
             whenError()
             return messagebox.showerror(title = "Format Not Selected", message = "Please select a format to download.")
-        elif quality == "137": video = url.streams.filter(res = "1080p").first()
-        elif quality == "135": video = url.streams.filter(res = "480p").first()
-        elif quality == "133": video = url.streams.filter(res = "240p").first()
-        elif quality == "160": video = url.streams.filter(res = "144p").first()
-        else: video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
-        size = video.filesize
+        elif quality == "137":
+            video = url.streams.filter(res = "1080p").first()
+            audio = url.streams.get_by_itag(251)
+            size = video.filesize + audio.filesize
+        elif quality == "135":
+            video = url.streams.filter(res = "480p").first()
+            audio = url.streams.get_by_itag(251)
+            size = video.filesize + audio.filesize
+        elif quality == "133":
+            video = url.streams.filter(res = "240p").first()
+            audio = url.streams.get_by_itag(251)
+            size = video.filesize + audio.filesize
+        elif quality == "160":
+            video = url.streams.filter(res = "144p").first()
+            audio = url.streams.get_by_itag(251)
+            size = video.filesize + audio.filesize
+        else:
+            video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
+            size = video.filesize
         size_string = f"{round(size/1024/1024, 2)} MB"
     except urllib.error.URLError as e:
         print(e)
@@ -1049,12 +1055,32 @@ def DownlaodWindow():
     except AttributeError as e:
         print(f"AttributeError: {e}")
         whenError()
-        return messagebox.showerror(title = "Format Not Available",
-        message = f"I can't retrieve '{url.title}' in the format that you chose. Change the selected quality or try again later.")
+        return messagebox.showerror(title = "Quality Not Available",
+        message = f"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
     except pytube.exceptions.LiveStreamError as e:
         print(e)
         whenError()
         return messagebox.showerror(title = "Video is Live", message = "Can't download a live video.")
+    except pytube.exceptions.AgeRestrictedError as e:
+        print(e)
+        whenError()
+        return messagebox.showerror(title = "Age Restricted", message = "This video is age restricted.")
+    except pytube.exceptions.MembersOnly as e:
+        print(e)
+        whenError()
+        return messagebox.showerror(title = "Members Only", message = "This video is members only.")
+    except pytube.exceptions.VideoPrivate as e:
+        print(e)
+        whenError()
+        return messagebox.showerror(title = "Private Video", message = "This video is private.")
+    except pytube.exceptions.VideoRegionBlocked as e:
+        print(e)
+        whenError()
+        return messagebox.showerror(title = "Region Blocked", message = "This video is region blocked.")
+    except pytube.exceptions.VideoUnavailable as e:
+        print(e)
+        whenError()
+        return messagebox.showerror(title = "Video Unavailable", message = "This video is unavailable.")
 
     # Get transcripts
     try:
@@ -1195,7 +1221,7 @@ def DownlaodWindow():
 def PlaylistWindow():
     # Starting
     def pVideoStart():
-        threading.Thread(target = Downloading).start()
+        threading.Thread(target = Downloading, args = (downloading_var,)).start()
         threading.Thread(target = PlaylistDownloader).start()
 
     # Back home
@@ -1214,8 +1240,7 @@ def PlaylistWindow():
         root.deiconify()
 
     # Set path
-    user = getpass.getuser()
-    path = f"C:/Users\{user}\Downloads"
+    path = f"C:/Users\{os.getlogin()}\Downloads"
     global directory
     directory = os.path.realpath(path) # Deafult path in case the user didn't choose
     def pBrowseDir(): # Path function
@@ -1377,88 +1402,6 @@ def PlaylistWindow():
         except NameError:
             subprocess.Popen(f'explorer "{directory}"')
 
-    # Downloading label function
-    def Downloading():
-        if downloading_var.get() == "Converting":
-            while True:
-                if downloading_var.get() == "Converting":
-                    downloading_var.set("Converting.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Converting.":
-                    downloading_var.set("Converting..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Converting..":
-                    downloading_var.set("Converting...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Converting...":
-                    downloading_var.set("Converting")
-                    time.sleep(0.5)
-                else: break
-        elif downloading_var.get() == "Merging":
-            while True:
-                if downloading_var.get() == "Merging":
-                    downloading_var.set("Merging.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Merging.":
-                    downloading_var.set("Merging..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Merging..":
-                    downloading_var.set("Merging...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Merging...":
-                    downloading_var.set("Merging")
-                    time.sleep(0.5)
-                else: break
-        elif downloading_var.get() == "Downloading audio":
-            while True:
-                if downloading_var.get() == "Downloading audio":
-                    downloading_var.set("Downloading audio.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading audio.":
-                    downloading_var.set("Downloading audio..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading audio..":
-                    downloading_var.set("Downloading audio...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading audio...":
-                    downloading_var.set("Downloading audio")
-                    time.sleep(0.5)
-                else: break
-        else:
-            downloading_var.set("Downloading")
-            time.sleep(0.5)
-            while True:
-                if downloading_var.get() == "Downloading":
-                    downloading_var.set("Downloading.")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading.":
-                    downloading_var.set("Downloading..")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading..":
-                    downloading_var.set("Downloading...")
-                    time.sleep(0.5)
-                else: break
-                if downloading_var.get() == "Downloading...":
-                    downloading_var.set("Downloading")
-                    time.sleep(0.5)
-                else: break
-            dont_change = ["Canceled", "Paused", "Finished", " "]
-            while True:
-                time.sleep(1)
-                if downloading_var.get() in dont_change: continue
-                else: Downloading()
-
     # Download playlist
     def PlaylistDownloader(event = None):
         # Preperations
@@ -1501,7 +1444,6 @@ def PlaylistWindow():
             downloading_var.set(" ")
             return messagebox.showerror(title = "No Selected Video", message = "Please select at least one video.")
         downloaded_counter = 0
-        downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
 
         # If the quality is non progressive video (1080p, 480p, 240p and 144p)
         if quality in non_progressive_list:
@@ -1513,17 +1455,12 @@ def PlaylistWindow():
                 cancel_button.place(x = 595 , y = 347)
                 raw_data = urllib.request.urlopen(url.thumbnail_url).read()
                 photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                progressbar.set(0)
-                percentage_var.set(f"0.00%  ")
-                sizeprogress_var.set(f"0 MB  ")
-                downloading_var.set("Downloading")
-                converting_percentage_var.set("")
                 if quality == "137": video = url.streams.filter(res = "1080p").first()
                 elif quality == "135": video = url.streams.filter(res = "480p").first()
                 elif quality == "133": video = url.streams.filter(res = "240p").first()
                 elif quality == "160": video = url.streams.filter(res = "144p").first()
-                else: video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
-                size = video.filesize
+                audio = url.streams.get_by_itag(251)
+                size = video.filesize + audio.filesize
                 if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
                 else: continue
                 ext = "mp4"
@@ -1536,7 +1473,14 @@ def PlaylistWindow():
                 # Downlaod video
                 try:
                     with open(vname, "wb") as f:
-                        customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
+                        percentage_var.set(f"0.00%  ")
+                        sizeprogress_var.set(f"0 MB  ")
+                        downloading_var.set("Downloading")
+                        converting_percentage_var.set("")
+                        progressbar.set(0)
+                        downloaded_counter = downloaded_counter + 1
+                        downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                        thumbnail.configure(image = photo)
                         downloaded = 0
                         is_paused = is_cancelled = False
                         video = request.stream(video.url) # Get an iterable stream
@@ -1582,9 +1526,8 @@ def PlaylistWindow():
                     downloading_var.set("Downloading audio")
                     with open(aname, "wb") as f:
                         is_paused = is_cancelled = False
-                        audio = url.streams.get_by_itag(251)
                         video = request.stream(audio.url) # Get an iterable stream
-                        downloaded = 0
+                        # downloaded = 0
                         while True:
                             if is_paused:
                                 time.sleep(0.1)
@@ -1595,10 +1538,15 @@ def PlaylistWindow():
                                 return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
                             if chunk:
                                 f.write(chunk) # Download the chunk into the file
+                                downloaded += len(chunk)
+                                remaining = size - downloaded
+                                bytes_downloaded = size - remaining
+                                percentage_of_completion = bytes_downloaded / size * 100
+                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                progressbar.set(percentage_of_completion/100)
                             else:
                                 # When finished
-                                downloaded_counter = downloaded_counter + 1
-                                downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
                                 break
                     # Merge video and audio
                     downloading_var.set("Merging")
@@ -1622,11 +1570,6 @@ def PlaylistWindow():
                 cancel_button.place(x = 595 , y = 347)
                 raw_data = urllib.request.urlopen(url.thumbnail_url).read()
                 photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                progressbar.set(0)
-                percentage_var.set(f"0.00%  ")
-                sizeprogress_var.set(f"0 MB  ")
-                downloading_var.set("Downloading")
-                converting_percentage_var.set("")
                 video = url.streams.get_by_itag(quality)
                 size = video.filesize
                 if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
@@ -1637,7 +1580,14 @@ def PlaylistWindow():
                 except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
                 try:
                     with open(vname, "wb") as f:
-                        customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
+                        percentage_var.set(f"0.00%  ")
+                        sizeprogress_var.set(f"0 MB  ")
+                        downloading_var.set("Downloading")
+                        converting_percentage_var.set("")
+                        progressbar.set(0)
+                        downloaded_counter = downloaded_counter + 1
+                        downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                        thumbnail.configure(image = photo)
                         downloaded = 0
                         video = request.stream(video.url) # Get an iterable stream
                         while True:
@@ -1672,8 +1622,6 @@ def PlaylistWindow():
                                     cancel_button.place(x = 595 , y = 347)
                                     downloading_var.set("Converting")
                                     Conversion(vname, ext, url.length)
-                                downloaded_counter = downloaded_counter + 1
-                                downloadcounter_var.set(f"{downloaded_counter}/{vids_counter} Downloaded")
                                 break # No more data = Finished
                 except PermissionError:
                     whenPlaylistError()
@@ -1709,27 +1657,12 @@ def PlaylistWindow():
     except KeyError:
         whenError()
         return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid link.")
-    except pytube.exceptions.AgeRestrictedError:
-        whenError()
-        return messagebox.showerror(title = "Age Restricted", message = "This playlist has age restricted video(s).")
-    except pytube.exceptions.MembersOnly:
-        whenError()
-        return messagebox.showerror(title = "Members Only", message = "This playlist has members only video(s).")
-    except pytube.exceptions.VideoPrivate:
-        whenError()
-        return messagebox.showerror(title = "Private Video", message = "This playlist has private video(s).")
-    except pytube.exceptions.VideoRegionBlocked:
-        whenError()
-        return messagebox.showerror(title = "Region Blocked", message = "This playlist has region blocked video(s).")
-    except pytube.exceptions.VideoUnavailable:
-        whenError()
-        return messagebox.showerror(title = "Video Unavailable", message = "This playlist has unavailable video(s).")
     except pytube.exceptions.RegexMatchError:
         whenError()
         return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid link.")
     if quality == "0":
         whenError()
-        return messagebox.showerror(title = "Link Not Valid", message = "Please select a format to download.")
+        return messagebox.showerror(title = "Format Not Selected", message = "Please select a format to download.")
     else:
         not_supported_list = ["250" , "249"]
         if quality in not_supported_list:
@@ -1748,12 +1681,25 @@ def PlaylistWindow():
                 print(f"================================")
                 print(f"({pl_tst_counter}) loop started")
                 try:
-                    if quality == "137": video = url.streams.filter(res = "1080p").first()
-                    elif quality == "135": video = url.streams.filter(res = "480p").first()
-                    elif quality == "133": video = url.streams.filter(res = "240p").first()
-                    elif quality == "160": video = url.streams.filter(res = "144p").first()
-                    else: video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
-                    size = video.filesize
+                    if quality == "137":
+                        video = url.streams.filter(res = "1080p").first()
+                        audio = url.streams.get_by_itag(251)
+                        size = video.filesize + audio.filesize
+                    elif quality == "135":
+                        video = url.streams.filter(res = "480p").first()
+                        audio = url.streams.get_by_itag(251)
+                        size = video.filesize + audio.filesize
+                    elif quality == "133":
+                        video = url.streams.filter(res = "240p").first()
+                        audio = url.streams.get_by_itag(251)
+                        size = video.filesize + audio.filesize
+                    elif quality == "160":
+                        video = url.streams.filter(res = "144p").first()
+                        audio = url.streams.get_by_itag(251)
+                        size = video.filesize + audio.filesize
+                    else:
+                        video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
+                        size = video.filesize
                     print(f"({pl_tst_counter}) got video item")
                 except urllib.error.URLError as e:
                     print(e)
@@ -1761,17 +1707,20 @@ def PlaylistWindow():
                     return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
                 except pytube.exceptions.LiveStreamError as e:
                     print(e)
+                    # continue
                     whenError()
                     return messagebox.showerror(title = "Video is Live", message = "I Can't retrieve a live video.")
                 except KeyError as e:
                     print(f"KeyError: {e}")
+                    # continue
                     whenError()
                     return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.")
                 except AttributeError as e:
                     print(f"AttributeError: {e}")
+                    # continue
                     whenError()
-                    return messagebox.showerror(title = "Format Not Available",
-                                                message = f"I can't retrieve '{url.title}' in the format that you chose. Change the selected quality or try again later.")
+                    return messagebox.showerror(title = "Quality Not Available",
+                                                message = f"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
                 try:
                     video_id = extract.video_id(url.watch_url)
                     YouTubeTranscriptApi.list_transcripts(video_id)
@@ -1787,16 +1736,24 @@ def PlaylistWindow():
                 print(f"({pl_tst_counter}) got size string")
                 plength = plength + url.length
                 print(f"({pl_tst_counter}) got length")
-                vid_option = f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB"
+                vid_option = f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB"
                 print(f"({pl_tst_counter}) got vid_option")
                 vids_list.append(vid_option)
                 print(f"({pl_tst_counter}) added vid_option to list")
                 vids_counter = vids_counter + 1
                 ploading_counter_var.set(f"({vids_counter})")
+    if vids_list == []: # If an exception occured on every video...
+        whenError()
+        return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve this playlist at the moment. Change the selected quality or try again later.")
 
     # Getting playlist thumbnail
-    raw_data = urllib.request.urlopen(url.thumbnail_url).read()
-    photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+    try:
+        raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+        photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
+    except UnboundLocalError:
+        whenError()
+        return messagebox.showerror(title = "Playlist is Unavailable",
+                                    message = "The cause for this may be one of the following:\n- Playlist is private\n- Playlist is age-restricted\n- Playlist is region blocked\n- Playlist is members only")
 
     # Playlist labels info
     r = reprlib.Repr()
@@ -1834,12 +1791,12 @@ def PlaylistWindow():
 
     # Downloading label
     downloading_var = StringVar()
-    customtkinter.CTkLabel(pWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 265 , y = 418)
+    customtkinter.CTkLabel(pWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 305 , y = 418)
     downloadcounter_var = StringVar()
-    customtkinter.CTkLabel(pWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(rely = 1.0, relx = 1.0, x = -17, y = -13, anchor = SE)
+    customtkinter.CTkLabel(pWindow, textvariable = downloadcounter_var, font = ("arial", 25), text_color = "LightBlue").place(rely = 1.0, relx = 1.0, x = -405, y = -13, anchor = SE)
     global converting_percentage_var
     converting_percentage_var = StringVar()
-    customtkinter.CTkLabel(pWindow, textvariable = converting_percentage_var, font = ("arial", 22)).place(x = 410 , y = 418)
+    customtkinter.CTkLabel(pWindow, textvariable = converting_percentage_var, font = ("arial", 25)).place(x = 450 , y = 418)
 
     # Playlist labels
     length_var = StringVar()
@@ -1848,7 +1805,8 @@ def PlaylistWindow():
     size_var.set(f"{size_string} MB")
     videos_var = IntVar()
     videos_var.set(vids_counter)
-    customtkinter.CTkLabel(pWindow, text = "", image = photo).place(x = 220 , y = 0)
+    thumbnail = customtkinter.CTkLabel(pWindow, text = "", image = photo)
+    thumbnail.place(x = 220 , y = 0)
     customtkinter.CTkLabel(pWindow, text = "Playlist Title:", font = ("arial bold", 20)).place(x = 20 , y = 165)
     customtkinter.CTkLabel(pWindow, text = r.repr(urls.title), font = ("arial", 20)).place(x = 148 , y = 165)
     customtkinter.CTkLabel(pWindow, text = "Channel:", font = ("arial bold", 20)).place(x = 20 , y = 195)
@@ -1890,7 +1848,7 @@ def PlaylistWindow():
     lang_choose.place(x = 430 , y = 315)
 
     # Video selector
-    menubutton = customtkinter.CTkOptionMenu(pWindow, font = ("arial", 14), values = vids_list, command = videoSelector, corner_radius = 15)
+    menubutton = customtkinter.CTkOptionMenu(pWindow, font = ("arial", 14), values = vids_list, command = videoSelector, corner_radius = 13)
     menubutton.set("Open Videos Menu")
     menubutton.place(x = 525 , y = 270)
 
@@ -2528,7 +2486,7 @@ def SearchWindow():
     def ResultsWindow(to_download):
         # Starting
         def pVideoStart():
-            threading.Thread(target = Downloading).start()
+            threading.Thread(target = Downloading, args = (downloading_var,)).start()
             threading.Thread(target = SearchDownloader).start()
 
         # Back home
@@ -2547,8 +2505,7 @@ def SearchWindow():
             root.deiconify()
 
         # Set path
-        user = getpass.getuser()
-        path = f"C:/Users\{user}\Downloads"
+        path = f"C:/Users\{os.getlogin()}\Downloads"
         global directory
         directory = os.path.realpath(path) # Deafult path in case the user didn't choose
         def pBrowseDir(): # Path function
@@ -2642,88 +2599,6 @@ def SearchWindow():
             except NameError:
                 subprocess.Popen(f'explorer "{directory}"')
 
-        # Downloading label function
-        def Downloading():
-            if downloading_var.get() == "Converting":
-                while True:
-                    if downloading_var.get() == "Converting":
-                        downloading_var.set("Converting.")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Converting.":
-                        downloading_var.set("Converting..")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Converting..":
-                        downloading_var.set("Converting...")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Converting...":
-                        downloading_var.set("Converting")
-                        time.sleep(0.5)
-                    else: break
-            elif downloading_var.get() == "Merging":
-                while True:
-                    if downloading_var.get() == "Merging":
-                        downloading_var.set("Merging.")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Merging.":
-                        downloading_var.set("Merging..")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Merging..":
-                        downloading_var.set("Merging...")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Merging...":
-                        downloading_var.set("Merging")
-                        time.sleep(0.5)
-                    else: break
-            elif downloading_var.get() == "Downloading audio":
-                while True:
-                    if downloading_var.get() == "Downloading audio":
-                        downloading_var.set("Downloading audio.")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Downloading audio.":
-                        downloading_var.set("Downloading audio..")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Downloading audio..":
-                        downloading_var.set("Downloading audio...")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Downloading audio...":
-                        downloading_var.set("Downloading audio")
-                        time.sleep(0.5)
-                    else: break
-            else:
-                downloading_var.set("Downloading")
-                time.sleep(0.5)
-                while True:
-                    if downloading_var.get() == "Downloading":
-                        downloading_var.set("Downloading.")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Downloading.":
-                        downloading_var.set("Downloading..")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Downloading..":
-                        downloading_var.set("Downloading...")
-                        time.sleep(0.5)
-                    else: break
-                    if downloading_var.get() == "Downloading...":
-                        downloading_var.set("Downloading")
-                        time.sleep(0.5)
-                    else: break
-                dont_change = ["Canceled", "Paused", "Finished", " "]
-                while True:
-                    time.sleep(1)
-                    if downloading_var.get() in dont_change: continue
-                    else: Downloading()
-
         # Pause/Resume function
         def toggle_download():
             global is_paused
@@ -2758,7 +2633,7 @@ def SearchWindow():
             audio_tags_list = ["251" , "140" , "250" , "249"]
             non_progressive_list = ["137" , "135" , "133", "160"]
             downloaded_counter = 0
-            downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
+            vids_counter = len(to_download)
             r = reprlib.Repr()
             r.maxstring = 27
             # Progress stuff
@@ -2782,23 +2657,17 @@ def SearchWindow():
                     cancel_button.place(x = 595 , y = 347)
                     raw_data = urllib.request.urlopen(url.thumbnail_url).read()
                     photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                    thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
-                    thumb.place(x = 415 , y = 15)
-                    percentage_var.set(f"0.00%  ")
-                    sizeprogress_var.set(f"0 MB  ")
-                    progressbar.set(0)
-                    downloading_var.set("Downloading")
-                    converting_percentage_var.set("")
                     if quality == "137": video = url.streams.filter(res = "1080p").first()
                     elif quality == "135": video = url.streams.filter(res = "480p").first()
                     elif quality == "133": video = url.streams.filter(res = "240p").first()
                     elif quality == "160": video = url.streams.filter(res = "144p").first()
+                    audio = url.streams.get_by_itag(251)
+                    size = video.filesize + audio.filesize
                     title_var.set(r.repr(url.title))
                     length_var.set(to_hms(url.length))
-                    size_var.set(f"{round(video.filesize/1024/1024, 2)} MB")
+                    size_var.set(f"{round(size/1024/1024, 2)} MB")
                     if quality in audio_tags_list: ext = "mp3"
                     else: ext = "mp4"
-                    size = video.filesize
                     try:
                         vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
                         aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
@@ -2808,6 +2677,14 @@ def SearchWindow():
                     # Downlaod video
                     try:
                         with open(vname, "wb") as f:
+                            percentage_var.set(f"0.00%  ")
+                            sizeprogress_var.set(f"0 MB  ")
+                            downloading_var.set("Downloading")
+                            converting_percentage_var.set("")
+                            progressbar.set(0)
+                            downloaded_counter = downloaded_counter + 1
+                            downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                            thumbnail.configure(image = photo)
                             video = request.stream(video.url) # Get an iterable stream
                             downloaded = 0
                             while True:
@@ -2853,9 +2730,7 @@ def SearchWindow():
                         downloading_var.set("Downloading audio")
                         with open(aname, "wb") as f:
                             is_paused = is_cancelled = False
-                            audio = url.streams.get_by_itag(251)
                             video = request.stream(audio.url) # Get an iterable stream
-                            downloaded = 0
                             while True:
                                 if is_paused:
                                     time.sleep(0.1)
@@ -2866,10 +2741,16 @@ def SearchWindow():
                                     return messagebox.showerror(title = "Something Went Wrong", message = "Something went wrong, please try again.")
                                 if chunk:
                                     f.write(chunk) # Download the chunk into the file
+                                    # Update progress
+                                    downloaded += len(chunk)
+                                    remaining = size - downloaded
+                                    bytes_downloaded = size - remaining
+                                    percentage_of_completion = bytes_downloaded / size * 100
+                                    percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
+                                    sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                    progressbar.set(percentage_of_completion/100)
                                 else:
                                     # When finished
-                                    downloaded_counter = downloaded_counter + 1
-                                    downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
                                     break
                         # Merge video and audio
                         downloading_var.set("Merging")
@@ -2893,13 +2774,6 @@ def SearchWindow():
                     cancel_button.place(x = 595 , y = 347)
                     raw_data = urllib.request.urlopen(url.thumbnail_url).read()
                     photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
-                    thumb = customtkinter.CTkLabel(sDWindow, text = "", image = photo)
-                    thumb.place(x = 415 , y = 15)
-                    percentage_var.set(f"0.00%  ")
-                    sizeprogress_var.set(f"0 MB  ")
-                    progressbar.set(0)
-                    downloading_var.set("Downloading")
-                    converting_percentage_var.set("")
                     video = url.streams.get_by_itag(quality)
                     title_var.set(r.repr(url.title))
                     length_var.set(to_hms(url.length))
@@ -2911,6 +2785,14 @@ def SearchWindow():
                     except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
                     try:
                         with open(vname, "wb") as f:
+                            percentage_var.set(f"0.00%  ")
+                            sizeprogress_var.set(f"0 MB  ")
+                            downloading_var.set("Downloading")
+                            converting_percentage_var.set("")
+                            progressbar.set(0)
+                            downloaded_counter = downloaded_counter + 1
+                            downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                            thumbnail.configure(image = photo)
                             video = request.stream(video.url) # Get an iterable stream
                             downloaded = 0
                             while True:
@@ -2945,8 +2827,6 @@ def SearchWindow():
                                         cancel_button.place(x = 595 , y = 347)
                                         downloading_var.set("Converting")
                                         Conversion(vname, ext, url.length)
-                                    downloaded_counter = downloaded_counter + 1
-                                    downloadcounter_var.set(f"{downloaded_counter}/{len(to_download)} Downloaded")
                                     break # No more data = Finished
                     except PermissionError:
                         whenResultsError()
@@ -2967,21 +2847,40 @@ def SearchWindow():
                 if msg_box == "yes": os.remove(vname)
             else:
                 downloadcounter_var.set("")
-                sDWindow.bell()
-                thumb.configure(image = "")
+                converting_percentage_var.set("")
+                thumbnail.configure(image = "")
                 title_var.set("Finished")
                 length_var.set("Finished")
                 size_var.set("Finished")
                 downloading_var.set("Finished")
                 customtkinter.CTkButton(sDWindow, text = "Open in File Explorer", font = ("arial bold", 20), command = openFile, corner_radius = 20).place(x = 460 , y = 420)
+                sDWindow.bell()
 
         # Get to_download list info, get link and check errors
         total_size = 0
         total_length = 0
         vids_subs = []
         for url in to_download:
-            video = url.streams.get_by_itag(quality)
-            total_size = total_size + video.filesize
+            if quality == "137":
+                video = url.streams.filter(res = "1080p").first()
+                audio = url.streams.get_by_itag(251)
+                size = video.filesize + audio.filesize
+            elif quality == "135":
+                video = url.streams.filter(res = "480p").first()
+                audio = url.streams.get_by_itag(251)
+                size = video.filesize + audio.filesize
+            elif quality == "133":
+                video = url.streams.filter(res = "240p").first()
+                audio = url.streams.get_by_itag(251)
+                size = video.filesize + audio.filesize
+            elif quality == "160":
+                video = url.streams.filter(res = "144p").first()
+                audio = url.streams.get_by_itag(251)
+                size = video.filesize + audio.filesize
+            else:
+                video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
+                size = video.filesize
+            total_size = total_size + size
             total_length = total_length + url.length
             try:
                 video_id = extract.video_id(url.watch_url)
@@ -3006,8 +2905,8 @@ def SearchWindow():
 
         # Form creating
         def onClosing():
-            if messagebox.askokcancel("Quit", "Do you want to quit?"):
-                root.destroy()
+            # if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.destroy()
         sWindow.destroy()
         sDWindow = customtkinter.CTkToplevel()
         sDWindow.title("Results Downloader")
@@ -3025,12 +2924,12 @@ def SearchWindow():
 
         # Downloading label
         downloading_var = StringVar()
-        customtkinter.CTkLabel(sDWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 265 , y = 418)
+        customtkinter.CTkLabel(sDWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 305 , y = 418)
         downloadcounter_var = StringVar()
-        customtkinter.CTkLabel(sDWindow, textvariable = downloadcounter_var, font = ("arial", 25)).place(rely = 1.0, relx = 1.0, x = -17, y = -13, anchor = SE)
+        customtkinter.CTkLabel(sDWindow, textvariable = downloadcounter_var, font = ("arial", 25), text_color = "LightBlue").place(rely = 1.0, relx = 1.0, x = -405, y = -14, anchor = SE)
         global converting_percentage_var
         converting_percentage_var = StringVar()
-        customtkinter.CTkLabel(sDWindow, textvariable = converting_percentage_var, font = ("arial", 22)).place(x = 410 , y = 418)
+        customtkinter.CTkLabel(sDWindow, textvariable = converting_percentage_var, font = ("arial", 25)).place(x = 450 , y = 418)
 
         # Search download labels
         title_var = StringVar()
@@ -3039,6 +2938,8 @@ def SearchWindow():
         length_var.set("...")
         size_var = StringVar()
         size_var.set("...")
+        thumbnail = customtkinter.CTkLabel(sDWindow, text = "", image = "")
+        thumbnail.place(x = 415 , y = 15)
         customtkinter.CTkLabel(sDWindow, text = "Current Video Info", font = ("arial bold italic", 30)).place(x = 10 , y = 15)
         customtkinter.CTkLabel(sDWindow, text = "Video Title:", font = ("arial bold", 20)).place(x = 20 , y = 55)
         customtkinter.CTkLabel(sDWindow, textvariable = title_var, font = ("arial", 20)).place(x = 132 , y = 55)
