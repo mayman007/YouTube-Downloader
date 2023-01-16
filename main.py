@@ -1268,59 +1268,55 @@ def PlaylistWindow():
         progress_size_label.configure(text_color = "#DCE4EE")
 
     # Captions download
-    def pCaptionsDownload():
-        for vid_link in vids_subs:
-            url = YouTube(vid_link)
-            video = url.streams.get_by_itag(quality)
-            if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(video.filesize/1024/1024, 2)} MB" in vids_list:
-                lang = lang_choose.get()
-                video_id = extract.video_id(vid_link)
-                transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-                if lang.lower() == "none":
-                    return
-                elif lang.lower() == "arabic":
-                    lang = "ar"
-                elif lang.lower() == "english":
-                    for transcript in transcript_list:
-                        if transcript.language_code == "en-US":
-                            lang = "en-US"
-                            break
-                        elif transcript.language_code == "en-UK":
-                            lang = "en-UK"
-                            break
-                        else:
-                            lang = "en"
-                downloadcounter_var.set("Subtitle Download")
-                try: # Get the subtitle directly if it's there
-                    final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
-                    print("got one already there")
-                    sub = "subtitle"
-                except: # If not then translate it
-                    translated = "no"
-                    en_list = ["en", "en-US","en-UK"]
-                    for transcript in transcript_list:
-                        if transcript.language_code in en_list: # Translate from English if it's there
-                            final = transcript.translate(lang).fetch()
-                            print(f"translated from {transcript.language_code}")
-                            sub = "translated_subtitle"
-                            translated = "yes"
-                        if translated == "no": # Avoid translating twice
-                            final = transcript.translate(lang).fetch()
-                            print(f"translated {transcript.language_code}")
-                            sub = "translated_subtitle"
-                            translated = "yes"
-                        else:
-                            pass
-                formatter = SRTFormatter()
-                srt_formatted = formatter.format_transcript(final)
-                try:
-                    with open(f"{directory2}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
-                        srt_file.write(srt_formatted)
-                except NameError:
-                    with open(f"{directory}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
-                        srt_file.write(srt_formatted)
-            else:
-                print(f"{url.title} not in list")
+    def pCaptionsDownload(vid_link, title):
+        if vid_link in vids_subs:
+            lang = lang_choose.get()
+            video_id = extract.video_id(vid_link)
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            if lang.lower() == "none":
+                return
+            elif lang.lower() == "arabic":
+                lang = "ar"
+            elif lang.lower() == "english":
+                for transcript in transcript_list:
+                    if transcript.language_code == "en-US":
+                        lang = "en-US"
+                        break
+                    elif transcript.language_code == "en-UK":
+                        lang = "en-UK"
+                        break
+                    else:
+                        lang = "en"
+            try: # Get the subtitle directly if it's there
+                final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
+                print("got one already there")
+                sub = "subtitle"
+            except: # If not then translate it
+                translated = "no"
+                en_list = ["en", "en-US","en-UK"]
+                for transcript in transcript_list:
+                    if transcript.language_code in en_list: # Translate from English if it's there
+                        final = transcript.translate(lang).fetch()
+                        print(f"translated from {transcript.language_code}")
+                        sub = "translated_subtitle"
+                        translated = "yes"
+                    if translated == "no": # Avoid translating twice
+                        final = transcript.translate(lang).fetch()
+                        print(f"translated {transcript.language_code}")
+                        sub = "translated_subtitle"
+                        translated = "yes"
+                    else:
+                        pass
+            formatter = SRTFormatter()
+            srt_formatted = formatter.format_transcript(final)
+            try:
+                with open(f"{directory2}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                    srt_file.write(srt_formatted)
+            except NameError:
+                with open(f"{directory}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                    srt_file.write(srt_formatted)
+        else:
+            print(f"{title} not in caption list")
 
     # Add/Remove videos from download list
     def videoSelector(choice):
@@ -1421,9 +1417,6 @@ def PlaylistWindow():
         except: pass
         audio_tags_list = ["251" , "140" , "250" , "249"]
         non_progressive_list = ["137" , "135" , "133", "160"]
-        # Download subtitles if selected
-        if caps == "yes": pCaptionsDownload()
-        else: pass
         # Progress stuff
         pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
         progress_label.configure(text_color = "green")
@@ -1447,7 +1440,7 @@ def PlaylistWindow():
 
         # If the quality is non progressive video (1080p, 480p, 240p and 144p)
         if quality in non_progressive_list:
-            for url in urls.videos:
+            for url in urls_list:
                 if is_cancelled: break
                 toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
                 toggle_button.place(x = 550 , y = 347)
@@ -1463,6 +1456,9 @@ def PlaylistWindow():
                 size = video.filesize + audio.filesize
                 if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
                 else: continue
+                # Download subtitles if selected
+                if caps == "yes": pCaptionsDownload(url.watch_url, url.title)
+                else: pass
                 ext = "mp4"
                 try:
                     vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
@@ -1562,7 +1558,7 @@ def PlaylistWindow():
 
         # If playlist is 720p, 360p, *audio
         else:
-            for url in urls.videos:
+            for url in urls_list:
                 if is_cancelled: break
                 toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, command = toggle_download)
                 toggle_button.place(x = 550 , y = 347)
@@ -1574,6 +1570,9 @@ def PlaylistWindow():
                 size = video.filesize
                 if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
                 else: continue
+                # Download subtitles if selected
+                if caps == "yes": pCaptionsDownload(url.watch_url, url.title)
+                else: pass
                 if quality in audio_tags_list: ext = "mp3"
                 else: ext = "mp4"
                 try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
@@ -1671,11 +1670,14 @@ def PlaylistWindow():
         else:
             global vids_counter, psize, plength
             vids_list = []
+            urls_list = []
             plength = 0
             psize = 0
             vids_counter = 0
             vids_subs = []
             pl_tst_counter = 0
+            p = reprlib.Repr()
+            p.maxstring = 40
             for url in urls.videos:
                 pl_tst_counter = pl_tst_counter + 1
                 print(f"================================")
@@ -1707,20 +1709,16 @@ def PlaylistWindow():
                     return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
                 except pytube.exceptions.LiveStreamError as e:
                     print(e)
-                    # continue
-                    whenError()
-                    return messagebox.showerror(title = "Video is Live", message = "I Can't retrieve a live video.")
+                    messagebox.showwarning(title = "Video is Live", message = f"I couldn't retrieve '{url.title}' because it's live.\nThe load of the playlist will continue.")
+                    continue
                 except KeyError as e:
                     print(f"KeyError: {e}")
-                    # continue
-                    whenError()
-                    return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.")
+                    messagebox.showwarning(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.\nThe load of the playlist will continue.")
+                    continue
                 except AttributeError as e:
                     print(f"AttributeError: {e}")
-                    # continue
-                    whenError()
-                    return messagebox.showerror(title = "Quality Not Available",
-                                                message = f"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
+                    messagebox.showwarning(title = "Quality Not Available", message = f"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.\nThe load of the playlist will continue.")
+                    continue
                 try:
                     video_id = extract.video_id(url.watch_url)
                     YouTubeTranscriptApi.list_transcripts(video_id)
@@ -1728,20 +1726,14 @@ def PlaylistWindow():
                     print(f"({pl_tst_counter}) found subtitle")
                 except:
                     print(f"({pl_tst_counter}) no subtitle")
-                p = reprlib.Repr()
-                p.maxstring = 40
                 psize = psize + size
-                print(f"({pl_tst_counter}) got size")
                 size_string = round(psize/1024/1024, 2)
-                print(f"({pl_tst_counter}) got size string")
                 plength = plength + url.length
-                print(f"({pl_tst_counter}) got length")
-                vid_option = f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB"
-                print(f"({pl_tst_counter}) got vid_option")
-                vids_list.append(vid_option)
-                print(f"({pl_tst_counter}) added vid_option to list")
+                vids_list.append(f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB")
+                urls_list.append(url)
                 vids_counter = vids_counter + 1
                 ploading_counter_var.set(f"({vids_counter})")
+                print(f"({pl_tst_counter}) got size + length + added vid_option to list")
     if vids_list == []: # If an exception occured on every video...
         whenError()
         return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve this playlist at the moment. Change the selected quality or try again later.")
@@ -1888,10 +1880,6 @@ def PlaylistWindow():
                 adv_checkbox.place(x = 410 , y = 240)
                 adv_checkbox.select()
                 advanced_checker = "yes"
-        # adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), state = "disabled")
-        # adv_checkbox.place(x = 410 , y = 240)
-        # adv_checkbox.bind("<Enter>", lambda event: show_tooltip(event, "Currently, this is feature is only available at single video download.", pWindow))
-        # adv_checkbox.bind("<Leave>", hide_tooltip)
 
     # Download button
     download_button = customtkinter.CTkButton(pWindow, text = "Download", font = ("arial bold", 25), command = pVideoStart, corner_radius = 20)
@@ -1922,10 +1910,6 @@ def SearchWindow():
     if quality == "0":
         whenError()
         return messagebox.showerror(title = "Format Not Selected", message = "Please select a format.")
-    # not_supported_list = ["137" , "135" , "250" , "249" , "133" , "160"]
-    # if quality in not_supported_list:
-    #     whenError()
-    #     return messagebox.showerror(title = "Not Supported", message = "Currently, we support searching youtube in 720p, 360p, 160kbps and 128kbps only.")
     sWindow = customtkinter.CTkToplevel()
     sWindow.title(f'Search Results For "{search_text}"')
     sWindow.withdraw()
@@ -2070,74 +2054,74 @@ def SearchWindow():
     # First video
     cb1 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var1, command = checkboxes)
     cb1.place(x = 30, y = 40)
+    img1 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img1.place(x = 80, y = 10)
     t1 = customtkinter.CTkLabel(sWindow, textvariable = t_var1, font = ("arial bold", 20))
     t1.place(x = 250, y = 15)
     a1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
     a1.place(x = 255, y = 40)
-    s1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    s1.place(x = 260, y = 65)
-    l1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    l1.place(x = 320, y = 65)
+    l1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    l1.place(x = 260, y = 65)
+    v1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    v1.place(x = 320, y = 65)
     b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube1, corner_radius = 20)
-    b1.place(x = 372, y = 63)
-    v1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
-    v1.place(x = 515, y = 65)
-    img1 = customtkinter.CTkLabel(sWindow, text = "", image = "")
-    img1.place(x = 80, y = 10)
+    b1.place(x = 405, y = 63)
+    # s1 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
+    # s1.place(x = 260, y = 65)
 
     # Second video
     cb2 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var2, command = checkboxes)
     cb2.place(x = 30, y = 140)
+    img2 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img2.place(x = 80, y = 110)
     t2 = customtkinter.CTkLabel(sWindow, textvariable = t_var2, font = ("arial bold", 20))
     t2.place(x = 250, y = 115)
     a2 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial", 15))
     a2.place(x = 255, y = 140)
-    s2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    s2.place(x = 260, y = 165)
-    l2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    l2.place(x = 320, y = 165)
+    l2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    l2.place(x = 260, y = 165)
+    v2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    v2.place(x = 320, y = 165)
     b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube2, corner_radius = 20)
-    b2.place(x = 372, y = 163)
-    v2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
-    v2.place(x = 515, y = 165)
-    img2 = customtkinter.CTkLabel(sWindow, text = "", image = "")
-    img2.place(x = 80, y = 110)
+    b2.place(x = 405, y = 163)
+    # s2 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
+    # s2.place(x = 260, y = 165)
 
     # Third video
     cb3 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var3, command = checkboxes)
     cb3.place(x = 30, y = 240)
+    img3 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img3.place(x = 80, y = 210)
     t3 = customtkinter.CTkLabel(sWindow, textvariable = t_var3, font = ("arial bold", 20))
     t3.place(x = 250, y = 215)
     a3 = customtkinter.CTkLabel(sWindow, text = "Not Available", font = ("arial", 15))
     a3.place(x = 255, y = 240)
-    s3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    s3.place(x = 260, y = 265)
-    l3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    l3.place(x = 320, y = 265)
+    l3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    l3.place(x = 260, y = 265)
+    v3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    v3.place(x = 320, y = 265)
     b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube3, corner_radius = 20)
-    b3.place(x = 372, y = 263)
-    v3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
-    v3.place(x = 515, y = 265)
-    img3 = customtkinter.CTkLabel(sWindow, text = "", image = "")
-    img3.place(x = 80, y = 210)
+    b3.place(x = 405, y = 263)
+    # s3 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
+    # s3.place(x = 260, y = 265)
 
     # Fourth video
     cb4 = customtkinter.CTkCheckBox(sWindow, text = "", variable = cb_var4, command = checkboxes)
     cb4.place(x = 30, y = 340)
+    img4 = customtkinter.CTkLabel(sWindow, text = "", image = "")
+    img4.place(x = 80, y = 310)
     t4 = customtkinter.CTkLabel(sWindow, textvariable = t_var4, font = ("arial bold", 20))
     t4.place(x = 250, y = 315)
     a4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
     a4.place(x = 255, y = 340)
-    s4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    s4.place(x = 260, y = 365)
-    l4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
-    l4.place(x = 320, y = 365)
+    l4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    l4.place(x = 260, y = 365)
+    v4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 14))
+    v4.place(x = 320, y = 365)
     b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube4, corner_radius = 20)
-    b4.place(x = 372, y = 363)
-    v4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 15))
-    v4.place(x = 515, y = 365)
-    img4 = customtkinter.CTkLabel(sWindow, text = "", image = "")
-    img4.place(x = 80, y = 310)
+    b4.place(x = 405, y = 363)
+    # s4 = customtkinter.CTkLabel(sWindow, text = "", font = ("arial", 12))
+    # s4.place(x = 260, y = 365)
 
     # Loading
     def Loading(button_var):
@@ -2147,13 +2131,13 @@ def SearchWindow():
         cb3.configure(state = "disabled")
         cb4.configure(state = "disabled")
         b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b1.place(x = 372, y = 63)
+        b1.place(x = 405, y = 63)
         b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b2.place(x = 372, y = 163)
+        b2.place(x = 405, y = 163)
         b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b3.place(x = 372, y = 263)
+        b3.place(x = 405, y = 263)
         b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", width = 0, state = "disabled", corner_radius = 20)
-        b4.place(x = 372, y = 363)
+        b4.place(x = 405, y = 363)
         pr_button.configure(state = "disabled")
         dn_button.configure(state = "disabled")
         nr_button.configure(state = "disabled")
@@ -2179,20 +2163,22 @@ def SearchWindow():
             else: break
 
     # Return to normal
-    def normalWidgets(results_counter, error):
+    def normalWidgets():
+        global results_counter
         if t_var1.get() != "Video is Not Available": cb1.configure(state = "normal")
         if t_var2.get() != "Video is Not Available": cb2.configure(state = "normal")
         if t_var3.get() != "Video is Not Available": cb3.configure(state = "normal")
         if t_var4.get() != "Video is Not Available": cb4.configure(state = "normal")
         b1 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube1, corner_radius = 20)
-        b1.place(x = 372, y = 63)
+        b1.place(x = 405, y = 63)
         b2 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube2, corner_radius = 20)
-        b2.place(x = 372, y = 163)
+        b2.place(x = 405, y = 163)
         b3 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube3, corner_radius = 20)
-        b3.place(x = 372, y = 263)
+        b3.place(x = 405, y = 263)
         b4 = customtkinter.CTkButton(sWindow, text = "Open in YouTube", font = ("arial bold", 12), fg_color = "red", hover_color = "red3", width = 0, command = openYouTube4, corner_radius = 20)
-        b4.place(x = 372, y = 363)
+        b4.place(x = 405, y = 363)
         dn_button.configure(state = "normal")
+        dn_button_var.set("Download")
         pr_button_var.set("Previous Results")
         nr_button_var.set("Next Results")
         if results_counter == 4:
@@ -2211,22 +2197,6 @@ def SearchWindow():
             pr_button.configure(state = "normal")
             nr_button.configure(state = "disabled")
             page_counter.set("Page 4/4")
-        if error == "yes":
-            nr_button.configure(state = "disabled")
-
-    # When error happen while on a page
-    def whenSearchError(counter):
-        global results_counter
-        results_counter = counter
-        if results_counter == 4:
-            whenError()
-            sWindow.destroy()
-        else:
-            if results_counter == 8: results_counter = 4
-            elif results_counter == 12: results_counter = 8
-            elif results_counter == 16: results_counter = 12
-            error = "yes"
-            normalWidgets(results_counter, error)
 
     # On buttons click
     def onPrClick():
@@ -2283,50 +2253,16 @@ def SearchWindow():
             elif results_counter in fourth: url4 = url
             results_counter = results_counter + 1
         print(f"got {results_counter} results")
-        print("====================")
 
-        current_video_count = 1
-        failed_list = []
-        while current_video_count != 5:
-            try:
-                if current_video_count == 1:
-                    video = url1.streams.get_by_itag(quality)
-                    size1 = f"{round(video.filesize/1024/1024, 2)} MB"
-                    failed_list.append("no")
-                elif current_video_count == 2:
-                    video = url2.streams.get_by_itag(quality)
-                    size2 = f"{round(video.filesize/1024/1024, 2)} MB"
-                    failed_list.append("no")
-                if current_video_count == 3:
-                    video = url3.streams.get_by_itag(quality)
-                    size3 = f"{round(video.filesize/1024/1024, 2)} MB"
-                    failed_list.append("no")
-                elif current_video_count == 4:
-                    video = url4.streams.get_by_itag(quality)
-                    size4 = f"{round(video.filesize/1024/1024, 2)} MB"
-                    failed_list.append("no")
-                ploading_counter_var.set(f"({current_video_count})")
-                print(f"{current_video_count} done")
-                current_video_count = current_video_count + 1
-            except urllib.error.URLError as e:
-                whenSearchError(results_counter)
-                return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
-            except KeyError as e:
-                print(f"KeyError: {e}")
-                failed_list.append(f"Try changing the quality. Or try again later.")
-                current_video_count = current_video_count + 1
-                continue
-            except AttributeError as e:
-                print(f"AttributeError: {e}")
-                failed_list.append(f"Try changing the quality. Or try again later.")
-                current_video_count = current_video_count + 1
-                continue
-            except pytube.exceptions.LiveStreamError as e:
-                print(f"LiveStreamError: {e}")
-                failed_list.append(f"This video is live. I can't retieve a live video.")
-                current_video_count = current_video_count + 1
-                continue
-        print("Done videos and sizes")
+        # Get thumbnails
+        raw_data = urllib.request.urlopen(url1.thumbnail_url).read()
+        thumb1 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
+        thumb2 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
+        thumb3 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
+        thumb4 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
 
         # Configure checkboxes
         if results_counter == 4:
@@ -2350,126 +2286,48 @@ def SearchWindow():
             cb3.configure(variable = cb_var15)
             cb4.configure(variable = cb_var16)
 
-        # Get thumbnails
-        raw_data = urllib.request.urlopen(url1.thumbnail_url).read()
-        thumb1 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
-        thumb2 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
-        thumb3 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
-        thumb4 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-
         # Configure first video in page
-        failed_list.reverse()
-        try:
-            s1.configure(text = size1)
-        except UnboundLocalError:
-            for error_message in failed_list:
-                if error_message == "no": continue
-                else: this_error_message = error_message
-            failed_list.remove(this_error_message)
-            t_var1.set("Video is Not Available")
-            a1.configure(text = this_error_message)
-            cb1.configure(state = "disabled")
-            l1.configure(text = "")
-            v1.configure(text = "")
-            s1.configure(text = "")
-            img1.configure(image = "")
-        else:
-            if url1.views > 1000000: views = f"{int(url1.views/1000000)}M"
-            elif url1.views > 1000: views = f"{int(url1.views/1000)}K"
-            else: views = int(url1.views/1000000)
-            t_var1.set(r.repr(url1.title))
-            a1.configure(text = r.repr(url1.author))
-            l1.configure(text = to_hms(url1.length))
-            v1.configure(text = f"{views} Views")
-            img1.configure(image = thumb1)
+        if url1.views > 1000000: views = f"{int(url1.views/1000000)}M"
+        elif url1.views > 1000: views = f"{int(url1.views/1000)}K"
+        else: views = int(url1.views/1000000)
+        t_var1.set(r.repr(url1.title))
+        a1.configure(text = r.repr(url1.author))
+        l1.configure(text = to_hms(url1.length))
+        v1.configure(text = f"{views} Views")
+        img1.configure(image = thumb1)
 
         # Configure second video in page
-        try:
-            s2.configure(text = size2)
-        except UnboundLocalError:
-            for error_message in failed_list:
-                if error_message == "no": continue
-                else: this_error_message = error_message
-            failed_list.remove(this_error_message)
-            t_var2.set("Video is Not Available")
-            a2.configure(text = this_error_message)
-            cb2.configure(state = "disabled")
-            l2.configure(text = "")
-            v2.configure(text = "")
-            s2.configure(text = "")
-            img2.configure(image = "")
-        else:
-            if url2.views > 1000000: views = f"{int(url2.views/1000000)}M"
-            elif url2.views > 1000: views = f"{int(url2.views/1000)}K"
-            else: views = int(url2.views/1000000)
-            t_var2.set(r.repr(url2.title))
-            a2.configure(text = r.repr(url2.author))
-            l2.configure(text = to_hms(url2.length))
-            v2.configure(text = f"{views} Views")
-            raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
-            photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-            img2.configure(image = thumb2)
+        if url2.views > 1000000: views = f"{int(url2.views/1000000)}M"
+        elif url2.views > 1000: views = f"{int(url2.views/1000)}K"
+        else: views = int(url2.views/1000000)
+        t_var2.set(r.repr(url2.title))
+        a2.configure(text = r.repr(url2.author))
+        l2.configure(text = to_hms(url2.length))
+        v2.configure(text = f"{views} Views")
+        img2.configure(image = thumb2)
 
         # Configure third video in page
-        try:
-            s3.configure(text = size3)
-        except UnboundLocalError:
-            for error_message in failed_list:
-                if error_message == "no": continue
-                else: this_error_message = error_message
-            failed_list.remove(this_error_message)
-            t_var3.set("Video is Not Available")
-            a3.configure(text = this_error_message)
-            cb3.configure(state = "disabled")
-            l3.configure(text = "")
-            v3.configure(text = "")
-            s3.configure(text = "")
-            img3.configure(image = "")
-        else:
-            if url3.views > 1000000: views = f"{int(url3.views/1000000)}M"
-            elif url3.views > 1000: views = f"{int(url3.views/1000)}K"
-            else: views = int(url3.views/1000000)
-            t_var3.set(r.repr(url3.title))
-            a3.configure(text = r.repr(url3.author))
-            l3.configure(text = to_hms(url3.length))
-            v3.configure(text = f"{views} Views")
-            raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
-            photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-            img3.configure(image = thumb3)
+        if url3.views > 1000000: views = f"{int(url3.views/1000000)}M"
+        elif url3.views > 1000: views = f"{int(url3.views/1000)}K"
+        else: views = int(url3.views/1000000)
+        t_var3.set(r.repr(url3.title))
+        a3.configure(text = r.repr(url3.author))
+        l3.configure(text = to_hms(url3.length))
+        v3.configure(text = f"{views} Views")
+        img3.configure(image = thumb3)
 
         # Configure fourth video in page
-        try:
-            s4.configure(text = size4)
-        except UnboundLocalError:
-            for error_message in failed_list:
-                if error_message == "no": continue
-                else: this_error_message = error_message
-            failed_list.remove(this_error_message)
-            t_var4.set("Video is Not Available")
-            a4.configure(text = this_error_message)
-            cb4.configure(state = "disabled")
-            l4.configure(text = "")
-            v4.configure(text = "")
-            s4.configure(text = "")
-            img4.configure(image = "")
-        else:
-            if url4.views > 1000000: views = f"{int(url4.views/1000000)}M"
-            elif url4.views > 1000: views = f"{int(url4.views/1000)}K"
-            else: views = int(url4.views/1000000)
-            t_var4.set(r.repr(url4.title))
-            a4.configure(text = r.repr(url4.author))
-            l4.configure(text = to_hms(url4.length))
-            v4.configure(text = f"{views} Views")
-            raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
-            photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-            img4.configure(image = thumb4)
+        if url4.views > 1000000: views = f"{int(url4.views/1000000)}M"
+        elif url4.views > 1000: views = f"{int(url4.views/1000)}K"
+        else: views = int(url4.views/1000000)
+        t_var4.set(r.repr(url4.title))
+        a4.configure(text = r.repr(url4.author))
+        l4.configure(text = to_hms(url4.length))
+        v4.configure(text = f"{views} Views")
+        img4.configure(image = thumb4)
 
         # Returns widgets to right state
-        error = "no"
-        normalWidgets(results_counter, error)
+        normalWidgets()
 
     # Proceed to downlaod page
     def onDnClick():
@@ -2532,58 +2390,55 @@ def SearchWindow():
             progress_size_label.configure(text_color = "#DCE4EE")
 
         # Captions download
-        def sCaptionsDownload():
-            for vid_link in vids_subs:
-                url = YouTube(vid_link)
-                if url in to_download:
-                    lang = lang_choose.get()
-                    video_id = extract.video_id(vid_link)
-                    transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-                    if lang.lower() == "none":
-                        return
-                    elif lang.lower() == "arabic":
-                        lang = "ar"
-                    elif lang.lower() == "english":
-                        for transcript in transcript_list:
-                            if transcript.language_code == "en-US":
-                                lang = "en-US"
-                                break
-                            elif transcript.language_code == "en-UK":
-                                lang = "en-UK"
-                                break
-                            else:
-                                lang = "en"
-                    downloadcounter_var.set("Subtitle Download")
-                    try: # Get the subtitle directly if it's there
-                        final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
-                        print("got one already there")
-                        sub = "subtitle"
-                    except: # If not then translate it
-                        translated = "no"
-                        en_list = ["en", "en-US","en-UK"]
-                        for transcript in transcript_list:
-                            if transcript.language_code in en_list: # Translate from English if it's there
-                                final = transcript.translate(lang).fetch()
-                                print(f"translated from {transcript.language_code}")
-                                sub = "translated_subtitle"
-                                translated = "yes"
-                            if translated == "no": # Avoid translating twice
-                                final = transcript.translate(lang).fetch()
-                                print(f"translated {transcript.language_code}")
-                                sub = "translated_subtitle"
-                                translated = "yes"
-                            else:
-                                pass
-                    formatter = SRTFormatter()
-                    srt_formatted = formatter.format_transcript(final)
-                    try:
-                        with open(f"{directory2}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
-                            srt_file.write(srt_formatted)
-                    except NameError:
-                        with open(f"{directory}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
-                            srt_file.write(srt_formatted)
-                else:
-                    print(f"{url.title} not in list")
+        def sCaptionsDownload(vid_link, title):
+            if vid_link in vids_subs:
+                lang = lang_choose.get()
+                video_id = extract.video_id(vid_link)
+                transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+                if lang.lower() == "none":
+                    return
+                elif lang.lower() == "arabic":
+                    lang = "ar"
+                elif lang.lower() == "english":
+                    for transcript in transcript_list:
+                        if transcript.language_code == "en-US":
+                            lang = "en-US"
+                            break
+                        elif transcript.language_code == "en-UK":
+                            lang = "en-UK"
+                            break
+                        else:
+                            lang = "en"
+                try: # Get the subtitle directly if it's there
+                    final = YouTubeTranscriptApi.get_transcript(video_id = video_id, languages = [lang])
+                    print("got one already there")
+                    sub = "subtitle"
+                except: # If not then translate it
+                    translated = "no"
+                    en_list = ["en", "en-US","en-UK"]
+                    for transcript in transcript_list:
+                        if transcript.language_code in en_list: # Translate from English if it's there
+                            final = transcript.translate(lang).fetch()
+                            print(f"translated from {transcript.language_code}")
+                            sub = "translated_subtitle"
+                            translated = "yes"
+                        if translated == "no": # Avoid translating twice
+                            final = transcript.translate(lang).fetch()
+                            print(f"translated {transcript.language_code}")
+                            sub = "translated_subtitle"
+                            translated = "yes"
+                        else:
+                            pass
+                formatter = SRTFormatter()
+                srt_formatted = formatter.format_transcript(final)
+                try:
+                    with open(f"{directory2}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                        srt_file.write(srt_formatted)
+                except NameError:
+                    with open(f"{directory}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                        srt_file.write(srt_formatted)
+            else:
+                print(f"{title} not in list")
 
         # Advanced checker
         def advancedChecker():
@@ -2643,9 +2498,6 @@ def SearchWindow():
             lang_choose.configure(state = "disabled")
             try: adv_checkbox.configure(state = "disabled")
             except: pass
-            # Download subtitles if selected
-            if caps == "yes": sCaptionsDownload()
-            else: pass
 
             # If the quality is non progressive video (1080p, 480p, 240p and 144p)
             if quality in non_progressive_list:
@@ -2666,6 +2518,9 @@ def SearchWindow():
                     title_var.set(r.repr(url.title))
                     length_var.set(to_hms(url.length))
                     size_var.set(f"{round(size/1024/1024, 2)} MB")
+                    # Download subtitles if selected
+                    if caps == "yes": sCaptionsDownload(url.watch_url, url.title)
+                    else: pass
                     if quality in audio_tags_list: ext = "mp3"
                     else: ext = "mp4"
                     try:
@@ -2778,6 +2633,9 @@ def SearchWindow():
                     title_var.set(r.repr(url.title))
                     length_var.set(to_hms(url.length))
                     size_var.set(f"{round(video.filesize/1024/1024, 2)} MB")
+                    # Download subtitles if selected
+                    if caps == "yes": sCaptionsDownload(url.watch_url, url.title)
+                    else: pass
                     if quality in audio_tags_list: ext = "mp3"
                     else: ext = "mp4"
                     size = video.filesize
@@ -2861,27 +2719,64 @@ def SearchWindow():
         total_length = 0
         vids_subs = []
         for url in to_download:
-            if quality == "137":
-                video = url.streams.filter(res = "1080p").first()
-                audio = url.streams.get_by_itag(251)
-                size = video.filesize + audio.filesize
-            elif quality == "135":
-                video = url.streams.filter(res = "480p").first()
-                audio = url.streams.get_by_itag(251)
-                size = video.filesize + audio.filesize
-            elif quality == "133":
-                video = url.streams.filter(res = "240p").first()
-                audio = url.streams.get_by_itag(251)
-                size = video.filesize + audio.filesize
-            elif quality == "160":
-                video = url.streams.filter(res = "144p").first()
-                audio = url.streams.get_by_itag(251)
-                size = video.filesize + audio.filesize
-            else:
-                video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
-                size = video.filesize
-            total_size = total_size + size
-            total_length = total_length + url.length
+            try:
+                if quality == "137":
+                    video = url.streams.filter(res = "1080p").first()
+                    audio = url.streams.get_by_itag(251)
+                    size = video.filesize + audio.filesize
+                elif quality == "135":
+                    video = url.streams.filter(res = "480p").first()
+                    audio = url.streams.get_by_itag(251)
+                    size = video.filesize + audio.filesize
+                elif quality == "133":
+                    video = url.streams.filter(res = "240p").first()
+                    audio = url.streams.get_by_itag(251)
+                    size = video.filesize + audio.filesize
+                elif quality == "160":
+                    video = url.streams.filter(res = "144p").first()
+                    audio = url.streams.get_by_itag(251)
+                    size = video.filesize + audio.filesize
+                else:
+                    video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
+                    size = video.filesize
+                total_size = total_size + size
+                total_length = total_length + url.length
+            except urllib.error.URLError as e:
+                normalWidgets()
+                return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
+            except KeyError as e:
+                print(f"KeyError: {e}")
+                normalWidgets()
+                return messagebox.showerror(title = "Something Went Wrong", message = f"I can't fetch '{url.title}' at the moment. Change the selected quality or try again later.")
+            except AttributeError as e:
+                print(f"AttributeError: {e}")
+                normalWidgets()
+                return messagebox.showerror(title = "Quality Not Available",
+                message = f"I can't fetch '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
+            except pytube.exceptions.LiveStreamError as e:
+                print(e)
+                normalWidgets()
+                return messagebox.showerror(title = "Video is Live", message = f"I Can't fetch '{url.title}' because it's a live video.")
+            except pytube.exceptions.AgeRestrictedError as e:
+                print(e)
+                normalWidgets()
+                return messagebox.showerror(title = "Age Restricted", message = f"'{url.title}' is age restricted.")
+            except pytube.exceptions.MembersOnly as e:
+                print(e)
+                normalWidgets()
+                return messagebox.showerror(title = "Members Only", message = f"'{url.title}' is members only.")
+            except pytube.exceptions.VideoPrivate as e:
+                print(e)
+                normalWidgets()
+                return messagebox.showerror(title = "Private Video", message = f"'{url.title}' is private.")
+            except pytube.exceptions.VideoRegionBlocked as e:
+                print(e)
+                normalWidgets()
+                return messagebox.showerror(title = "Region Blocked", message = f"'{url.title}' is region blocked.")
+            except pytube.exceptions.VideoUnavailable as e:
+                print(e)
+                normalWidgets()
+                return messagebox.showerror(title = "Video Unavailable", message = f"'{url.title}' is unavailable.")
             try:
                 video_id = extract.video_id(url.watch_url)
                 YouTubeTranscriptApi.list_transcripts(video_id)
