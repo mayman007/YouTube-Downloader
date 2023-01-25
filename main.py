@@ -47,8 +47,8 @@ x = (root.winfo_screenwidth() // 2) - (width // 2)
 y = (root.winfo_screenheight() // 2) - (height // 2)
 root.geometry(f"{width}x{height}+{x}+{y}") # Centers the window
 root.resizable(False, False)
-if platform == "linux" or platform == "linux2": pass
-else: root.iconbitmap("YDICO.ico") #Windows & MacOS
+if platform == "linux" or platform == "linux2": pass # Linux
+else: root.iconbitmap("YDICO.ico") # Windows
 root.title("YouTube Downloader")
 customtkinter.CTkLabel(root, text = "YouTube Downloader", font = ("arial bold", 45)).place(x = 140 , y = 20)
 
@@ -393,7 +393,7 @@ def AdvancedWindow():
         advWindow.maxsize(700, 460)
         advWindow.minsize(700, 460)
         if platform == "linux" or platform == "linux2": pass
-        else: advWindow.iconbitmap("YDICO.ico") #Windows & MacOS
+        else: advWindow.iconbitmap("YDICO.ico")
         advWindow.protocol("WM_DELETE_WINDOW", onClosing)
         root.withdraw()
 
@@ -723,7 +723,8 @@ def DownlaodWindow():
         root.deiconify()
 
     # Set path
-    path = f"C:/Users\{os.getlogin()}\Downloads"
+    if platform == "linux" or platform == "linux2": path = f"/home/{os.getlogin()}/Downloads"
+    else: path = f"C:/Users\{os.getlogin()}\Downloads"
     global directory
     directory = os.path.realpath(path) # Deafult path in case the user didn't choose
     def BrowseDir(): # Path function
@@ -821,10 +822,16 @@ def DownlaodWindow():
     # Open folder in file explorer when download is finished
     def openFile():
         try:
-            dir2 = os.path.normpath(directory2)
-            subprocess.Popen(f'explorer "{dir2}"')
-        except NameError:
-            subprocess.Popen(f'explorer "{directory}"')
+            try:
+                dir2 = os.path.normpath(directory2)
+                if platform == "linux" or platform == "linux2": subprocess.Popen(dir2)
+                else: subprocess.Popen(f'explorer "{dir2}"')
+            except NameError:
+                if platform == "linux" or platform == "linux2": subprocess.Popen(directory)
+                else: subprocess.Popen(f'explorer "{directory}"')
+        except PermissionError:
+            try: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{dir2}'")
+            except NameError: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{directory}'")
 
     # One Video Downloader
     def VideoDownloader(event = None):
@@ -1136,7 +1143,7 @@ def DownlaodWindow():
     newWindow.maxsize(700, 460)
     newWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
-    else: newWindow.iconbitmap("YDICO.ico") #Windows & MacOS
+    else: newWindow.iconbitmap("YDICO.ico")
     newWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # newWindow.bind("<Return>", VideoDownloader)
     root.withdraw()
@@ -1250,7 +1257,8 @@ def PlaylistWindow():
         root.deiconify()
 
     # Set path
-    path = f"C:/Users\{os.getlogin()}\Downloads"
+    if platform == "linux" or platform == "linux2": path = f"/home/{os.getlogin()}/Downloads"
+    else: path = f"C:/Users\{os.getlogin()}\Downloads"
     global directory
     directory = os.path.realpath(path) # Deafult path in case the user didn't choose
     def pBrowseDir(): # Path function
@@ -1403,10 +1411,16 @@ def PlaylistWindow():
     # Open folder in file explorer when download is finished
     def openFile():
         try:
-            dir2 = os.path.normpath(directory2)
-            subprocess.Popen(f'explorer "{dir2}"')
-        except NameError:
-            subprocess.Popen(f'explorer "{directory}"')
+            try:
+                dir2 = os.path.normpath(directory2)
+                if platform == "linux" or platform == "linux2": subprocess.Popen(dir2)
+                else: subprocess.Popen(f'explorer "{dir2}"')
+            except NameError:
+                if platform == "linux" or platform == "linux2": subprocess.Popen(directory)
+                else: subprocess.Popen(f'explorer "{directory}"')
+        except PermissionError:
+            try: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{dir2}'")
+            except NameError: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{directory}'")
 
     # Download playlist
     def PlaylistDownloader(event = None):
@@ -1786,7 +1800,7 @@ def PlaylistWindow():
     pWindow.maxsize(700, 460)
     pWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
-    else: pWindow.iconbitmap("YDICO.ico") #Windows & MacOS
+    else: pWindow.iconbitmap("YDICO.ico")
     pWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # pWindow.bind("<Return>", PlaylistDownloader)
     root.withdraw()
@@ -1935,7 +1949,7 @@ def SearchWindow():
     sWindow.maxsize(700, 460)
     sWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
-    else: sWindow.iconbitmap("YDICO.ico") #Windows & MacOS
+    else: sWindow.iconbitmap("YDICO.ico")
     sWindow.withdraw()
     sWindow.protocol("WM_DELETE_WINDOW", onClosing)
     global to_download
@@ -2373,7 +2387,8 @@ def SearchWindow():
             root.deiconify()
 
         # Set path
-        path = f"C:/Users\{os.getlogin()}\Downloads"
+        if platform == "linux" or platform == "linux2": path = f"/home/{os.getlogin()}/Downloads"
+        else: path = f"C:/Users\{os.getlogin()}\Downloads"
         global directory
         directory = os.path.realpath(path) # Deafult path in case the user didn't choose
         def pBrowseDir(): # Path function
@@ -2459,10 +2474,16 @@ def SearchWindow():
         # Open folder in file explorer when download is finished
         def openFile():
             try:
-                dir2 = os.path.normpath(directory2)
-                subprocess.Popen(f'explorer "{dir2}"')
-            except NameError:
-                subprocess.Popen(f'explorer "{directory}"')
+                try:
+                    dir2 = os.path.normpath(directory2)
+                    if platform == "linux" or platform == "linux2": subprocess.Popen(dir2)
+                    else: subprocess.Popen(f'explorer "{dir2}"')
+                except NameError:
+                    if platform == "linux" or platform == "linux2": subprocess.Popen(directory)
+                    else: subprocess.Popen(f'explorer "{directory}"')
+            except PermissionError:
+                try: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{dir2}'")
+                except NameError: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{directory}'")
 
         # Pause/Resume function
         def toggle_download():
@@ -2825,7 +2846,7 @@ def SearchWindow():
             root.destroy()
         sDWindow.protocol("WM_DELETE_WINDOW", onClosing)
         if platform == "linux" or platform == "linux2": pass
-        else: sDWindow.iconbitmap("YDICO.ico") #Windows & MacOS
+        else: sDWindow.iconbitmap("YDICO.ico")
         # sDWindow.bind("<Return>", SearchDownloader)
 
         # Downloading label
