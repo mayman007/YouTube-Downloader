@@ -45,7 +45,7 @@ width = 700
 height = 460
 x = (root.winfo_screenwidth() // 2) - (width // 2)
 y = (root.winfo_screenheight() // 2) - (height // 2)
-root.geometry(f"{width}x{height}+{x}+{y}")
+root.geometry(f"{width}x{height}+{x}+{y}") # Centers the window
 root.resizable(False, False)
 if platform == "linux" or platform == "linux2": pass
 else: root.iconbitmap("YDICO.ico") #Windows & MacOS
@@ -58,18 +58,20 @@ def linkCopy():
     end = link_entry.index("sel.last")
     to_copy = link_entry.get()[start:end]
     root.clipboard_append(to_copy)
+
 # Link Entry Cut
 def linkCut():
     start = link_entry.index("sel.first")
     end = link_entry.index("sel.last")
     to_copy = link_entry.get()[start:end]
     root.clipboard_append(to_copy) # Get text from clipboard
-    try: # delete the selected text
+    try: # Delete the selected text
         start = link_entry.index("sel.first")
         end = link_entry.index("sel.last")
         link_entry.delete(start, end)
     except TclError:
-        pass # nothing was selected, so paste doesn't need to delete anything
+        pass # Nothing was selected, so paste won't delete
+
 # Link Entry Paste
 def linkPaste():
     clipboard = root.clipboard_get() # Get text from clipboard
@@ -79,8 +81,9 @@ def linkPaste():
         end = link_entry.index("sel.last")
         link_entry.delete(start, end)
     except TclError:
-        pass # nothing was selected, so paste doesn't need to delete anything
-    link_entry.insert("insert", clipboard) # insert the modified clipboard contents
+        pass # Nothing was selected, so paste won't delete
+    link_entry.insert("insert", clipboard) # Insert the modified clipboard contents
+
 # Right-Click menu
 m = Menu(root, tearoff = 0)
 m.add_command(label ="Cut", font = ("arial", 11), command = linkCut)
@@ -96,29 +99,32 @@ def searchCopy():
     end = link_entry.index("sel.last")
     to_copy = link_entry.get()[start:end]
     root.clipboard_append(to_copy)
+
 # Search Entry Cut
 def searchCut():
     start = search_entry.index("sel.first")
     end = search_entry.index("sel.last")
     to_copy = search_entry.get()[start:end]
     root.clipboard_append(to_copy) # Get text from clipboard
-    try: # delete the selected text
+    try: # Delete the selected text
         start = search_entry.index("sel.first")
         end = search_entry.index("sel.last")
         search_entry.delete(start, end)
     except TclError:
-        pass # nothing was selected, so paste doesn't need to delete anything
+        pass # Nothing was selected, so paste won't delete
+
 # Search Entry Paste
 def searchPaste():
     clipboard = root.clipboard_get() # Get text from clipboard
     clipboard = clipboard.replace("\n", "\\n")
-    try: # delete the selected text, if any
+    try: # Delete the selected text, if any
         start = search_entry.index("sel.first")
         end = search_entry.index("sel.last")
         search_entry.delete(start, end)
     except TclError:
-        pass # nothing was selected, so paste doesn't need to delete anything
-    search_entry.insert("insert", clipboard) # insert the modified clipboard contents
+        pass # Nothing was selected, so paste won't delete
+    search_entry.insert("insert", clipboard) # Insert the modified clipboard contents
+
 # Right-Click menu
 m2 = Menu(root, tearoff = 0)
 m2.add_command(label ="Cut", font = ("arial", 11), command = searchCut)
@@ -128,21 +134,21 @@ def searchRightClickMenu(event):
     try: m2.tk_popup(event.x_root, event.y_root)
     finally: m2.grab_release()
 
-# Paste link here
+# Paste link widgets
 link_var = StringVar()
 customtkinter.CTkLabel(root, text = "Paste Your URL Here", font = ("arial bold", 25)).place(x = 105 , y = 120)
 link_entry = customtkinter.CTkEntry(root, width = 345, textvariable = link_var, corner_radius = 20)
 link_entry.place(x = 100 , y = 160)
 link_entry.bind("<Button-3>", linkRightClickMenu)
 
-# Type keywords here
+# Type keywords widgets
 search_var = StringVar()
 customtkinter.CTkLabel(root, text = "Type Your Keywords Here", font = ("arial bold", 25)).place(x = 105 , y = 220)
 search_entry = customtkinter.CTkEntry(root, width = 345, textvariable = search_var, corner_radius = 20)
 search_entry.place(x = 100 , y = 260)
 search_entry.bind("<Button-3>", searchRightClickMenu)
 
-# Format and quality selections for downloads
+# Quality selections for downloads
 quality_var = IntVar()
 def downloadQualitySelect(quality):
     if quality == "Video: 1080p": quality_var.set(137)
@@ -167,7 +173,7 @@ download_optionmenu = customtkinter.CTkOptionMenu(root, width = 175, height = 35
 download_optionmenu.place(x = 460 , y = 155)
 download_optionmenu.set("Download")
 
-# Format and quality selections for search
+# Quality selections for search
 quality_var = IntVar()
 def searchQualitySelect(quality):
     if quality == "Video: 1080p": quality_var.set(137)
@@ -218,7 +224,7 @@ defaultcolor_menu = customtkinter.CTkOptionMenu(root, values = ["Blue", "Dark-bl
 defaultcolor_menu.place(x = 127 , y = 415)
 defaultcolor_menu.set(get_default_color().title())
 
-# Loadings
+# Loading labels dots loop
 ploading_counter_var = StringVar()
 customtkinter.CTkLabel(root, textvariable = ploading_counter_var, font = ("arial", 22)).place(x = 530 , y = 208)
 def Loading(loading_optionmenu):
@@ -242,7 +248,7 @@ def Loading(loading_optionmenu):
             time.sleep(0.5)
         else: break
 
-# Downloading label function
+# Downloading labels dots loop
 def Downloading(downloading_var):
     if downloading_var.get() == "Converting":
         while True:
@@ -521,6 +527,7 @@ def AdvancedWindow():
                 preset_combobox.configure(state = "normal")
                 tune_combobox.configure(state = "normal")
                 profile_combobox.configure(state = "normal")
+
         # Placing the switch and labels
         customtkinter.CTkLabel(advWindow, text = "Audio Only", font = ("arial", 15)).place(x = 27 , y = 417)
         switch = customtkinter.CTkSwitch(advWindow, text = "", command = switchFunction)
@@ -528,11 +535,13 @@ def AdvancedWindow():
         switch.select()
         customtkinter.CTkLabel(advWindow, text = "Video & Audio", font = ("arial", 15)).place(x = 154 , y = 417)
 
-        # Buttons stuff
-        def cancelButton(): # For cancel button
+        # Cancel
+        def cancelButton():
             advWindow.destroy()
             root.deiconify()
-        def resetButton(): # For reset button
+
+        # Reset everything
+        def resetButton():
             switch.select()
             if switch_value == "audio only": switchFunction()
             crf_slider.configure(state = "normal")
@@ -552,7 +561,9 @@ def AdvancedWindow():
             audio_quality_or_bitrate.set("bitrate")
             abitrate_combobox.set("320")
             aquality_combobox.set("")
-        def okButton(): # For ok button
+
+        # Save the ffmpeg command
+        def okButton():
             global ffmpeg_command, advanced_quality_settings, advanced_extention, fps
             fps = "30"
             ffmpeg_command = 'ffmpeg -i "input"'
@@ -1007,20 +1018,19 @@ def DownlaodWindow():
             if msg_box == "yes": os.remove(vname)
 
 
-    # Get video info, get link and check errors
-    whenOpening()
-    try:
+    whenOpening() # Disable widgets in root to load
+    try: # Get url object
         global url
         url = YouTube(link)
         quality = str(quality_var.get())
-        if not "youtu" in link or "playlist" in link:
+        if not "youtu" in link:
             raise pytube.exceptions.RegexMatchError
     except pytube.exceptions.RegexMatchError:
         whenError()
         return messagebox.showerror(title = "Link Not Valid", message = "Please enter a valid video link.")
     global video
     global size
-    try:
+    try: # Get video and size
         if quality == "0":
             whenError()
             return messagebox.showerror(title = "Format Not Selected", message = "Please select a format to download.")
@@ -2799,9 +2809,6 @@ def SearchWindow():
         elif quality == "251": quality_string = "160kbps"
 
         # Form creating
-        def onClosing():
-            # if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            root.destroy()
         sWindow.destroy()
         sDWindow = customtkinter.CTkToplevel()
         sDWindow.title("Results Downloader")
@@ -2812,6 +2819,10 @@ def SearchWindow():
         sDWindow.geometry(f"{width}x{height}+{x}+{y}")
         sDWindow.maxsize(700, 460)
         sDWindow.minsize(700, 460)
+        def onClosing():
+            # if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            sDWindow.destroy()
+            root.destroy()
         sDWindow.protocol("WM_DELETE_WINDOW", onClosing)
         if platform == "linux" or platform == "linux2": pass
         else: sDWindow.iconbitmap("YDICO.ico") #Windows & MacOS
