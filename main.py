@@ -647,6 +647,7 @@ def AdvancedWindow():
             print(advanced_extention)
             advWindow.withdraw()
             root.deiconify()
+            customtkinter.CTkLabel(root, text = "(Advanced Quality Settings will apply on your next downloads)", font = ("arial", 12)).place(x = 375 , y = 385)
 
         # Placing the buttons
         customtkinter.CTkButton(advWindow, text = "OK", font = ("arial bold", 20), width = 120, corner_radius = 20, command = okButton).place(x = 565 , y = 415)
@@ -659,10 +660,11 @@ advanced_quality_settings = "no"
 adv_quailty_button = customtkinter.CTkButton(root, text = "Advanced Quality Settings", width = 175, font = ("arial bold", 15), command = AdvancedWindow, corner_radius = 20)
 adv_quailty_button.place(x = 460 , y = 415)
 
+
 # Conversion function
 def Conversion(input, ext, seconds):
     global ffmpeg_command
-    output = input.replace(f").{ext}", f"_advanced).{advanced_extention}")
+    output = input.replace(f").{ext}", f"_advanced_settings_applied).{advanced_extention}")
     ffmpeg_command = ffmpeg_command.replace("input", input)
     ffmpeg_command = ffmpeg_command.replace("output", output)
     # Progress reader function
