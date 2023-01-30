@@ -1129,11 +1129,9 @@ def DownlaodWindow():
     elif quality == "140": quality_string = "128kbps"
     elif quality == "251": quality_string = "160kbps"
 
-    # Return to normal state in root
-    whenError()
-
     # Video form creating
     newWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
+    newWindow.withdraw()
     newWindow.title("Video Downloader")
     width = 700
     height = 460
@@ -1146,7 +1144,6 @@ def DownlaodWindow():
     else: newWindow.iconbitmap("YDICO.ico")
     newWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # newWindow.bind("<Return>", VideoDownloader)
-    root.withdraw()
 
     # Downloading label
     downloading_var = StringVar()
@@ -1207,10 +1204,6 @@ def DownlaodWindow():
     cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
     cancel_button.place(x = 595 , y = 347)
 
-    # Back to home button
-    back_button = customtkinter.CTkButton(newWindow, text = "Back To Home", font = ("arial bold", 20), command = backHome, corner_radius = 20)
-    back_button.place(x = 20 , y = 420)
-
     # Advanced quality settings check
     global advanced_checker
     advanced_checker = "no"
@@ -1232,6 +1225,15 @@ def DownlaodWindow():
     # Download button
     download_button = customtkinter.CTkButton(newWindow, text = "Download", font = ("arial bold", 25), command = VideoStart, corner_radius = 20)
     download_button.place(x = 540 , y = 306)
+
+    # Back to home button
+    back_button = customtkinter.CTkButton(newWindow, text = "Back To Home", font = ("arial bold", 20), command = backHome, corner_radius = 20)
+    back_button.place(x = 20 , y = 420)
+
+    # Return to normal state in root
+    whenError()
+    root.withdraw()
+    newWindow.deiconify()
 
 
 # Playlist window
@@ -1786,11 +1788,9 @@ def PlaylistWindow():
     elif quality == "140": quality_string = "128kbps"
     elif quality == "251": quality_string = "160kbps"
 
-    # Return to normal state in root
-    whenError()
-
     # Playlist form creating
-    pWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
+    pWindow = customtkinter.CTkToplevel()
+    pWindow.withdraw()
     pWindow.title("Playlist Downloader")
     width = 700
     height = 460
@@ -1803,7 +1803,6 @@ def PlaylistWindow():
     else: pWindow.iconbitmap("YDICO.ico")
     pWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # pWindow.bind("<Return>", PlaylistDownloader)
-    root.withdraw()
 
     # Downloading label
     downloading_var = StringVar()
@@ -1912,6 +1911,11 @@ def PlaylistWindow():
     # Back to home button
     back_button = customtkinter.CTkButton(pWindow, text = "Back To Home", font = ("arial bold", 20), command = backHome, corner_radius = 20)
     back_button.place(x = 20 , y = 420)
+
+    # Return to normal state in root
+    whenError()
+    root.withdraw()
+    pWindow.deiconify()
 
 # Search window
 def SearchWindow():
@@ -2830,8 +2834,8 @@ def SearchWindow():
         elif quality == "251": quality_string = "160kbps"
 
         # Form creating
-        sWindow.destroy()
         sDWindow = customtkinter.CTkToplevel()
+        sDWindow.withdraw()
         sDWindow.title("Results Downloader")
         width = 700
         height = 460
@@ -2954,6 +2958,11 @@ def SearchWindow():
         # Back to home button
         back_button = customtkinter.CTkButton(sDWindow, text = "Back To Home", font = ("arial bold", 20), command = backHome, corner_radius = 20)
         back_button.place(x = 20 , y = 420)
+
+        # Return to normal state in root
+        whenError()
+        sWindow.destroy()
+        sDWindow.deiconify()
 
 
     # Buttons&label
