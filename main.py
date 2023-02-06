@@ -2752,6 +2752,7 @@ def SearchWindow():
                 sDWindow.bell()
 
         # Get to_download list info, get link and check errors
+        loaded_count = 0
         total_size = 0
         total_length = 0
         vids_subs = []
@@ -2778,6 +2779,8 @@ def SearchWindow():
                     size = video.filesize
                 total_size = total_size + size
                 total_length = total_length + url.length
+                loaded_count += 1
+                loaded_counter.set(f"({loaded_count})")
             except urllib.error.URLError as e:
                 normalWidgets()
                 return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
@@ -2859,7 +2862,7 @@ def SearchWindow():
         downloading_var = StringVar()
         customtkinter.CTkLabel(sDWindow, textvariable = downloading_var, font = ("arial", 25)).place(x = 305 , y = 418)
         downloadcounter_var = StringVar()
-        customtkinter.CTkLabel(sDWindow, textvariable = downloadcounter_var, font = ("arial", 25), text_color = "LightBlue").place(rely = 1.0, relx = 1.0, x = -405, y = -14, anchor = SE)
+        customtkinter.CTkLabel(sDWindow, textvariable = downloadcounter_var, font = ("arial", 25), text_color = "LightBlue").place(rely = 1.0, relx = 1.0, x = -405, y = -13, anchor = SE)
         global converting_percentage_var
         converting_percentage_var = StringVar()
         customtkinter.CTkLabel(sDWindow, textvariable = converting_percentage_var, font = ("arial", 25)).place(x = 450 , y = 418)
@@ -2966,12 +2969,13 @@ def SearchWindow():
         sWindow.destroy()
         sDWindow.deiconify()
 
-
-    # Buttons&label
+    # Footer Buttons & label
     page_counter = StringVar()
     page_counter.set("Page 1/4")
     selected_counter = StringVar()
     selected_counter.set("0 Selected")
+    loaded_counter = StringVar()
+    loaded_counter.set("")
     pr_button_var = StringVar()
     pr_button_var.set("Previous Results")
     nr_button_var = StringVar()
@@ -2983,6 +2987,7 @@ def SearchWindow():
     dn_button_var.set("Download")
     dn_button = customtkinter.CTkButton(sWindow, textvariable = dn_button_var, font = ("arial bold", 15), command = onDnClick, corner_radius = 20)
     dn_button.place(x = 290, y = 420)
+    customtkinter.CTkLabel(sWindow, textvariable = loaded_counter, font = ("arial bold", 13)).place(x = 350, y = 390)
     customtkinter.CTkLabel(sWindow, textvariable = page_counter, font = ("arial bold", 15)).place(x = 450, y = 420)
     nr_button = customtkinter.CTkButton(sWindow, textvariable = nr_button_var, font = ("arial bold", 15), command = onNrClick, corner_radius = 20)
     nr_button.place(x = 540, y = 420)
