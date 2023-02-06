@@ -384,6 +384,7 @@ def AdvancedWindow():
             advWindow.destroy()
             root.deiconify()
         advWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
+        advWindow.withdraw()
         advWindow.title("Advanced Quality Settings")
         width = 700
         height = 460
@@ -395,7 +396,6 @@ def AdvancedWindow():
         if platform == "linux" or platform == "linux2": pass
         else: advWindow.iconbitmap("YDICO.ico")
         advWindow.protocol("WM_DELETE_WINDOW", onClosing)
-        root.withdraw()
 
         # CRF slider function
         def crfSlider(num):
@@ -653,6 +653,8 @@ def AdvancedWindow():
         customtkinter.CTkButton(advWindow, text = "OK", font = ("arial bold", 20), width = 120, corner_radius = 20, command = okButton).place(x = 565 , y = 415)
         customtkinter.CTkButton(advWindow, text = "Reset", font = ("arial bold", 20), width = 120, corner_radius = 20, command = resetButton).place(x = 435 , y = 415)
         customtkinter.CTkButton(advWindow, text = "Cancel", font = ("arial bold", 20), width = 120, corner_radius = 20, command = cancelButton).place(x = 305 , y = 415)
+        root.withdraw()
+        advWindow.deiconify()
 
 
 # Advanced settings button
@@ -2285,14 +2287,20 @@ def SearchWindow():
         print(f"got {results_counter} results")
 
         # Get thumbnails
-        raw_data = urllib.request.urlopen(url1.thumbnail_url).read()
-        thumb1 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
-        thumb2 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
-        thumb3 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-        raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
-        thumb4 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        try:
+            raw_data = urllib.request.urlopen(url1.thumbnail_url).read()
+            thumb1 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+            raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
+            thumb2 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+            raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
+            thumb3 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+            raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
+            thumb4 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
+        except UnboundLocalError:
+            whenError()
+            sWindow.destroy()
+            root.deiconify()
+            return messagebox.showerror(title = "Something Went Wrong", message = "Try again later.")
 
         # Configure checkboxes
         if results_counter == 4:
