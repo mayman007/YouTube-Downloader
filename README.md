@@ -85,16 +85,21 @@ Install the latest exe <a href = "https://github.com/Shinobi7k/YouTube-Downloade
 
 <li>Git-clone this repo & change directory</li>
 
-`git clone https://github.com/Shinobi7k/YouTube-Downloader.git`
-<br>
+```
+git clone https://github.com/Shinobi7k/YouTube-Downloader.git
 
-`cd YouTube-Downloader`
+cd YouTube-Downloader
+```
 <li>Install modules using pip</li>
 
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 <li>Run the .py file!</li>
 
-`py main.py`
+```
+py main.py
+```
 </ol>
 
 ### **For Linux Users:**
@@ -111,18 +116,24 @@ sudo apt install ffmpeg
 </li>
 <li>Git-clone this repo & change directory
 
-`git clone https://github.com/Shinobi7k/YouTube-Downloader.git`
+```
+git clone https://github.com/Shinobi7k/YouTube-Downloader.git
 
-`cd YouTube-Downloader`
+cd YouTube-Downloader
+```
 </li>
 <li>
 Install modules using pip
 
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 </li>
 <li>
 Run the .py file!
 
-`python3 main.py`
+```
+python3 main.py
+```
 </li>
 </ol>
