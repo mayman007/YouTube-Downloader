@@ -1,12 +1,14 @@
-<div align="center">
+<div align = "center">
 <img src = "YDICO.ico" width = 200></img>
 </div>
-<h1><b>YouTube Downloader</b></h1>
+
+# **YouTube Downloader**
+
 <!-- for github badges (buttons) https://shields.io/ -->
 
-> <p><b>Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.</p></b>
+> **Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.**
 
-<h2>Features</h2>
+## Features
 <ul>
 <li>🔗 Download videos by URL.</li>
 <li>🗒️ Download playlists. With an option to select which videos to download.</li>
@@ -21,7 +23,7 @@
 <li>🌃 Customize your theme and default color.</li>
 </ul>
 
-<h2>Screenshots</h2>
+## Screenshots
 <dl>
 <figure>
 <img src = "images/home_dark.png"></img>
@@ -72,25 +74,55 @@
 </dl>
 
 
-<h2>Installation Guide</h2>
-<p>Install the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install from the source code:</p>
+## Installation Guide
+### **For Windows Users:**
+Install the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install from the source code:
 
 <ol>
 <li>First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
 
-<li>Download <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and add it to the path or put ffmpeg.exe in the same folder as the script (for linux users, just sudo apt install ffmpeg)</li>
+<li>Download <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and add it to the path or put ffmpeg.exe in the same folder as the script</li>
 
 <li>Git-clone this repo & change directory</li>
 
-```git clone https://github.com/Shinobi7k/YouTube-Downloader.git```
+`git clone https://github.com/Shinobi7k/YouTube-Downloader.git`
 <br>
-```cd YouTube-Downloader```
 
+`cd YouTube-Downloader`
 <li>Install modules using pip</li>
 
-```pip install -r requirements.txt```
-
+`pip install -r requirements.txt`
 <li>Run the .py file!</li>
 
-```py main.py```
+`py main.py`
+</ol>
+
+### **For Linux Users:**
+<ol>
+<li>Install the following packages:
+
+```
+apt install python3 -y
+apt install python3-pip -y
+sudo apt-get install python3-tk
+sudo apt install git-all
+sudo apt install ffmpeg
+```
+</li>
+<li>Git-clone this repo & change directory
+
+`git clone https://github.com/Shinobi7k/YouTube-Downloader.git`
+
+`cd YouTube-Downloader`
+</li>
+<li>
+Install modules using pip
+
+`pip install -r requirements.txt`
+</li>
+<li>
+Run the .py file!
+
+`python3 main.py`
+</li>
 </ol>
