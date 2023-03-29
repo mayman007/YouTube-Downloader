@@ -76,7 +76,7 @@
 
 ## Installation Guide
 ### **For Windows:**
-Download the exe from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install from the source code:
+Download the exe from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install it from the source code:
 
 <ol>
 <li>Install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
