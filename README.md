@@ -76,10 +76,10 @@
 
 ## Installation Guide
 ### **For Windows Users:**
-Install the latest exe <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install from the source code:
+Download the exe from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>, or install from the source code:
 
 <ol>
-<li>First, install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
+<li>Install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
 
 <li>Download <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and add it to the path or put ffmpeg.exe in the same folder as the script</li>
 
@@ -103,6 +103,7 @@ py main.py
 </ol>
 
 ### **For Linux Users:**
+Download the executable file for linux from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a> and write `sudo apt install ffmpeg` in the terminal, or install it from the source code:
 <ol>
 <li>Install the following packages:
 
