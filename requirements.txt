@@ -2,3 +2,4 @@ pytube==15.0.0
 customtkinter==5.2.0
 youtube_transcript_api==0.6.1
 pillow==10.0.0
+requests==2.31.0
