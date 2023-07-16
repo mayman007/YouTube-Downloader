@@ -18,6 +18,7 @@ import subprocess
 import webbrowser
 import shlex
 from sys import platform
+import requests
 
 
 # Get config prefences from JSON
@@ -1171,6 +1172,21 @@ def DownlaodWindow():
     customtkinter.CTkLabel(newWindow, text = "File Size:", font = ("arial bold", 20)).place(x = 20 , y = 315)
     customtkinter.CTkLabel(newWindow, text = size_string, font = ("arial", 20)).place(x = 112 , y = 315)
 
+    # Get thumbnail
+    def download_thumbnail():
+        try:
+            response = requests.get(url.thumbnail_url)
+            response.raise_for_status()  # Raise an exception if there's an error
+        except requests.exceptions.ConnectionError:
+            return messagebox.showinfo(title = "Connection Error", message = f"Check your internet connection and try again.")
+        thumb_dir = filedialog.askdirectory()
+        thumb_path = f"{thumb_dir}/{url.title}_thumbnail.png"
+        with open(thumb_path, 'wb') as file:
+            file.write(response.content)
+        messagebox.showinfo(title = "Thumbnail Downloaded", message = f"Thumbnail has been downloaded successfully in '{thumb_dir}'")
+    thumbnail_button = customtkinter.CTkButton(newWindow, text = "Download Thumbnail", font = ("arial bold", 18), command = Thread(target = download_thumbnail).start, corner_radius = 20)
+    thumbnail_button.place(x = 480 , y = 260)
+
     # Path change
     customtkinter.CTkLabel(newWindow, text = "Download Path:", font = ("arial bold", 20)).place(x = 20 , y = 345)
     path_var = StringVar()
@@ -1216,13 +1232,13 @@ def DownlaodWindow():
         if advanced_quality_settings == "audio":
             if quality_string in audio_quality_list:
                 adv_checkbox = customtkinter.CTkCheckBox(newWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                adv_checkbox.place(x = 410 , y = 270)
+                adv_checkbox.place(x = 410 , y = 225)
                 adv_checkbox.select()
                 advanced_checker = "yes"
         else:
             if not quality_string in audio_quality_list:
                 adv_checkbox = customtkinter.CTkCheckBox(newWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                adv_checkbox.place(x = 410 , y = 270)
+                adv_checkbox.place(x = 410 , y = 225)
                 adv_checkbox.select()
                 advanced_checker = "yes"
 
@@ -1841,6 +1857,25 @@ def PlaylistWindow():
     customtkinter.CTkLabel(pWindow, text = "Total Videos:", font = ("arial bold", 20)).place(x = 340 , y = 285)
     customtkinter.CTkLabel(pWindow, textvariable = videos_var, font = ("arial", 20)).place(x = 470 , y = 285)
 
+    # Get thumbnail
+    def download_thumbnail():
+        if messagebox.askokcancel(title = "Download Thumbnails", message = f"Do you want to download the thumbnails of all the videos?"):
+            thumb_dir = filedialog.askdirectory()
+            try:
+                for url in urls_list:
+                    # Below line doesn't work properly for some reason
+                    # if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list:
+                    response = requests.get(url.thumbnail_url)
+                    response.raise_for_status()
+                    thumb_path = f"{thumb_dir}/{url.title}_thumbnail.png"
+                    with open(thumb_path, 'wb') as file:
+                        file.write(response.content)
+            except requests.exceptions.ConnectionError:
+                return messagebox.showinfo(title = "Connection Error", message = f"Check your internet connection and try again.")
+            messagebox.showinfo(title = "Thumbnails Downloaded", message = f"Thumbnails has been downloaded successfully in '{thumb_dir}'")
+    thumbnail_button = customtkinter.CTkButton(pWindow, text = "Download Thumbnail", font = ("arial bold", 18), command = Thread(target = download_thumbnail).start, corner_radius = 20)
+    thumbnail_button.place(x = 480 , y = 230)
+
     # Path change
     customtkinter.CTkLabel(pWindow, text = "Download Path:", font = ("arial bold", 20)).place(x = 20 , y = 345)
     ppath_var = StringVar()
@@ -1898,13 +1933,13 @@ def PlaylistWindow():
         if advanced_quality_settings == "audio":
             if quality_string in audio_quality_list:
                 adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                adv_checkbox.place(x = 410 , y = 240)
+                adv_checkbox.place(x = 410 , y = 195)
                 adv_checkbox.select()
                 advanced_checker = "yes"
         else:
             if not quality_string in audio_quality_list:
                 adv_checkbox = customtkinter.CTkCheckBox(pWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                adv_checkbox.place(x = 410 , y = 240)
+                adv_checkbox.place(x = 410 , y = 195)
                 adv_checkbox.select()
                 advanced_checker = "yes"
 
@@ -2301,6 +2336,9 @@ def SearchWindow():
             sWindow.destroy()
             root.deiconify()
             return messagebox.showerror(title = "Something Went Wrong", message = "Try again later.")
+        except urllib.error.URLError:
+            normalWidgets()
+            return messagebox.showerror(title = "Internet Error", message = "Please check your internet connection.")
 
         # Configure checkboxes
         if results_counter == 4:
@@ -2902,6 +2940,23 @@ def SearchWindow():
         customtkinter.CTkLabel(sDWindow, text = "Total Size:", font = ("arial bold", 20)).place(x = 20 , y = 310)
         customtkinter.CTkLabel(sDWindow, text = f"{round(total_size/1024/1024, 2)} MB", font = ("arial", 20)).place(x = 123 , y = 310)
 
+        # Get thumbnail
+        def download_thumbnail():
+            if messagebox.askokcancel(title = "Download Thumbnails", message = f"Do you want to download the thumbnails of all the selected videos?"):
+                thumb_dir = filedialog.askdirectory()
+                try:
+                    for url in to_download:
+                        response = requests.get(url.thumbnail_url)
+                        response.raise_for_status()
+                        thumb_path = f"{thumb_dir}/{url.title}_thumbnail.png"
+                        with open(thumb_path, 'wb') as file:
+                            file.write(response.content)
+                except requests.exceptions.ConnectionError:
+                    return messagebox.showinfo(title = "Connection Error", message = f"Check your internet connection and try again.")
+                messagebox.showinfo(title = "Thumbnails Downloaded", message = f"Thumbnails has been downloaded successfully in '{thumb_dir}'")
+        thumbnail_button = customtkinter.CTkButton(sDWindow, text = "Download Thumbnail", font = ("arial bold", 18), command = Thread(target = download_thumbnail).start, corner_radius = 20)
+        thumbnail_button.place(x = 480 , y = 260)
+
         # Path change
         customtkinter.CTkLabel(sDWindow, text = "Download Path:", font = ("arial bold", 20)).place(x = 20 , y = 345)
         ppath_var = StringVar()
@@ -2954,13 +3009,13 @@ def SearchWindow():
             if advanced_quality_settings == "audio":
                 if quality_string in audio_quality_list:
                     adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                    adv_checkbox.place(x = 410 , y = 270)
+                    adv_checkbox.place(x = 410 , y = 225)
                     adv_checkbox.select()
                     advanced_checker = "yes"
             else:
                 if not quality_string in audio_quality_list:
                     adv_checkbox = customtkinter.CTkCheckBox(sDWindow, text = "Apply Advanced Quality Settings", font = ("arial bold", 15), command = advancedChecker)
-                    adv_checkbox.place(x = 410 , y = 270)
+                    adv_checkbox.place(x = 410 , y = 225)
                     adv_checkbox.select()
                     advanced_checker = "yes"
 
