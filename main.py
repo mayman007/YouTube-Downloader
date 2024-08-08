@@ -23,24 +23,25 @@ import requests
 
 
 # Get config prefences from JSON
-try:
-    def get_bg_theme():
+
+def get_bg_theme():
+    try:
         with open("theme_config.json", "r") as f:
             theme = json.load(f)
         return theme["bg_theme"]
-    def get_default_color():
+    except FileNotFoundError:
+        with open("_internal/theme_config.json", "r") as f:
+            theme = json.load(f)
+    return theme["bg_theme"]
+def get_default_color():
+    try:
         with open("theme_config.json", "r") as f:
             theme = json.load(f)
         return theme["default_color"]
-except FileNotFoundError:
-    def get_bg_theme():
+    except FileNotFoundError:
         with open("_internal/theme_config.json", "r") as f:
             theme = json.load(f)
-        return theme["bg_theme"]
-    def get_default_color():
-        with open("_internal/theme_config.json", "r") as f:
-            theme = json.load(f)
-        return theme["default_color"]
+    return theme["default_color"]
 
 # Set themes
 customtkinter.set_appearance_mode(get_bg_theme())
@@ -62,7 +63,7 @@ root.resizable(False, False)
 if platform == "linux" or platform == "linux2": pass # Linux
 else:
     try: root.iconbitmap("YDICO.ico") # Windows
-    except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+    except TclError: root.iconbitmap("_internal/YDICO.ico") # Windows
 root.title("YouTube Downloader")
 customtkinter.CTkLabel(root, text = "YouTube Downloader", font = ("arial bold", 45)).place(x = 140 , y = 20)
 
@@ -376,7 +377,7 @@ def whenError():
         search_optionmenu.configure(corner_radius = 35)
         ploading_counter_var.set("")
         adv_quailty_button = customtkinter.CTkButton(root, text = "Advanced Quality Settings", width = 175, font = ("arial bold", 15), command = AdvancedWindow, corner_radius = 20)
-        adv_quailty_button.place(x = 460 , y = 415)
+        adv_quailty_button.place(x = 460 , y = 375)
         link_entry.configure(state = "normal")
         search_entry.configure(state = "normal")
 
@@ -388,7 +389,7 @@ def whenOpening():
     defaultcolor_menu.configure(state = "disabled")
     ploading_counter_var.set("")
     adv_quailty_button = customtkinter.CTkButton(root, text = "Advanced Quality Settings", width = 175, font = ("arial bold", 15), state = "disabled", corner_radius = 20)
-    adv_quailty_button.place(x = 460 , y = 415)
+    adv_quailty_button.place(x = 460 , y = 375)
     link_entry.configure(state = "disabled")
     search_entry.configure(state = "disabled")
 
@@ -417,7 +418,7 @@ def AdvancedWindow():
         if platform == "linux" or platform == "linux2": pass
         else:
             try: advWindow.iconbitmap("YDICO.ico") # Windows
-            except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+            except TclError: advWindow.iconbitmap("_internal/YDICO.ico") # Windows
         advWindow.protocol("WM_DELETE_WINDOW", onClosing)
 
         # CRF slider function
@@ -706,7 +707,7 @@ def AboutWindow():
         if platform == "linux" or platform == "linux2": pass
         else:
             try: abtWindow.iconbitmap("YDICO.ico") # Windows
-            except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+            except TclError: abtWindow.iconbitmap("_internal/YDICO.ico") # Windows
         abtWindow.protocol("WM_DELETE_WINDOW", onClosing)
 
     # Back to home button
@@ -992,7 +993,7 @@ def DownlaodWindow():
                 whenVideoError()
                 path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
                 return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
-            except FileNotFoundError:
+            except TclError:
                 whenVideoError()
                 path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
                 return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
@@ -1233,7 +1234,7 @@ def DownlaodWindow():
     if platform == "linux" or platform == "linux2": pass
     else:
         try: newWindow.iconbitmap("YDICO.ico") # Windows
-        except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+        except TclError: newWindow.iconbitmap("_internal/YDICO.ico") # Windows
     newWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # newWindow.bind("<Return>", VideoDownloader)
 
@@ -1914,7 +1915,7 @@ def PlaylistWindow():
     if platform == "linux" or platform == "linux2": pass
     else: 
         try: pWindow.iconbitmap("YDICO.ico") # Windows
-        except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+        except TclError: pWindow.iconbitmap("_internal/YDICO.ico") # Windows
     pWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # pWindow.bind("<Return>", PlaylistDownloader)
 
@@ -2088,7 +2089,7 @@ def SearchWindow():
     if platform == "linux" or platform == "linux2": pass
     else:
         try: sWindow.iconbitmap("YDICO.ico") # Windows
-        except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+        except TclError: sWindow.iconbitmap("_internal/YDICO.ico") # Windows
     sWindow.withdraw()
     sWindow.protocol("WM_DELETE_WINDOW", onClosing)
     global to_download
@@ -3004,7 +3005,7 @@ def SearchWindow():
         if platform == "linux" or platform == "linux2": pass
         else:
             try: sDWindow.iconbitmap("YDICO.ico") # Windows
-            except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
+            except TclError: sDWindow.iconbitmap("_internal/YDICO.ico") # Windows
         # sDWindow.bind("<Return>", SearchDownloader)
 
         # Downloading label
