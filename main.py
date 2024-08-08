@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 import customtkinter
-from pytube import YouTube, Playlist, Search, extract, request
-import pytube.request
+import pytube
+from pytubefix import YouTube, Playlist, Search, extract, request
+import pytubefix.request
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import SRTFormatter
 import threading
@@ -46,7 +47,7 @@ width = 700
 height = 460
 x = (root.winfo_screenwidth() // 2) - (width // 2)
 y = (root.winfo_screenheight() // 2) - (height // 2)
-root.geometry(f"{width}x{height}+{x}+{y}") # Centers the window
+root.geometry(fr"{width}x{height}+{x}+{y}") # Centers the window
 root.resizable(False, False)
 if platform == "linux" or platform == "linux2": pass # Linux
 else: root.iconbitmap("YDICO.ico") # Windows
@@ -391,7 +392,7 @@ def AdvancedWindow():
         height = 460
         x = (advWindow.winfo_screenwidth() // 2) - (width // 2)
         y = (advWindow.winfo_screenheight() // 2) - (height // 2)
-        advWindow.geometry(f"{width}x{height}+{x}+{y}")
+        advWindow.geometry(fr"{width}x{height}+{x}+{y}")
         advWindow.maxsize(700, 460)
         advWindow.minsize(700, 460)
         if platform == "linux" or platform == "linux2": pass
@@ -400,14 +401,14 @@ def AdvancedWindow():
 
         # CRF slider function
         def crfSlider(num):
-            if num == 23: crf_var.set(f"{int(num)} (Default)")
-            elif num == 0: crf_var.set(f"{int(num)} (Loseless Quality)")
-            elif num == 51: crf_var.set(f"{int(num)} (Lowest Quality)")
+            if num == 23: crf_var.set(fr"{int(num)} (Default)")
+            elif num == 0: crf_var.set(fr"{int(num)} (Loseless Quality)")
+            elif num == 51: crf_var.set(fr"{int(num)} (Lowest Quality)")
             else: crf_var.set(int(num))
 
         # Radiobuttons function
         def radioDisableNormal():
-            if video_crf_or_bitrate.get() == "crf":
+            if video_crf_or_bitrate.get() == "crfr":
                 crf_slider.configure(state = "normal")
                 bitrate_entry.configure(state = "disabled")
                 bitrate_entry.configure(border_color = "#565B5E")
@@ -423,7 +424,7 @@ def AdvancedWindow():
 
         # Widgets vars
         video_crf_or_bitrate = StringVar()
-        video_crf_or_bitrate.set("crf")
+        video_crf_or_bitrate.set("crfr")
         crf_var = StringVar()
         crf_var.set("23 (Default)")
         audio_quality_or_bitrate = StringVar()
@@ -471,7 +472,7 @@ def AdvancedWindow():
         fps_combobox.place(x = 185 , y = 125)
         fps_combobox._entry.configure(readonlybackground = fps_combobox._apply_appearance_mode(fps_combobox._fg_color))
         fps_combobox.set("30 (Default)")
-        crf_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Constant Quality:", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "crf", command = radioDisableNormal)
+        crf_radiobutton = customtkinter.CTkRadioButton(advWindow, text = "Constant Quality:", font = ("arial bold", 20), variable = video_crf_or_bitrate, value = "crfr", command = radioDisableNormal)
         crf_radiobutton.place(x = 20 , y = 163)
         customtkinter.CTkLabel(advWindow, textvariable = crf_var, font = ("arial", 17)).place(x = 520 , y = 161)
         crf_slider = customtkinter.CTkSlider(advWindow, corner_radius = 15, width = 300, from_ = 0, to = 51, number_of_steps = 51, command = crfSlider)
@@ -521,7 +522,7 @@ def AdvancedWindow():
                 format_combobox.configure(state = "readonly")
                 codec_combobox.configure(state = "readonly")
                 fps_combobox.configure(state = "readonly")
-                if video_crf_or_bitrate.get() == "crf": crf_slider.configure(state = "normal")
+                if video_crf_or_bitrate.get() == "crfr": crf_slider.configure(state = "normal")
                 else: bitrate_entry.configure(state = "normal")
                 crf_radiobutton.configure(state = "normal")
                 bitrate_radiobutton.configure(state = "normal")
@@ -555,7 +556,7 @@ def AdvancedWindow():
             preset_combobox.set("Medium (Default)")
             tune_combobox.set("None (Default)")
             profile_combobox.set("Main (Default)")
-            video_crf_or_bitrate.set("crf")
+            video_crf_or_bitrate.set("crfr")
             crfSlider(23)
             bitrate_entry_var.set("")
             aformat_combobox.set("MP3 (Default)")
@@ -601,7 +602,7 @@ def AdvancedWindow():
                 else:
                     tune = tune_combobox.get().lower().replace(" ", "")
                     ffmpeg_command = ffmpeg_command + f' -tune {tune}'
-                if video_crf_or_bitrate.get() == "crf":
+                if video_crf_or_bitrate.get() == "crfr":
                     if crf_slider.get() == "23 (Default)": crf = "23"
                     elif crf_slider.get() == "0 (Loseless Quality)": crf = "0"
                     elif crf_slider.get() == "51 (Highest Quality)": crf = "51"
@@ -667,7 +668,7 @@ adv_quailty_button.place(x = 460 , y = 415)
 # Conversion function
 def Conversion(input, ext, seconds):
     global ffmpeg_command
-    output = input.replace(f").{ext}", f"_advanced_settings_applied).{advanced_extention}")
+    output = input.replace(fr").{ext}", fr"_advanced_settings_applied).{advanced_extention}")
     ffmpeg_command = ffmpeg_command.replace("input", input)
     ffmpeg_command = ffmpeg_command.replace("output", output)
     # Progress reader function
@@ -728,8 +729,8 @@ def DownlaodWindow():
         root.deiconify()
 
     # Set path
-    if platform == "linux" or platform == "linux2": path = f"/home/{os.getlogin()}/Downloads"
-    else: path = f"C:/Users\{os.getlogin()}\Downloads"
+    if platform == "linux" or platform == "linux2": path = fr"/home/{os.getlogin()}/Downloads"
+    else: path = fr"C:/Users\{os.getlogin()}\Downloads"
     global directory
     directory = os.path.realpath(path) # Deafult path in case the user didn't choose
     def BrowseDir(): # Path function
@@ -781,12 +782,12 @@ def DownlaodWindow():
             for transcript in transcript_list:
                 if transcript.language_code in en_list: # Translate from English if it's there
                     final = transcript.translate(lang).fetch()
-                    print(f"translated from {transcript.language_code}")
+                    print(fr"translated from {transcript.language_code}")
                     sub = "translated_subtitle"
                     translated = "yes"
                 if translated == "no": # Avoid translating twice
                     final = transcript.translate(lang).fetch()
-                    print(f"translated {transcript.language_code}")
+                    print(fr"translated {transcript.language_code}")
                     sub = "translated_subtitle"
                     translated = "yes"
                 else:
@@ -794,10 +795,10 @@ def DownlaodWindow():
         formatter = SRTFormatter()
         srt_formatted = formatter.format_transcript(final)
         try:
-            with open(f"{directory2}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+            with open(fr"{directory2}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
                 srt_file.write(srt_formatted)
         except NameError:
-            with open(f"{directory}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+            with open(fr"{directory}/{clean_filename(url.title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
                 srt_file.write(srt_formatted)
 
     # Advanced checker
@@ -835,8 +836,8 @@ def DownlaodWindow():
                 if platform == "linux" or platform == "linux2": subprocess.Popen(directory)
                 else: subprocess.Popen(f'explorer "{directory}"')
         except PermissionError:
-            try: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{dir2}'")
-            except NameError: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{directory}'")
+            try: messagebox.showerror(title = "Permission Denied", message = fr"I do not have permission to open '{dir2}'")
+            except NameError: messagebox.showerror(title = "Permission Denied", message = fr"I do not have permission to open '{directory}'")
 
     # One Video Downloader
     def VideoDownloader(event = None):
@@ -859,7 +860,7 @@ def DownlaodWindow():
         if caps == "yes": CaptionsDownload()
         else: pass
         # Progress stuff
-        pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
+        pytubefix.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
         progress_label.configure(text_color = "green")
         progress_size_label.configure(text_color = "LightBlue")
 
@@ -872,11 +873,11 @@ def DownlaodWindow():
             audio = url.streams.get_by_itag(251)
             size = video.filesize + audio.filesize
             try:
-                vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
-                aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
+                vname = fr"{directory2}/{clean_filename(url.title)}_video.mp4"
+                aname = fr"{directory2}/{clean_filename(url.title)}_audio.mp3"
             except NameError:
-                vname = f"{directory}/{clean_filename(url.title)}_video.mp4"
-                aname = f"{directory}/{clean_filename(url.title)}_audio.mp3"
+                vname = fr"{directory}/{clean_filename(url.title)}_video.mp4"
+                aname = fr"{directory}/{clean_filename(url.title)}_audio.mp3"
             # Downlaod video
             try:
                 with open(vname, "wb") as f:
@@ -901,20 +902,20 @@ def DownlaodWindow():
                             remaining = size - downloaded
                             bytes_downloaded = size - remaining
                             percentage_of_completion = bytes_downloaded / size * 100
-                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                            percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                            sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                             progressbar.set(percentage_of_completion/100)
                         else:
                             # When finished
                             break
             except PermissionError:
                 whenVideoError()
-                path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
-                return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
+                return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
             except FileNotFoundError:
                 whenVideoError()
-                path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
-                return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
+                return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
             toggle_button = customtkinter.CTkButton(newWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
             toggle_button.place(x = 550 , y = 347)
             cancel_button = customtkinter.CTkButton(newWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
@@ -941,15 +942,15 @@ def DownlaodWindow():
                             remaining = size - downloaded
                             bytes_downloaded = size - remaining
                             percentage_of_completion = bytes_downloaded / size * 100
-                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                            percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                            sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                             progressbar.set(percentage_of_completion/100)
                         else:
                             # When finished
                             break
                 # Merge video and audio
                 downloading_var.set("Merging")
-                final_name = vname.replace("_video", f"_({quality_string})")
+                final_name = vname.replace("_video", fr"_({quality_string})")
                 cmd = f'ffmpeg -y -i "{aname}" -i "{vname}" -c copy "{final_name}"'
                 subprocess.call(cmd, shell=True)
                 os.remove(vname)
@@ -972,8 +973,8 @@ def DownlaodWindow():
             size = video.filesize
             if quality in audio_tags_list: ext = "mp3"
             else: ext = "mp4"
-            try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
-            except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
+            try: vname = fr"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
+            except NameError: vname = fr"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
             try:
                 with open(vname, "wb") as f:
                     is_paused = is_cancelled = False
@@ -999,8 +1000,8 @@ def DownlaodWindow():
                             remaining = size - downloaded
                             bytes_downloaded = size - remaining
                             percentage_of_completion = bytes_downloaded / size * 100
-                            percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                            sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                            percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                            sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                             progressbar.set(percentage_of_completion/100)
                         else:
                             # When finished
@@ -1019,14 +1020,14 @@ def DownlaodWindow():
                             break
             except PermissionError:
                 whenVideoError()
-                path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                path = vname.replace(fr"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
             except FileNotFoundError:
                 whenVideoError()
-                path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                path = vname.replace(fr"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
         if is_cancelled:
-            msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+            msg_box = messagebox.askquestion(title = "Delete Canceled File", message = fr"Do you want to delete '{vname}'?")
             if msg_box == "yes": os.remove(vname)
 
 
@@ -1065,20 +1066,20 @@ def DownlaodWindow():
         else:
             video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
             size = video.filesize
-        size_string = f"{round(size/1024/1024, 2)} MB"
+        size_string = fr"{round(size/1024/1024, 2)} MB"
     except urllib.error.URLError as e:
         print(e)
         whenError()
         return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
     except KeyError as e:
-        print(f"KeyError: {e}")
+        print(fr"KeyError: {e}")
         whenError()
-        return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.")
+        return messagebox.showerror(title = "Something Went Wrong", message = fr"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.")
     except AttributeError as e:
-        print(f"AttributeError: {e}")
+        print(fr"AttributeError: {e}")
         whenError()
         return messagebox.showerror(title = "Quality Not Available",
-        message = f"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
+        message = fr"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
     except pytube.exceptions.LiveStreamError as e:
         print(e)
         whenError()
@@ -1142,7 +1143,7 @@ def DownlaodWindow():
     height = 460
     x = (newWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (newWindow.winfo_screenheight() // 2) - (height // 2)
-    newWindow.geometry(f"{width}x{height}+{x}+{y}")
+    newWindow.geometry(fr"{width}x{height}+{x}+{y}")
     newWindow.maxsize(700, 460)
     newWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
@@ -1178,12 +1179,12 @@ def DownlaodWindow():
             response = requests.get(url.thumbnail_url)
             response.raise_for_status()  # Raise an exception if there's an error
         except requests.exceptions.ConnectionError:
-            return messagebox.showinfo(title = "Connection Error", message = f"Check your internet connection and try again.")
+            return messagebox.showinfo(title = "Connection Error", message = fr"Check your internet connection and try again.")
         thumb_dir = filedialog.askdirectory()
-        thumb_path = f"{thumb_dir}/{url.title}_thumbnail.png"
+        thumb_path = fr"{thumb_dir}/{url.title}_thumbnail.png"
         with open(thumb_path, 'wb') as file:
             file.write(response.content)
-        messagebox.showinfo(title = "Thumbnail Downloaded", message = f"Thumbnail has been downloaded successfully in '{thumb_dir}'")
+        messagebox.showinfo(title = "Thumbnail Downloaded", message = fr"Thumbnail has been downloaded successfully in '{thumb_dir}'")
     thumbnail_button = customtkinter.CTkButton(newWindow, text = "Download Thumbnail", font = ("arial bold", 18), command = Thread(target = download_thumbnail).start, corner_radius = 20)
     thumbnail_button.place(x = 480 , y = 260)
 
@@ -1279,8 +1280,8 @@ def PlaylistWindow():
         root.deiconify()
 
     # Set path
-    if platform == "linux" or platform == "linux2": path = f"/home/{os.getlogin()}/Downloads"
-    else: path = f"C:/Users\{os.getlogin()}\Downloads"
+    if platform == "linux" or platform == "linux2": path = fr"/home/{os.getlogin()}/Downloads"
+    else: path = fr"C:/Users\{os.getlogin()}\Downloads"
     global directory
     directory = os.path.realpath(path) # Deafult path in case the user didn't choose
     def pBrowseDir(): # Path function
@@ -1337,12 +1338,12 @@ def PlaylistWindow():
                 for transcript in transcript_list:
                     if transcript.language_code in en_list: # Translate from English if it's there
                         final = transcript.translate(lang).fetch()
-                        print(f"translated from {transcript.language_code}")
+                        print(fr"translated from {transcript.language_code}")
                         sub = "translated_subtitle"
                         translated = "yes"
                     if translated == "no": # Avoid translating twice
                         final = transcript.translate(lang).fetch()
-                        print(f"translated {transcript.language_code}")
+                        print(fr"translated {transcript.language_code}")
                         sub = "translated_subtitle"
                         translated = "yes"
                     else:
@@ -1350,13 +1351,13 @@ def PlaylistWindow():
             formatter = SRTFormatter()
             srt_formatted = formatter.format_transcript(final)
             try:
-                with open(f"{directory2}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                with open(fr"{directory2}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
                     srt_file.write(srt_formatted)
             except NameError:
-                with open(f"{directory}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                with open(fr"{directory}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
                     srt_file.write(srt_formatted)
         else:
-            print(f"{title} not in caption list")
+            print(fr"{title} not in caption list")
 
     # Add/Remove videos from download list
     def videoSelector(choice):
@@ -1403,7 +1404,7 @@ def PlaylistWindow():
         menubutton.configure(values = vids_list)
         menubutton.set("Open Videos Menu")
         length_var.set(to_hms(plength))
-        size_var.set(f"{round(psize/1024/1024, 2)} MB")
+        size_var.set(fr"{round(psize/1024/1024, 2)} MB")
         videos_var.set(vids_counter)
 
     # Advanced checker
@@ -1441,8 +1442,8 @@ def PlaylistWindow():
                 if platform == "linux" or platform == "linux2": subprocess.Popen(directory)
                 else: subprocess.Popen(f'explorer "{directory}"')
         except PermissionError:
-            try: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{dir2}'")
-            except NameError: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{directory}'")
+            try: messagebox.showerror(title = "Permission Denied", message = fr"I do not have permission to open '{dir2}'")
+            except NameError: messagebox.showerror(title = "Permission Denied", message = fr"I do not have permission to open '{directory}'")
 
     # Download playlist
     def PlaylistDownloader(event = None):
@@ -1464,7 +1465,7 @@ def PlaylistWindow():
         audio_tags_list = ["251" , "140" , "250" , "249"]
         non_progressive_list = ["137" , "135" , "133", "160"]
         # Progress stuff
-        pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
+        pytubefix.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
         progress_label.configure(text_color = "green")
         progress_size_label.configure(text_color = "LightBlue")
 
@@ -1500,28 +1501,28 @@ def PlaylistWindow():
                 elif quality == "160": video = url.streams.filter(res = "144p").first()
                 audio = url.streams.get_by_itag(251)
                 size = video.filesize + audio.filesize
-                if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
+                if fr"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
                 else: continue
                 # Download subtitles if selected
                 if caps == "yes": pCaptionsDownload(url.watch_url, url.title)
                 else: pass
                 ext = "mp4"
                 try:
-                    vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
-                    aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
+                    vname = fr"{directory2}/{clean_filename(url.title)}_video.mp4"
+                    aname = fr"{directory2}/{clean_filename(url.title)}_audio.mp3"
                 except NameError:
-                    vname = f"{directory}/{clean_filename(url.title)}_video.mp4"
-                    aname = f"{directory}/{clean_filename(url.title)}_audio.mp3"
+                    vname = fr"{directory}/{clean_filename(url.title)}_video.mp4"
+                    aname = fr"{directory}/{clean_filename(url.title)}_audio.mp3"
                 # Downlaod video
                 try:
                     with open(vname, "wb") as f:
-                        percentage_var.set(f"0.00%  ")
-                        sizeprogress_var.set(f"0 MB  ")
+                        percentage_var.set(fr"0.00%  ")
+                        sizeprogress_var.set(fr"0 MB  ")
                         downloading_var.set("Downloading")
                         converting_percentage_var.set("")
                         progressbar.set(0)
                         downloaded_counter = downloaded_counter + 1
-                        downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                        downloadcounter_var.set(fr"{downloaded_counter}/{vids_counter}")
                         thumbnail.configure(image = photo)
                         downloaded = 0
                         is_paused = is_cancelled = False
@@ -1544,20 +1545,20 @@ def PlaylistWindow():
                                 remaining = size - downloaded
                                 bytes_downloaded = size - remaining
                                 percentage_of_completion = bytes_downloaded / size * 100
-                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                                sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                                 progressbar.set(percentage_of_completion/100)
                             else:
                                 # When finished
                                 break
                 except PermissionError:
                     whenPlaylistError()
-                    path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
-                    return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                    path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
+                    return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
                 except FileNotFoundError:
                     whenPlaylistError()
-                    path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
-                    return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                    path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
+                    return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
                 toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
                 toggle_button.place(x = 550 , y = 347)
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
@@ -1584,15 +1585,15 @@ def PlaylistWindow():
                                 remaining = size - downloaded
                                 bytes_downloaded = size - remaining
                                 percentage_of_completion = bytes_downloaded / size * 100
-                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                                sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                                 progressbar.set(percentage_of_completion/100)
                             else:
                                 # When finished
                                 break
                     # Merge video and audio
                     downloading_var.set("Merging")
-                    final_name = vname.replace("_video", f"_({quality_string})")
+                    final_name = vname.replace("_video", fr"_({quality_string})")
                     cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
                     subprocess.call(cmd, shell=True)
                     os.remove(vname)
@@ -1614,24 +1615,24 @@ def PlaylistWindow():
                 photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                 video = url.streams.get_by_itag(quality)
                 size = video.filesize
-                if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
+                if fr"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list: pass
                 else: continue
                 # Download subtitles if selected
                 if caps == "yes": pCaptionsDownload(url.watch_url, url.title)
                 else: pass
                 if quality in audio_tags_list: ext = "mp3"
                 else: ext = "mp4"
-                try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
-                except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
+                try: vname = fr"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
+                except NameError: vname = fr"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
                 try:
                     with open(vname, "wb") as f:
-                        percentage_var.set(f"0.00%  ")
-                        sizeprogress_var.set(f"0 MB  ")
+                        percentage_var.set(fr"0.00%  ")
+                        sizeprogress_var.set(fr"0 MB  ")
                         downloading_var.set("Downloading")
                         converting_percentage_var.set("")
                         progressbar.set(0)
                         downloaded_counter = downloaded_counter + 1
-                        downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                        downloadcounter_var.set(fr"{downloaded_counter}/{vids_counter}")
                         thumbnail.configure(image = photo)
                         downloaded = 0
                         video = request.stream(video.url) # Get an iterable stream
@@ -1655,8 +1656,8 @@ def PlaylistWindow():
                                 remaining = size - downloaded
                                 bytes_downloaded = size - remaining
                                 percentage_of_completion = bytes_downloaded / size * 100
-                                percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                                sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                                 progressbar.set(percentage_of_completion/100)
                             else:
                                 # Convert if there is a conversion
@@ -1670,12 +1671,12 @@ def PlaylistWindow():
                                 break # No more data = Finished
                 except PermissionError:
                     whenPlaylistError()
-                    path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                    return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                    path = vname.replace(fr"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                    return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
                 except FileNotFoundError:
                     whenPlaylistError()
-                    path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                    return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                    path = vname.replace(fr"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                    return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
 
         # When finished
         toggle_button = customtkinter.CTkButton(pWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
@@ -1683,7 +1684,7 @@ def PlaylistWindow():
         cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
         cancel_button.place(x = 595 , y = 347)
         if is_cancelled:
-            msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+            msg_box = messagebox.askquestion(title = "Delete Canceled File", message = fr"Do you want to delete '{vname}'?")
             if msg_box == "yes": os.remove(vname)
         else:
             downloadcounter_var.set("")
@@ -1726,8 +1727,8 @@ def PlaylistWindow():
             p.maxstring = 40
             for url in urls.videos:
                 pl_tst_counter = pl_tst_counter + 1
-                print(f"================================")
-                print(f"({pl_tst_counter}) loop started")
+                print(fr"================================")
+                print(fr"({pl_tst_counter}) loop started")
                 try:
                     if quality == "137":
                         video = url.streams.filter(res = "1080p").first()
@@ -1748,41 +1749,41 @@ def PlaylistWindow():
                     else:
                         video = url.streams.get_by_itag(quality) # 1080p, 720, 360p, *audio
                         size = video.filesize
-                    print(f"({pl_tst_counter}) got video item")
+                    print(fr"({pl_tst_counter}) got video item")
                 except urllib.error.URLError as e:
                     print(e)
                     whenError()
                     return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
                 except pytube.exceptions.LiveStreamError as e:
                     print(e)
-                    messagebox.showwarning(title = "Video is Live", message = f"I couldn't retrieve '{url.title}' because it's live.\nThe load of the playlist will continue.")
+                    messagebox.showwarning(title = "Video is Live", message = fr"I couldn't retrieve '{url.title}' because it's live.\nThe load of the playlist will continue.")
                     continue
                 except KeyError as e:
-                    print(f"KeyError: {e}")
-                    messagebox.showwarning(title = "Something Went Wrong", message = f"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.\nThe load of the playlist will continue.")
+                    print(fr"KeyError: {e}")
+                    messagebox.showwarning(title = "Something Went Wrong", message = fr"I can't retrieve '{url.title}' at the moment. Change the selected quality or try again later.\nThe load of the playlist will continue.")
                     continue
                 except AttributeError as e:
-                    print(f"AttributeError: {e}")
-                    messagebox.showwarning(title = "Quality Not Available", message = f"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.\nThe load of the playlist will continue.")
+                    print(fr"AttributeError: {e}")
+                    messagebox.showwarning(title = "Quality Not Available", message = fr"I can't retrieve '{url.title}' in the quality that you chose. Change the selected quality or try again later.\nThe load of the playlist will continue.")
                     continue
                 try:
                     video_id = extract.video_id(url.watch_url)
                     YouTubeTranscriptApi.list_transcripts(video_id)
                     vids_subs.append(url.watch_url)
-                    print(f"({pl_tst_counter}) found subtitle")
+                    print(fr"({pl_tst_counter}) found subtitle")
                 except:
-                    print(f"({pl_tst_counter}) no subtitle")
+                    print(fr"({pl_tst_counter}) no subtitle")
                 psize = psize + size
                 size_string = round(psize/1024/1024, 2)
                 plength = plength + url.length
-                vids_list.append(f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB")
+                vids_list.append(fr"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB")
                 urls_list.append(url)
                 vids_counter = vids_counter + 1
-                ploading_counter_var.set(f"({vids_counter})")
-                print(f"({pl_tst_counter}) got size + length + added vid_option to list")
+                ploading_counter_var.set(fr"({vids_counter})")
+                print(fr"({pl_tst_counter}) got size + length + added vid_option to list")
     if vids_list == []: # If an exception occured on every video...
         whenError()
-        return messagebox.showerror(title = "Something Went Wrong", message = f"I can't retrieve this playlist at the moment. Change the selected quality or try again later.")
+        return messagebox.showerror(title = "Something Went Wrong", message = fr"I can't retrieve this playlist at the moment. Change the selected quality or try again later.")
 
     # Getting playlist thumbnail
     try:
@@ -1816,7 +1817,7 @@ def PlaylistWindow():
     height = 460
     x = (pWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (pWindow.winfo_screenheight() // 2) - (height // 2)
-    pWindow.geometry(f"{width}x{height}+{x}+{y}")
+    pWindow.geometry(fr"{width}x{height}+{x}+{y}")
     pWindow.maxsize(700, 460)
     pWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
@@ -1837,7 +1838,7 @@ def PlaylistWindow():
     length_var = StringVar()
     length_var.set(to_hms(plength))
     size_var = StringVar()
-    size_var.set(f"{size_string} MB")
+    size_var.set(fr"{size_string} MB")
     videos_var = IntVar()
     videos_var.set(vids_counter)
     thumbnail = customtkinter.CTkLabel(pWindow, text = "", image = photo)
@@ -1859,20 +1860,20 @@ def PlaylistWindow():
 
     # Get thumbnail
     def download_thumbnail():
-        if messagebox.askokcancel(title = "Download Thumbnails", message = f"Do you want to download the thumbnails of all the videos?"):
+        if messagebox.askokcancel(title = "Download Thumbnails", message = fr"Do you want to download the thumbnails of all the videos?"):
             thumb_dir = filedialog.askdirectory()
             try:
                 for url in urls_list:
                     # Below line doesn't work properly for some reason
-                    # if f"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list:
+                    # if fr"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list:
                     response = requests.get(url.thumbnail_url)
                     response.raise_for_status()
-                    thumb_path = f"{thumb_dir}/{url.title}_thumbnail.png"
+                    thumb_path = fr"{thumb_dir}/{url.title}_thumbnail.png"
                     with open(thumb_path, 'wb') as file:
                         file.write(response.content)
             except requests.exceptions.ConnectionError:
-                return messagebox.showinfo(title = "Connection Error", message = f"Check your internet connection and try again.")
-            messagebox.showinfo(title = "Thumbnails Downloaded", message = f"Thumbnails has been downloaded successfully in '{thumb_dir}'")
+                return messagebox.showinfo(title = "Connection Error", message = fr"Check your internet connection and try again.")
+            messagebox.showinfo(title = "Thumbnails Downloaded", message = fr"Thumbnails has been downloaded successfully in '{thumb_dir}'")
     thumbnail_button = customtkinter.CTkButton(pWindow, text = "Download Thumbnail", font = ("arial bold", 18), command = Thread(target = download_thumbnail).start, corner_radius = 20)
     thumbnail_button.place(x = 480 , y = 230)
 
@@ -1988,7 +1989,7 @@ def SearchWindow():
     height = 460
     x = (sWindow.winfo_screenwidth() // 2) - (width // 2)
     y = (sWindow.winfo_screenheight() // 2) - (height // 2)
-    sWindow.geometry(f"{width}x{height}+{x}+{y}")
+    sWindow.geometry(fr"{width}x{height}+{x}+{y}")
     sWindow.maxsize(700, 460)
     sWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
@@ -2067,7 +2068,7 @@ def SearchWindow():
         else:
             if search.results[15] in to_download: to_download.remove(search.results[15])
 
-        selected_counter.set(f"{len(to_download)} Selected")
+        selected_counter.set(fr"{len(to_download)} Selected")
         print("==========")
         print(to_download)
         print(len(to_download))
@@ -2319,7 +2320,7 @@ def SearchWindow():
             elif results_counter in third: url3 = url
             elif results_counter in fourth: url4 = url
             results_counter = results_counter + 1
-        print(f"got {results_counter} results")
+        print(fr"got {results_counter} results")
 
         # Get thumbnails
         try:
@@ -2363,43 +2364,43 @@ def SearchWindow():
             cb4.configure(variable = cb_var16)
 
         # Configure first video in page
-        if url1.views > 1000000: views = f"{int(url1.views/1000000)}M"
-        elif url1.views > 1000: views = f"{int(url1.views/1000)}K"
+        if url1.views > 1000000: views = fr"{int(url1.views/1000000)}M"
+        elif url1.views > 1000: views = fr"{int(url1.views/1000)}K"
         else: views = int(url1.views/1000000)
         t_var1.set(r.repr(url1.title))
         a1.configure(text = r.repr(url1.author))
         l1.configure(text = to_hms(url1.length))
-        v1.configure(text = f"{views} Views")
+        v1.configure(text = fr"{views} Views")
         img1.configure(image = thumb1)
 
         # Configure second video in page
-        if url2.views > 1000000: views = f"{int(url2.views/1000000)}M"
-        elif url2.views > 1000: views = f"{int(url2.views/1000)}K"
+        if url2.views > 1000000: views = fr"{int(url2.views/1000000)}M"
+        elif url2.views > 1000: views = fr"{int(url2.views/1000)}K"
         else: views = int(url2.views/1000000)
         t_var2.set(r.repr(url2.title))
         a2.configure(text = r.repr(url2.author))
         l2.configure(text = to_hms(url2.length))
-        v2.configure(text = f"{views} Views")
+        v2.configure(text = fr"{views} Views")
         img2.configure(image = thumb2)
 
         # Configure third video in page
-        if url3.views > 1000000: views = f"{int(url3.views/1000000)}M"
-        elif url3.views > 1000: views = f"{int(url3.views/1000)}K"
+        if url3.views > 1000000: views = fr"{int(url3.views/1000000)}M"
+        elif url3.views > 1000: views = fr"{int(url3.views/1000)}K"
         else: views = int(url3.views/1000000)
         t_var3.set(r.repr(url3.title))
         a3.configure(text = r.repr(url3.author))
         l3.configure(text = to_hms(url3.length))
-        v3.configure(text = f"{views} Views")
+        v3.configure(text = fr"{views} Views")
         img3.configure(image = thumb3)
 
         # Configure fourth video in page
-        if url4.views > 1000000: views = f"{int(url4.views/1000000)}M"
-        elif url4.views > 1000: views = f"{int(url4.views/1000)}K"
+        if url4.views > 1000000: views = fr"{int(url4.views/1000000)}M"
+        elif url4.views > 1000: views = fr"{int(url4.views/1000)}K"
         else: views = int(url4.views/1000000)
         t_var4.set(r.repr(url4.title))
         a4.configure(text = r.repr(url4.author))
         l4.configure(text = to_hms(url4.length))
-        v4.configure(text = f"{views} Views")
+        v4.configure(text = fr"{views} Views")
         img4.configure(image = thumb4)
 
         # Returns widgets to right state
@@ -2409,7 +2410,7 @@ def SearchWindow():
     def onDnClick():
         if to_download == []:
             return messagebox.showerror(title = "No Selected Video", message = "Please select at least one video to download.")
-        msg_box = messagebox.askquestion(title = "Proceed To Download", message = f"Are you sure that you want to download {len(to_download)} video(s)")
+        msg_box = messagebox.askquestion(title = "Proceed To Download", message = fr"Are you sure that you want to download {len(to_download)} video(s)")
         if msg_box == "yes":
             button_var = dn_button_var
             threading.Thread(target = ResultsWindow, args = (to_download,)).start()
@@ -2439,8 +2440,8 @@ def SearchWindow():
             root.deiconify()
 
         # Set path
-        if platform == "linux" or platform == "linux2": path = f"/home/{os.getlogin()}/Downloads"
-        else: path = f"C:/Users\{os.getlogin()}\Downloads"
+        if platform == "linux" or platform == "linux2": path = fr"/home/{os.getlogin()}/Downloads"
+        else: path = fr"C:/Users\{os.getlogin()}\Downloads"
         global directory
         directory = os.path.realpath(path) # Deafult path in case the user didn't choose
         def pBrowseDir(): # Path function
@@ -2496,12 +2497,12 @@ def SearchWindow():
                     for transcript in transcript_list:
                         if transcript.language_code in en_list: # Translate from English if it's there
                             final = transcript.translate(lang).fetch()
-                            print(f"translated from {transcript.language_code}")
+                            print(fr"translated from {transcript.language_code}")
                             sub = "translated_subtitle"
                             translated = "yes"
                         if translated == "no": # Avoid translating twice
                             final = transcript.translate(lang).fetch()
-                            print(f"translated {transcript.language_code}")
+                            print(fr"translated {transcript.language_code}")
                             sub = "translated_subtitle"
                             translated = "yes"
                         else:
@@ -2509,13 +2510,13 @@ def SearchWindow():
                 formatter = SRTFormatter()
                 srt_formatted = formatter.format_transcript(final)
                 try:
-                    with open(f"{directory2}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                    with open(fr"{directory2}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
                         srt_file.write(srt_formatted)
                 except NameError:
-                    with open(f"{directory}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
+                    with open(fr"{directory}/{clean_filename(title)}_{sub}_{lang}.srt", "w", encoding = "utf-8") as srt_file:
                         srt_file.write(srt_formatted)
             else:
-                print(f"{title} not in list")
+                print(fr"{title} not in list")
 
         # Advanced checker
         def advancedChecker():
@@ -2534,8 +2535,8 @@ def SearchWindow():
                     if platform == "linux" or platform == "linux2": subprocess.Popen(directory)
                     else: subprocess.Popen(f'explorer "{directory}"')
             except PermissionError:
-                try: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{dir2}'")
-                except NameError: messagebox.showerror(title = "Permission Denied", message = f"I do not have permission to open '{directory}'")
+                try: messagebox.showerror(title = "Permission Denied", message = fr"I do not have permission to open '{dir2}'")
+                except NameError: messagebox.showerror(title = "Permission Denied", message = fr"I do not have permission to open '{directory}'")
 
         # Pause/Resume function
         def toggle_download():
@@ -2575,7 +2576,7 @@ def SearchWindow():
             r = reprlib.Repr()
             r.maxstring = 27
             # Progress stuff
-            pytube.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
+            pytubefix.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
             progress_label.configure(text_color = "green")
             progress_size_label.configure(text_color = "LightBlue")
             lang_choose.configure(state = "disabled")
@@ -2600,28 +2601,28 @@ def SearchWindow():
                     size = video.filesize + audio.filesize
                     title_var.set(r.repr(url.title))
                     length_var.set(to_hms(url.length))
-                    size_var.set(f"{round(size/1024/1024, 2)} MB")
+                    size_var.set(fr"{round(size/1024/1024, 2)} MB")
                     # Download subtitles if selected
                     if caps == "yes": sCaptionsDownload(url.watch_url, url.title)
                     else: pass
                     if quality in audio_tags_list: ext = "mp3"
                     else: ext = "mp4"
                     try:
-                        vname = f"{directory2}/{clean_filename(url.title)}_video.mp4"
-                        aname = f"{directory2}/{clean_filename(url.title)}_audio.mp3"
+                        vname = fr"{directory2}/{clean_filename(url.title)}_video.mp4"
+                        aname = fr"{directory2}/{clean_filename(url.title)}_audio.mp3"
                     except NameError:
-                        vname = f"{directory}/{clean_filename(url.title)}_video.mp4"
-                        aname = f"{directory}/{clean_filename(url.title)}_audio.mp3"
+                        vname = fr"{directory}/{clean_filename(url.title)}_video.mp4"
+                        aname = fr"{directory}/{clean_filename(url.title)}_audio.mp3"
                     # Downlaod video
                     try:
                         with open(vname, "wb") as f:
-                            percentage_var.set(f"0.00%  ")
-                            sizeprogress_var.set(f"0 MB  ")
+                            percentage_var.set(fr"0.00%  ")
+                            sizeprogress_var.set(fr"0 MB  ")
                             downloading_var.set("Downloading")
                             converting_percentage_var.set("")
                             progressbar.set(0)
                             downloaded_counter = downloaded_counter + 1
-                            downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                            downloadcounter_var.set(fr"{downloaded_counter}/{vids_counter}")
                             thumbnail.configure(image = photo)
                             video = request.stream(video.url) # Get an iterable stream
                             downloaded = 0
@@ -2645,19 +2646,19 @@ def SearchWindow():
                                     remaining = size - downloaded
                                     bytes_downloaded = size - remaining
                                     percentage_of_completion = bytes_downloaded / size * 100
-                                    percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                    sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                    percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                                    sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                                     progressbar.set(percentage_of_completion/100)
                                 else:
                                     break # No more data = Finished
                     except PermissionError:
                         whenResultsError()
-                        path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
-                        return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                        path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
+                        return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
                     except FileNotFoundError:
                         whenResultsError()
-                        path = vname.replace(f"/{clean_filename(url.title)}_video.mp4", "")
-                        return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                        path = vname.replace(fr"/{clean_filename(url.title)}_video.mp4", "")
+                        return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
                     toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
                     toggle_button.place(x = 550 , y = 347)
                     cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
@@ -2684,15 +2685,15 @@ def SearchWindow():
                                     remaining = size - downloaded
                                     bytes_downloaded = size - remaining
                                     percentage_of_completion = bytes_downloaded / size * 100
-                                    percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                    sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                    percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                                    sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                                     progressbar.set(percentage_of_completion/100)
                                 else:
                                     # When finished
                                     break
                         # Merge video and audio
                         downloading_var.set("Merging")
-                        final_name = vname.replace("_video", f"_({quality_string})")
+                        final_name = vname.replace("_video", fr"_({quality_string})")
                         cmd = f'ffmpeg -y -i "{aname}"  -r 30 -i "{vname}"  -filter:a aresample=async=1 -c:a flac -c:v copy "{final_name}"'
                         subprocess.call(cmd, shell=True)
                         os.remove(vname)
@@ -2715,24 +2716,24 @@ def SearchWindow():
                     video = url.streams.get_by_itag(quality)
                     title_var.set(r.repr(url.title))
                     length_var.set(to_hms(url.length))
-                    size_var.set(f"{round(video.filesize/1024/1024, 2)} MB")
+                    size_var.set(fr"{round(video.filesize/1024/1024, 2)} MB")
                     # Download subtitles if selected
                     if caps == "yes": sCaptionsDownload(url.watch_url, url.title)
                     else: pass
                     if quality in audio_tags_list: ext = "mp3"
                     else: ext = "mp4"
                     size = video.filesize
-                    try: vname = f"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
-                    except NameError: vname = f"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
+                    try: vname = fr"{directory2}/{clean_filename(url.title)}_({quality_string}).{ext}"
+                    except NameError: vname = fr"{directory}/{clean_filename(url.title)}_({quality_string}).{ext}"
                     try:
                         with open(vname, "wb") as f:
-                            percentage_var.set(f"0.00%  ")
-                            sizeprogress_var.set(f"0 MB  ")
+                            percentage_var.set(fr"0.00%  ")
+                            sizeprogress_var.set(fr"0 MB  ")
                             downloading_var.set("Downloading")
                             converting_percentage_var.set("")
                             progressbar.set(0)
                             downloaded_counter = downloaded_counter + 1
-                            downloadcounter_var.set(f"{downloaded_counter}/{vids_counter}")
+                            downloadcounter_var.set(fr"{downloaded_counter}/{vids_counter}")
                             thumbnail.configure(image = photo)
                             video = request.stream(video.url) # Get an iterable stream
                             downloaded = 0
@@ -2756,8 +2757,8 @@ def SearchWindow():
                                     remaining = size - downloaded
                                     bytes_downloaded = size - remaining
                                     percentage_of_completion = bytes_downloaded / size * 100
-                                    percentage_var.set(f"{round(percentage_of_completion, 2)}%  ")
-                                    sizeprogress_var.set(f"{int(bytes_downloaded / 1024 / 1024)} MB  ")
+                                    percentage_var.set(fr"{round(percentage_of_completion, 2)}%  ")
+                                    sizeprogress_var.set(fr"{int(bytes_downloaded / 1024 / 1024)} MB  ")
                                     progressbar.set(percentage_of_completion/100)
                                 else:
                                     # Convert if there is a conversion
@@ -2771,12 +2772,12 @@ def SearchWindow():
                                     break # No more data = Finished
                     except PermissionError:
                         whenResultsError()
-                        path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                        return messagebox.showerror(title = "Permission Error", message = f"I don't have permission to access '{path}'. Change the path or run me as administrator.")
+                        path = vname.replace(fr"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                        return messagebox.showerror(title = "Permission Error", message = fr"I don't have permission to access '{path}'. Change the path or run me as administrator.")
                     except FileNotFoundError:
                         whenResultsError()
-                        path = vname.replace(f"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
-                        return messagebox.showerror(title = "Folder Not Found", message = f"'{path}' is not found. Change the path to an existing folder.")
+                        path = vname.replace(fr"/{clean_filename(url.title)}_({quality_string}).{ext}", "")
+                        return messagebox.showerror(title = "Folder Not Found", message = fr"'{path}' is not found. Change the path to an existing folder.")
 
             # When finished
             toggle_button = customtkinter.CTkButton(sDWindow, text = "⏸️", font = ("arial", 15), fg_color = "grey14", text_color = "CadetBlue1", width = 5, height = 26, state = "disabled")
@@ -2784,7 +2785,7 @@ def SearchWindow():
             cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, state = "disabled", corner_radius = 20)
             cancel_button.place(x = 595 , y = 347)
             if is_cancelled:
-                msg_box = messagebox.askquestion(title = "Delete Canceled File", message = f"Do you want to delete '{vname}'?")
+                msg_box = messagebox.askquestion(title = "Delete Canceled File", message = fr"Do you want to delete '{vname}'?")
                 if msg_box == "yes": os.remove(vname)
             else:
                 downloadcounter_var.set("")
@@ -2826,50 +2827,50 @@ def SearchWindow():
                 total_size = total_size + size
                 total_length = total_length + url.length
                 loaded_count += 1
-                loaded_counter.set(f"({loaded_count})")
+                loaded_counter.set(fr"({loaded_count})")
             except urllib.error.URLError as e:
                 normalWidgets()
                 return messagebox.showerror(title = "Not Connected", message = "Please check your internet connection.")
             except KeyError as e:
-                print(f"KeyError: {e}")
+                print(fr"KeyError: {e}")
                 normalWidgets()
-                return messagebox.showerror(title = "Something Went Wrong", message = f"I can't fetch '{url.title}' at the moment. Change the selected quality or try again later.")
+                return messagebox.showerror(title = "Something Went Wrong", message = fr"I can't fetch '{url.title}' at the moment. Change the selected quality or try again later.")
             except AttributeError as e:
-                print(f"AttributeError: {e}")
+                print(fr"AttributeError: {e}")
                 normalWidgets()
                 return messagebox.showerror(title = "Quality Not Available",
-                message = f"I can't fetch '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
+                message = fr"I can't fetch '{url.title}' in the quality that you chose. Change the selected quality or try again later.")
             except pytube.exceptions.LiveStreamError as e:
                 print(e)
                 normalWidgets()
-                return messagebox.showerror(title = "Video is Live", message = f"I Can't fetch '{url.title}' because it's a live video.")
+                return messagebox.showerror(title = "Video is Live", message = fr"I Can't fetch '{url.title}' because it's a live video.")
             except pytube.exceptions.AgeRestrictedError as e:
                 print(e)
                 normalWidgets()
-                return messagebox.showerror(title = "Age Restricted", message = f"'{url.title}' is age restricted.")
+                return messagebox.showerror(title = "Age Restricted", message = fr"'{url.title}' is age restricted.")
             except pytube.exceptions.MembersOnly as e:
                 print(e)
                 normalWidgets()
-                return messagebox.showerror(title = "Members Only", message = f"'{url.title}' is members only.")
+                return messagebox.showerror(title = "Members Only", message = fr"'{url.title}' is members only.")
             except pytube.exceptions.VideoPrivate as e:
                 print(e)
                 normalWidgets()
-                return messagebox.showerror(title = "Private Video", message = f"'{url.title}' is private.")
+                return messagebox.showerror(title = "Private Video", message = fr"'{url.title}' is private.")
             except pytube.exceptions.VideoRegionBlocked as e:
                 print(e)
                 normalWidgets()
-                return messagebox.showerror(title = "Region Blocked", message = f"'{url.title}' is region blocked.")
+                return messagebox.showerror(title = "Region Blocked", message = fr"'{url.title}' is region blocked.")
             except pytube.exceptions.VideoUnavailable as e:
                 print(e)
                 normalWidgets()
-                return messagebox.showerror(title = "Video Unavailable", message = f"'{url.title}' is unavailable.")
+                return messagebox.showerror(title = "Video Unavailable", message = fr"'{url.title}' is unavailable.")
             try:
                 video_id = extract.video_id(url.watch_url)
                 YouTubeTranscriptApi.list_transcripts(video_id)
                 vids_subs.append(url.watch_url)
-                print(f"({url.title}) found subtitle")
+                print(fr"({url.title}) found subtitle")
             except:
-                print(f"({url.title}) no subtitle")
+                print(fr"({url.title}) no subtitle")
                 pass
 
         # Selected labels prepare
@@ -2892,7 +2893,7 @@ def SearchWindow():
         height = 460
         x = (sDWindow.winfo_screenwidth() // 2) - (width // 2)
         y = (sDWindow.winfo_screenheight() // 2) - (height // 2)
-        sDWindow.geometry(f"{width}x{height}+{x}+{y}")
+        sDWindow.geometry(fr"{width}x{height}+{x}+{y}")
         sDWindow.maxsize(700, 460)
         sDWindow.minsize(700, 460)
         def onClosing():
@@ -2934,26 +2935,26 @@ def SearchWindow():
         customtkinter.CTkLabel(sDWindow, text = "Total Videos:", font = ("arial bold", 20)).place(x = 20 , y = 205)
         customtkinter.CTkLabel(sDWindow, text = len(to_download), font = ("arial", 20)).place(x = 151 , y = 205)
         customtkinter.CTkLabel(sDWindow, text = "Total Length:", font = ("arial bold", 20)).place(x = 20 , y = 240)
-        customtkinter.CTkLabel(sDWindow, text = f"{to_hms(total_length)}", font = ("arial", 20)).place(x = 150 , y = 240)
+        customtkinter.CTkLabel(sDWindow, text = fr"{to_hms(total_length)}", font = ("arial", 20)).place(x = 150 , y = 240)
         customtkinter.CTkLabel(sDWindow, text = "Quality:", font = ("arial bold", 20)).place(x = 20 , y = 275)
         customtkinter.CTkLabel(sDWindow, text = quality_string, font = ("arial", 20)).place(x = 96 , y = 275)
         customtkinter.CTkLabel(sDWindow, text = "Total Size:", font = ("arial bold", 20)).place(x = 20 , y = 310)
-        customtkinter.CTkLabel(sDWindow, text = f"{round(total_size/1024/1024, 2)} MB", font = ("arial", 20)).place(x = 123 , y = 310)
+        customtkinter.CTkLabel(sDWindow, text = fr"{round(total_size/1024/1024, 2)} MB", font = ("arial", 20)).place(x = 123 , y = 310)
 
         # Get thumbnail
         def download_thumbnail():
-            if messagebox.askokcancel(title = "Download Thumbnails", message = f"Do you want to download the thumbnails of all the selected videos?"):
+            if messagebox.askokcancel(title = "Download Thumbnails", message = fr"Do you want to download the thumbnails of all the selected videos?"):
                 thumb_dir = filedialog.askdirectory()
                 try:
                     for url in to_download:
                         response = requests.get(url.thumbnail_url)
                         response.raise_for_status()
-                        thumb_path = f"{thumb_dir}/{url.title}_thumbnail.png"
+                        thumb_path = fr"{thumb_dir}/{url.title}_thumbnail.png"
                         with open(thumb_path, 'wb') as file:
                             file.write(response.content)
                 except requests.exceptions.ConnectionError:
-                    return messagebox.showinfo(title = "Connection Error", message = f"Check your internet connection and try again.")
-                messagebox.showinfo(title = "Thumbnails Downloaded", message = f"Thumbnails has been downloaded successfully in '{thumb_dir}'")
+                    return messagebox.showinfo(title = "Connection Error", message = fr"Check your internet connection and try again.")
+                messagebox.showinfo(title = "Thumbnails Downloaded", message = fr"Thumbnails has been downloaded successfully in '{thumb_dir}'")
         thumbnail_button = customtkinter.CTkButton(sDWindow, text = "Download Thumbnail", font = ("arial bold", 18), command = Thread(target = download_thumbnail).start, corner_radius = 20)
         thumbnail_button.place(x = 480 , y = 260)
 
