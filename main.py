@@ -659,10 +659,66 @@ def AdvancedWindow():
         advWindow.deiconify()
 
 
+
+# Advanced Settings Window
+def AboutWindow():
+    global abtWindow
+    def onClosing():
+        abtWindow.destroy()
+        root.deiconify()
+
+    try:
+        abtWindow.deiconify()
+        root.withdraw()
+    except:
+        # Form creating
+        abtWindow = customtkinter.CTkToplevel() # Toplevel object which will be treated as a new window
+        abtWindow.withdraw()
+        abtWindow.title("About Developer")
+        width = 700
+        height = 460
+        x = (abtWindow.winfo_screenwidth() // 2) - (width // 2)
+        y = (abtWindow.winfo_screenheight() // 2) - (height // 2)
+        abtWindow.geometry(fr"{width}x{height}+{x}+{y}")
+        abtWindow.maxsize(700, 460)
+        abtWindow.minsize(700, 460)
+        if platform == "linux" or platform == "linux2": pass
+        else: abtWindow.iconbitmap("YDICO.ico")
+        abtWindow.protocol("WM_DELETE_WINDOW", onClosing)
+
+    # Back to home button
+    back_button = customtkinter.CTkButton(abtWindow, text = "Back To Home", font = ("arial bold", 20), command = onClosing, corner_radius = 20)
+    back_button.place(x = 20 , y = 420)
+
+    # About info
+    customtkinter.CTkLabel(abtWindow, text = "Developer:", font = ("arial bold", 30)).place(x = 20 , y = 15)
+    customtkinter.CTkLabel(abtWindow, text = "Mohamed Ayman", font = ("arial bold", 25)).place(x = 185 , y = 20)
+
+    customtkinter.CTkLabel(abtWindow, text = "Email:", font = ("arial bold", 30)).place(x = 20 , y = 65)
+    customtkinter.CTkLabel(abtWindow, text = "mohamedayman011324@gmail.com", font = ("arial bold", 25)).place(x = 117 , y = 70)
+
+    customtkinter.CTkLabel(abtWindow, text = "Github:", font = ("arial bold", 30)).place(x = 20 , y = 115)
+    github_label = customtkinter.CTkLabel(abtWindow, text = "github.com/mayman007", font = ("arial bold", 25), text_color="blue", cursor="hand2")
+    github_label.place(x = 137 , y = 120)
+    github_label.bind("<Button-1>", lambda e: webbrowser.open_new("http://github.com/mayman007"))
+
+    customtkinter.CTkLabel(abtWindow, text = "Website:", font = ("arial bold", 30)).place(x = 20 , y = 165)
+    website_label = customtkinter.CTkLabel(abtWindow, text = "mohamedayman.pages.dev", font = ("arial bold", 25), text_color="blue", cursor="hand2")
+    website_label.place(x = 152 , y = 170)
+    website_label.bind("<Button-1>", lambda e: webbrowser.open_new("http://mohamedayman.pages.dev"))
+
+    root.withdraw()
+    abtWindow.deiconify()
+
+
 # Advanced settings button
 advanced_quality_settings = "no"
 adv_quailty_button = customtkinter.CTkButton(root, text = "Advanced Quality Settings", width = 175, font = ("arial bold", 15), command = AdvancedWindow, corner_radius = 20)
-adv_quailty_button.place(x = 460 , y = 415)
+adv_quailty_button.place(x = 460 , y = 375)
+
+# About button
+about_button = customtkinter.CTkButton(root, text = "About Developer", width = 175, font = ("arial bold", 15), command = AboutWindow, corner_radius = 20)
+about_button.place(x = 460 , y = 415)
 
 
 # Conversion function
@@ -855,7 +911,7 @@ def DownlaodWindow():
         try: adv_checkbox.configure(state = "disabled")
         except: pass
         audio_tags_list = ["251" , "140" , "250" , "249"]
-        non_progressive_list = ["137" , "135" , "133", "160"]
+        non_progressive_list = ["137" , "22", "135" , "133", "160"]
         # Download subtitles if selected
         if caps == "yes": CaptionsDownload()
         else: pass
@@ -867,6 +923,7 @@ def DownlaodWindow():
         # If the quality is non progressive video (1080p, 480p, 240p and 144p)
         if quality in non_progressive_list:
             if quality == "137": video = url.streams.filter(res = "1080p").first()
+            elif quality == "22": video = url.streams.filter(res = "720p").first()
             elif quality == "135": video = url.streams.filter(res = "480p").first()
             elif quality == "133": video = url.streams.filter(res = "240p").first()
             elif quality == "160": video = url.streams.filter(res = "144p").first()
@@ -1049,6 +1106,10 @@ def DownlaodWindow():
             return messagebox.showerror(title = "Format Not Selected", message = "Please select a format to download.")
         elif quality == "137":
             video = url.streams.filter(res = "1080p").first()
+            audio = url.streams.get_by_itag(251)
+            size = video.filesize + audio.filesize
+        elif quality == "22":
+            video = url.streams.filter(res = "720p").first()
             audio = url.streams.get_by_itag(251)
             size = video.filesize + audio.filesize
         elif quality == "135":
@@ -1463,7 +1524,7 @@ def PlaylistWindow():
         try: adv_checkbox.configure(state = "disabled")
         except: pass
         audio_tags_list = ["251" , "140" , "250" , "249"]
-        non_progressive_list = ["137" , "135" , "133", "160"]
+        non_progressive_list = ["137" , "22", "135" , "133", "160"]
         # Progress stuff
         pytubefix.request.default_range_size = 2097152  # 2MB chunk size (update progress every 2MB)
         progress_label.configure(text_color = "green")
@@ -1496,6 +1557,7 @@ def PlaylistWindow():
                 raw_data = urllib.request.urlopen(url.thumbnail_url).read()
                 photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                 if quality == "137": video = url.streams.filter(res = "1080p").first()
+                elif quality == "22": video = url.streams.filter(res = "720p").first()
                 elif quality == "135": video = url.streams.filter(res = "480p").first()
                 elif quality == "133": video = url.streams.filter(res = "240p").first()
                 elif quality == "160": video = url.streams.filter(res = "144p").first()
@@ -1732,6 +1794,10 @@ def PlaylistWindow():
                 try:
                     if quality == "137":
                         video = url.streams.filter(res = "1080p").first()
+                        audio = url.streams.get_by_itag(251)
+                        size = video.filesize + audio.filesize
+                    elif quality == "22":
+                        video = url.streams.filter(res = "720p").first()
                         audio = url.streams.get_by_itag(251)
                         size = video.filesize + audio.filesize
                     elif quality == "135":
@@ -2570,7 +2636,7 @@ def SearchWindow():
             path_button = customtkinter.CTkButton(sDWindow, text = "Change Path", font = ("arial bold", 12), fg_color = "dim grey", width = 5, state = "disabled", corner_radius = 20)
             path_button.place(x = 430 , y = 347)
             audio_tags_list = ["251" , "140" , "250" , "249"]
-            non_progressive_list = ["137" , "135" , "133", "160"]
+            non_progressive_list = ["137" , "22", "135" , "133", "160"]
             downloaded_counter = 0
             vids_counter = len(to_download)
             r = reprlib.Repr()
@@ -2594,6 +2660,7 @@ def SearchWindow():
                     raw_data = urllib.request.urlopen(url.thumbnail_url).read()
                     photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                     if quality == "137": video = url.streams.filter(res = "1080p").first()
+                    elif quality == "22": video = url.streams.filter(res = "720p").first()
                     elif quality == "135": video = url.streams.filter(res = "480p").first()
                     elif quality == "133": video = url.streams.filter(res = "240p").first()
                     elif quality == "160": video = url.streams.filter(res = "144p").first()
@@ -2807,6 +2874,10 @@ def SearchWindow():
             try:
                 if quality == "137":
                     video = url.streams.filter(res = "1080p").first()
+                    audio = url.streams.get_by_itag(251)
+                    size = video.filesize + audio.filesize
+                elif quality == "22":
+                    video = url.streams.filter(res = "720p").first()
                     audio = url.streams.get_by_itag(251)
                     size = video.filesize + audio.filesize
                 elif quality == "135":
