@@ -23,14 +23,24 @@ import requests
 
 
 # Get config prefences from JSON
-def get_bg_theme():
-    with open("theme_config.json", "r") as f:
-        theme = json.load(f)
-    return theme["bg_theme"]
-def get_default_color():
-    with open("theme_config.json", "r") as f:
-        theme = json.load(f)
-    return theme["default_color"]
+try:
+    def get_bg_theme():
+        with open("theme_config.json", "r") as f:
+            theme = json.load(f)
+        return theme["bg_theme"]
+    def get_default_color():
+        with open("theme_config.json", "r") as f:
+            theme = json.load(f)
+        return theme["default_color"]
+except FileNotFoundError:
+    def get_bg_theme():
+        with open("_internal/theme_config.json", "r") as f:
+            theme = json.load(f)
+        return theme["bg_theme"]
+    def get_default_color():
+        with open("_internal/theme_config.json", "r") as f:
+            theme = json.load(f)
+        return theme["default_color"]
 
 # Set themes
 customtkinter.set_appearance_mode(get_bg_theme())
@@ -50,7 +60,9 @@ y = (root.winfo_screenheight() // 2) - (height // 2)
 root.geometry(fr"{width}x{height}+{x}+{y}") # Centers the window
 root.resizable(False, False)
 if platform == "linux" or platform == "linux2": pass # Linux
-else: root.iconbitmap("YDICO.ico") # Windows
+else:
+    try: root.iconbitmap("YDICO.ico") # Windows
+    except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
 root.title("YouTube Downloader")
 customtkinter.CTkLabel(root, text = "YouTube Downloader", font = ("arial bold", 45)).place(x = 140 , y = 20)
 
@@ -211,11 +223,18 @@ def changeTheme(color):
         customtkinter.set_default_color_theme(color)
         customtkinter.CTkLabel(root, text = "(Restart to take full effect)", font = ("arial", 12)).place(x = 242 , y = 415)
         to_change = "default_color"
-    with open("theme_config.json", "r", encoding="utf8") as f:
-        theme = json.load(f)
-    with open("theme_config.json", "w", encoding="utf8") as f:
-        theme[to_change] = color
-        json.dump(theme, f, sort_keys = True, indent = 4, ensure_ascii = False)
+    try:
+        with open("theme_config.json", "r", encoding="utf8") as f:
+            theme = json.load(f)
+        with open("theme_config.json", "w", encoding="utf8") as f:
+            theme[to_change] = color
+            json.dump(theme, f, sort_keys = True, indent = 4, ensure_ascii = False)
+    except FileNotFoundError:
+        with open("_internal/theme_config.json", "r", encoding="utf8") as f:
+            theme = json.load(f)
+        with open("_internal/theme_config.json", "w", encoding="utf8") as f:
+            theme[to_change] = color
+            json.dump(theme, f, sort_keys = True, indent = 4, ensure_ascii = False)
 customtkinter.CTkLabel(root, text = "Appearance Settings", font = ("arial bold", 19)).place(x = 34 , y = 340)
 customtkinter.CTkLabel(root, text = "Theme Mode: ", font = ("arial", 15)).place(x = 27 , y = 375)
 themes_menu = customtkinter.CTkOptionMenu(root, values = ["System", "Dark", "Light"], width = 110, command = changeTheme, corner_radius = 15)
@@ -396,7 +415,9 @@ def AdvancedWindow():
         advWindow.maxsize(700, 460)
         advWindow.minsize(700, 460)
         if platform == "linux" or platform == "linux2": pass
-        else: advWindow.iconbitmap("YDICO.ico")
+        else:
+            try: advWindow.iconbitmap("YDICO.ico") # Windows
+            except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
         advWindow.protocol("WM_DELETE_WINDOW", onClosing)
 
         # CRF slider function
@@ -683,7 +704,9 @@ def AboutWindow():
         abtWindow.maxsize(700, 460)
         abtWindow.minsize(700, 460)
         if platform == "linux" or platform == "linux2": pass
-        else: abtWindow.iconbitmap("YDICO.ico")
+        else:
+            try: abtWindow.iconbitmap("YDICO.ico") # Windows
+            except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
         abtWindow.protocol("WM_DELETE_WINDOW", onClosing)
 
     # Back to home button
@@ -1208,7 +1231,9 @@ def DownlaodWindow():
     newWindow.maxsize(700, 460)
     newWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
-    else: newWindow.iconbitmap("YDICO.ico")
+    else:
+        try: newWindow.iconbitmap("YDICO.ico") # Windows
+        except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
     newWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # newWindow.bind("<Return>", VideoDownloader)
 
@@ -1887,7 +1912,9 @@ def PlaylistWindow():
     pWindow.maxsize(700, 460)
     pWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
-    else: pWindow.iconbitmap("YDICO.ico")
+    else: 
+        try: pWindow.iconbitmap("YDICO.ico") # Windows
+        except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
     pWindow.protocol("WM_DELETE_WINDOW", onClosing)
     # pWindow.bind("<Return>", PlaylistDownloader)
 
@@ -2059,7 +2086,9 @@ def SearchWindow():
     sWindow.maxsize(700, 460)
     sWindow.minsize(700, 460)
     if platform == "linux" or platform == "linux2": pass
-    else: sWindow.iconbitmap("YDICO.ico")
+    else:
+        try: sWindow.iconbitmap("YDICO.ico") # Windows
+        except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
     sWindow.withdraw()
     sWindow.protocol("WM_DELETE_WINDOW", onClosing)
     global to_download
@@ -2973,7 +3002,9 @@ def SearchWindow():
             root.destroy()
         sDWindow.protocol("WM_DELETE_WINDOW", onClosing)
         if platform == "linux" or platform == "linux2": pass
-        else: sDWindow.iconbitmap("YDICO.ico")
+        else:
+            try: sDWindow.iconbitmap("YDICO.ico") # Windows
+            except FileNotFoundError: root.iconbitmap("_internal/YDICO.ico") # Windows
         # sDWindow.bind("<Return>", SearchDownloader)
 
         # Downloading label
