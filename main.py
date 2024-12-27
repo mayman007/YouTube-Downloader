@@ -675,7 +675,7 @@ def AdvancedWindow():
             print(advanced_extention)
             advWindow.withdraw()
             root.deiconify()
-            customtkinter.CTkLabel(root, text = "(Advanced Quality Settings will apply on your next downloads)", font = ("arial", 12)).place(x = 375 , y = 385)
+            customtkinter.CTkLabel(root, text = "(Advanced Quality Settings will apply on your next downloads)", font = ("arial", 12)).place(x = 360 , y = 340)
 
         # Placing the buttons
         customtkinter.CTkButton(advWindow, text = "OK", font = ("arial bold", 20), width = 120, corner_radius = 20, command = okButton).place(x = 565 , y = 415)
