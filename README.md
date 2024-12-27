@@ -108,7 +108,7 @@ py main.py
 
 ### **For Linux:**
 #### **The Easy Way:**
-Download the binary for linux from the latest [release](https://github.com/mayman007/YouTube-Downloader/releases) and install [ffmpeg](https://www.ffmpeg.org/download.html#build-linux) (`sudo apt install ffmpeg` if you're on a Debian-Based distroe)
+Download the binary for linux from the latest [release](https://github.com/mayman007/YouTube-Downloader/releases) and install [ffmpeg](https://www.ffmpeg.org/download.html#build-linux) (`sudo apt install ffmpeg` if you're on a Debian-Based distro)
 
 #### **Build From Source:**
 ##### **For Debian-Based distros (Debian, Ubuntu, Mint, etc)**
