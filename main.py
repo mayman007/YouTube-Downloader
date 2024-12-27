@@ -378,6 +378,8 @@ def whenError():
         ploading_counter_var.set("")
         adv_quailty_button = customtkinter.CTkButton(root, text = "Advanced Quality Settings", width = 175, font = ("arial bold", 15), command = AdvancedWindow, corner_radius = 20)
         adv_quailty_button.place(x = 460 , y = 375)
+        about_button = customtkinter.CTkButton(root, text = "About Developer", width = 175, font = ("arial bold", 15), command = AboutWindow, corner_radius = 20)
+        about_button.place(x = 460 , y = 415)
         link_entry.configure(state = "normal")
         search_entry.configure(state = "normal")
 
@@ -390,6 +392,8 @@ def whenOpening():
     ploading_counter_var.set("")
     adv_quailty_button = customtkinter.CTkButton(root, text = "Advanced Quality Settings", width = 175, font = ("arial bold", 15), state = "disabled", corner_radius = 20)
     adv_quailty_button.place(x = 460 , y = 375)
+    about_button = customtkinter.CTkButton(root, text = "About Developer", width = 175, font = ("arial bold", 15), state = "disabled", corner_radius = 20)
+    about_button.place(x = 460 , y = 415)
     link_entry.configure(state = "disabled")
     search_entry.configure(state = "disabled")
 
