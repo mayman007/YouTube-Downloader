@@ -1,5 +1,5 @@
 pytube==15.0.0
-pytubefix==6.9.2
+pytubefix==8.8.4
 customtkinter==5.2.2
 youtube_transcript_api==0.6.2
 pillow==10.4.0
