@@ -111,7 +111,7 @@ py main.py
 Download the binary for linux from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a> and run `sudo apt install ffmpeg` in the terminal.
 
 #### **Build From Source:**
-##### **Debian-Based distros (Debian, Ubuntu, Mint, etc)**
+##### **For Debian-Based distros (Debian, Ubuntu, Mint, etc)**
 <ol>
 <li>Install the following packages:
 
@@ -147,5 +147,5 @@ python3 main.py
 </li>
 </ol>
 
-##### **Other distros**
+##### **For other distros**
 Figure it out yourself.
