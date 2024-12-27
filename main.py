@@ -1205,7 +1205,7 @@ def DownlaodWindow():
         caps = "no"
 
     # Getting video thumbnail
-    raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+    raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg").read()
     photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
 
     # Video labels info
@@ -1267,12 +1267,12 @@ def DownlaodWindow():
     # Get thumbnail
     def download_thumbnail():
         try:
-            response = requests.get(url.thumbnail_url)
+            response = requests.get(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg")
             response.raise_for_status()  # Raise an exception if there's an error
         except requests.exceptions.ConnectionError:
             return messagebox.showinfo(title = "Connection Error", message = fr"Check your internet connection and try again.")
         thumb_dir = filedialog.askdirectory()
-        thumb_path = fr"{thumb_dir}/{url.title}_thumbnail.png"
+        thumb_path = fr"{thumb_dir}/{clean_filename(url.title)}_thumbnail.png"
         with open(thumb_path, 'wb') as file:
             file.write(response.content)
         messagebox.showinfo(title = "Thumbnail Downloaded", message = fr"Thumbnail has been downloaded successfully in '{thumb_dir}'")
@@ -1584,7 +1584,7 @@ def PlaylistWindow():
                 toggle_button.place(x = 550 , y = 347)
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
-                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg").read()
                 photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                 if quality == "137": video = url.streams.filter(res = "1080p").first()
                 elif quality == "22": video = url.streams.filter(res = "720p").first()
@@ -1703,7 +1703,7 @@ def PlaylistWindow():
                 toggle_button.place(x = 550 , y = 347)
                 cancel_button = customtkinter.CTkButton(pWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                 cancel_button.place(x = 595 , y = 347)
-                raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg").read()
                 photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                 video = url.streams.get_by_itag(quality)
                 size = video.filesize
@@ -1883,7 +1883,7 @@ def PlaylistWindow():
 
     # Getting playlist thumbnail
     try:
-        raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+        raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg").read()
         photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
     except UnboundLocalError:
         whenError()
@@ -1964,9 +1964,9 @@ def PlaylistWindow():
                 for url in urls_list:
                     # Below line doesn't work properly for some reason
                     # if fr"✔️ {p.repr(clean_filename(url.title))} | {to_hms(url.length)} | {round(size/1024/1024, 2)} MB" in vids_list:
-                    response = requests.get(url.thumbnail_url)
+                    response = requests.get(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg")
                     response.raise_for_status()
-                    thumb_path = fr"{thumb_dir}/{url.title}_thumbnail.png"
+                    thumb_path = fr"{thumb_dir}/{clean_filename(url.title)}_thumbnail.png"
                     with open(thumb_path, 'wb') as file:
                         file.write(response.content)
             except requests.exceptions.ConnectionError:
@@ -2424,13 +2424,13 @@ def SearchWindow():
 
         # Get thumbnails
         try:
-            raw_data = urllib.request.urlopen(url1.thumbnail_url).read()
+            raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url1.video_id}/maxresdefault.jpg").read()
             thumb1 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-            raw_data = urllib.request.urlopen(url2.thumbnail_url).read()
+            raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url2.video_id}/maxresdefault.jpg").read()
             thumb2 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-            raw_data = urllib.request.urlopen(url3.thumbnail_url).read()
+            raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url3.video_id}/maxresdefault.jpg").read()
             thumb3 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
-            raw_data = urllib.request.urlopen(url4.thumbnail_url).read()
+            raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url4.video_id}/maxresdefault.jpg").read()
             thumb4 = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (160 , 90))
         except UnboundLocalError:
             whenError()
@@ -2691,7 +2691,7 @@ def SearchWindow():
                     toggle_button.place(x = 550 , y = 347)
                     cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                     cancel_button.place(x = 595 , y = 347)
-                    raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                    raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg").read()
                     photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                     if quality == "137": video = url.streams.filter(res = "1080p").first()
                     elif quality == "22": video = url.streams.filter(res = "720p").first()
@@ -2812,7 +2812,7 @@ def SearchWindow():
                     toggle_button.place(x = 550 , y = 347)
                     cancel_button = customtkinter.CTkButton(sDWindow, text = "Cancel", font = ("arial bold", 12), fg_color = "red2", width = 80, height = 26, command = cancel_download, corner_radius = 20)
                     cancel_button.place(x = 595 , y = 347)
-                    raw_data = urllib.request.urlopen(url.thumbnail_url).read()
+                    raw_data = urllib.request.urlopen(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg").read()
                     photo = customtkinter.CTkImage(light_image = Image.open(io.BytesIO(raw_data)), dark_image = Image.open(io.BytesIO(raw_data)), size = (270 , 150))
                     video = url.streams.get_by_itag(quality)
                     title_var.set(r.repr(url.title))
@@ -3054,9 +3054,9 @@ def SearchWindow():
                 thumb_dir = filedialog.askdirectory()
                 try:
                     for url in to_download:
-                        response = requests.get(url.thumbnail_url)
+                        response = requests.get(f"https://img.youtube.com/vi/{url.video_id}/maxresdefault.jpg")
                         response.raise_for_status()
-                        thumb_path = fr"{thumb_dir}/{url.title}_thumbnail.png"
+                        thumb_path = fr"{thumb_dir}/{clean_filename(url.title)}_thumbnail.png"
                         with open(thumb_path, 'wb') as file:
                             file.write(response.content)
                 except requests.exceptions.ConnectionError:
