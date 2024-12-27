@@ -78,14 +78,14 @@
 ## Installation Guide
 ### **For Windows:**
 #### **The Easy Way:**
-Download the exe from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>.
+Download the exe from the latest [release](https://github.com/mayman007/YouTube-Downloader/releases).
 
 #### **Build From Source:**
 
 <ol>
 <li>Install <a href = "https://www.python.org/downloads/">python</a> and <a href = "https://git-scm.com/downloads">git</a> and add them to the path</li>
 
-<li>Download <a href = "https://ffmpeg.org/download.html">ffmpeg</a> and add it to the path or put ffmpeg.exe in the same folder as the script</li>
+<li>Download <a href = "https://www.ffmpeg.org/download.html#build-windows">ffmpeg</a> and add it to the path or put ffmpeg.exe in the same folder as the script</li>
 
 <li>Git-clone this repo & change directory</li>
 
@@ -108,7 +108,7 @@ py main.py
 
 ### **For Linux:**
 #### **The Easy Way:**
-Download the binary for linux from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a> and run `sudo apt install ffmpeg` in the terminal.
+Download the binary for linux from the latest [release](https://github.com/mayman007/YouTube-Downloader/releases) and install [ffmpeg](https://www.ffmpeg.org/download.html#build-linux) (`sudo apt install ffmpeg` if you're on a Debian-Based distroe)
 
 #### **Build From Source:**
 ##### **For Debian-Based distros (Debian, Ubuntu, Mint, etc)**
@@ -149,3 +149,7 @@ python3 main.py
 
 ##### **For other distros**
 Figure it out yourself.
+
+## Support
+
+Have questions, feedback, or issues? open an [issue](https://github.com/mayman007/YouTube-Downloader/issues)
