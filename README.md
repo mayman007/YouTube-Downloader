@@ -78,7 +78,7 @@
 ## Installation Guide
 ### **For Windows:**
 #### **The Easy Way:**
-Download the binary from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>.
+Download the exe from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a>.
 
 #### **Build From Source:**
 
@@ -111,6 +111,7 @@ py main.py
 Download the binary for linux from the latest <a href = "https://github.com/Shinobi7k/YouTube-Downloader/releases">release</a> and run `sudo apt install ffmpeg` in the terminal.
 
 #### **Build From Source:**
+##### **Debian-Based distros (Debian, Ubuntu, Mint, etc)**
 <ol>
 <li>Install the following packages:
 
@@ -145,3 +146,6 @@ python3 main.py
 ```
 </li>
 </ol>
+
+##### **Other distros**
+Figure it out yourself.
