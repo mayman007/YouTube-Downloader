@@ -1,12 +1,15 @@
 <div align = "center">
 <img src = "YDICO.ico" width = 200></img>
-</div>
+
 
 # **YouTube Downloader**
 
 <!-- for github badges (buttons) https://shields.io/ -->
 
 > **Simple & modern YouTube Downloader to download videos, playlists, subtitles and search queries.**
+
+<a href='https://github.com/mayman007/YouTube-Downloader/releases'><img alt='Get it on GitHub' src='https://i.imgur.com/MQgAiVO.png' width="300"/></a><br>
+</div>
 
 ## Features
 <ul>
