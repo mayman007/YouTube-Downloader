@@ -1,3 +1,4 @@
+import re
 from tkinter import *
 from tkinter import filedialog, messagebox
 import customtkinter
@@ -163,9 +164,24 @@ search_entry = customtkinter.CTkEntry(root, width = 345, textvariable = search_v
 search_entry.place(x = 100 , y = 260)
 search_entry.bind("<Button-3>", searchRightClickMenu)
 
+def check_youtube_link(link):
+    video_pattern = re.compile(r"(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w\-]+")
+    playlist_pattern = re.compile(r"(https?://)?(www\.)?youtube\.com/playlist\?list=[\w\-]+")
+    if playlist_pattern.match(link):
+        return "Playlist Link"
+    elif video_pattern.match(link):
+        return "Video Link"
+    else:
+        return "Invalid YouTube Link"
+
 # Quality selections for downloads
 quality_var = IntVar()
 def downloadQualitySelect(quality):
+    url_text = link_var.get()
+    url_validaty = check_youtube_link(url_text)
+    if url_validaty == "Invalid YouTube Link":
+        whenError()
+        return messagebox.showerror(title = "URL is invalid", message = "Please enter a vaild URL.")
     if quality == "Video: 1080p": quality_var.set(137)
     elif quality == "Video: 720p": quality_var.set(22)
     elif quality == "Video: 480p": quality_var.set(135)
@@ -179,7 +195,7 @@ def downloadQualitySelect(quality):
     else: quality_var.set(0)
     global link
     link = link_var.get()
-    if "playlist" in link: threading.Thread(target = PlaylistWindow).start()
+    if url_validaty == "Playlist Link": threading.Thread(target = PlaylistWindow).start()
     else: threading.Thread(target = DownlaodWindow).start()
     loading_optionmenu = download_optionmenu
     threading.Thread(target = Loading, args = (loading_optionmenu,)).start()
@@ -191,6 +207,13 @@ download_optionmenu.set("Download")
 # Quality selections for search
 quality_var = IntVar()
 def searchQualitySelect(quality):
+    search_text = search_var.get()
+    if search_text == "":
+        whenError()
+        return messagebox.showerror(title = "Entry is Empty", message = "Please type something.")
+    elif len(search_text) < 3:
+        whenError()
+        return messagebox.showerror(title = "Characters Not Enough", message = "Please type at least 3 characters.")
     if quality == "Video: 1080p": quality_var.set(137)
     elif quality == "Video: 720p": quality_var.set(22)
     elif quality == "Video: 480p": quality_var.set(135)
@@ -2078,12 +2101,6 @@ def SearchWindow():
     whenOpening()
     # Window creating
     search_text = search_var.get()
-    if search_text == "":
-        whenError()
-        return messagebox.showerror(title = "Entry is Empty", message = "Please type something.")
-    elif len(search_text) < 3:
-        whenError()
-        return messagebox.showerror(title = "Characters Not Enough", message = "Please type at least 3 characters.")
     quality = str(quality_var.get())
     if quality == "0":
         whenError()
